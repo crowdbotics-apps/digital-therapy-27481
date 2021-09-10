@@ -12,6 +12,8 @@ target 'digital_therapy_27481' do
     :hermes_enabled => false
   )
 
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'digital_therapy_27481Tests' do
     inherit! :complete
     # Pods for testing
