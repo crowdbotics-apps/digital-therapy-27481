@@ -187,6 +187,7 @@ class LoginScreen extends Component {
             >
               <TouchableOpacity
                 onPress={() => {
+                  this.props.navigation.navigate("HomeScreen")
                   // if (!this.state.submitting) {
                   //   if (this.state.email != "") {
                   //     this.signIn(this.state.email)

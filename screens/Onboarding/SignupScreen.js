@@ -260,6 +260,7 @@ class SignupScreen extends Component {
             >
               <TouchableOpacity
                 onPress={() => {
+                  this.props.navigation.navigate("ForgotScreen")
                   // if (!this.state.submitting) {
                   //   if (this.state.email != "") {
                   //     this.signIn(this.state.email)

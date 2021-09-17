@@ -1,190 +1,141 @@
-import React, {Component} from 'react';
+import React from "react"
 import {
   View,
-  Platform,
-  ActivityIndicator,
-  ImageBackground,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import MainStyle from '../../Styles/ButtonStyle';
-// import Button from '../../src/component/Button';
-import axios from 'axios';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {
-  Container,
-  Content,
-  Form,
-  Item,
-  Input,
-  Label,
-  Button,
-  Toast,
   Text,
-  Icon,
-} from 'native-base';
-import Theme from '../../Styles/Theme';
-import qs from 'qs';
-import strings from '../../Localization';
-import {NavigationActions, StackActions} from 'react-navigation';
-import {
-  BaseURL,
-  Header,
-  iosConfig,
-  androidConfig,
-} from '../../Connection/index';
-import CodePin from 'react-native-pin-code';
-class ForgotPassword extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      email: '',
-      loading: false,
-      otp: '',
-      submitting: false,
-      received: false,
-      confirmPassword: '',
-      password: '',
-      confirmPassError: false,
-    };
-  }
-  componentDidMount() {
-    console.warn(this.props.navigation.getParam('UserId', -1));
-  }
-  render() {
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: 'flex-start',
-          backgroundColor: 'white',
-        }}>
-        <View style={{flex: 1}}>
-          <View style={Styles.ImageContainer}>
-            <Image
-              source={require('../../assets/logo.png')}
-              style={Styles.logoStyle}
-              resizeMode="contain"
-            />
-          </View>
-          <Form style={Styles.formStyle}>
-            <View style={{marginVertical: 10}}>
-              {/* <Text>Enter New Password</Text> */}
-              <Item>
-                <Input
-                  style={Styles.inputStyle}
-                  placeholder="Password"
-                  autoCapitalize="none"
-                  secureTextEntry
-                  onChangeText={(text) => {
-                    this.setState({password: text});
-                  }}
-                />
-              </Item>
-            </View>
-          </Form>
-          <Form style={Styles.formStyle}>
-            <View style={{marginVertical: 10}}>
-              {/* <Text>Confirm Password</Text> */}
-              <Item error={this.state.confirmPassError}>
-                <Input
-                  style={Styles.inputStyle}
-                  placeholder="Confirm Password"
-                  autoCapitalize="none"
-                  secureTextEntry
-                  onChangeText={(text) => {
-                    this.setState({confirmPassword: text});
-                  }}
-                />
-              </Item>
-            </View>
-          </Form>
+  TextInput,
+  StyleSheet,
+  Button,
+  TouchableOpacity
+} from "react-native"
+import Theme from "../../Styles/Theme"
+import Icon from "react-native-vector-icons/MaterialIcons"
+import strings from "../../Localization"
 
-          <Button
-            onPress={() => {
-              if (this.state.password != '') {
-                if (this.state.password === this.state.confirmPassword) {
-                  !this.state.submitting
-                    ? this.updatePassword(
-                        this.props.navigation.getParam('UserId', -1),
-                        this.state.password,
-                      )
-                    : null;
-                } else {
-                  this.setState({confirmPassError: true});
-                  Toast.show({text: 'Password does not match'});
-                }
-              } else {
-                Toast.show({text: 'Password cannot be blank'});
-              }
-            }}
-            info
-            style={{
-              width: '80%',
-              marginVertical: 20,
-              justifyContent: 'center',
-              alignSelf: 'center',
-            }}>
-            {this.state.submitting ? (
-              <ActivityIndicator size="small" color="white" />
-            ) : (
-              <Text style={{textAlign: 'center'}}>Update Password</Text>
-            )}
-          </Button>
+const RecoverPassword = ({ navigation }) => {
+  return (
+    <View style={{ flex: 1 }}>
+      <Text style={styles.fStyle}>{strings.createNewPassowrd} </Text>
+
+      <View>
+        <Text style={styles.textStyle}>{strings.typeInPassword}</Text>
+      </View>
+
+      <View
+        style={{
+          alignItems: "flex-end",
+          // flexDirection: "row",
+          justifyContent: "center",
+          flex: 0.8
+        }}
+      >
+        {/* Password */}
+        <View style={styles.inputStyle}>
+          <Icon name="lock" size={18} />
+          <TextInput
+            style={styles.textInputStyle}
+            placeholder="Password"
+            autoCapitalize="none"
+            secureTextEntry
+          />
         </View>
-      </ScrollView>
-    );
-  }
-  updatePassword(userid, password) {
-    var self = this;
-    self.setState({submitting: true});
-    axios
-      .post(
-        BaseURL.concat(
-          'api/ShoeCleaning/UpdateForgotPassowrd?UserId=' +
-            userid +
-            '&Password=' +
-            password,
-        ),
-        {},
-        {
-          headers: Header,
-        },
-      )
-      .then((res) => {
-        if (res.data.success) {
-          Toast.show({text: 'Password updated successfully'}, 3000);
-          self.props.navigation.popToTop();
-          console.warn(res.data);
-        }
-      })
-      .catch(function (error) {
-        console.warn(error);
-        Toast.show({text: 'Something went wrong'}, 3000);
-        self.setState({loading: false});
-      })
-      .finally(() => self.setState({submitting: false}));
-  }
+        {/* Confirm Password */}
+        <View style={styles.inputStyle}>
+          <Icon name="lock" size={18} />
+          <TextInput
+            style={styles.textInputStyle}
+            placeholder="Confirm Password"
+            autoCapitalize="none"
+            secureTextEntry
+          />
+        </View>
+      </View>
+      <View style={styles.signInBackground}>
+        <TouchableOpacity
+          style={styles.signInTextBackground}
+          // onPress={() => navigation.navigate("HomeScreen")}
+        >
+          <Text style={styles.signInColorTextBackground}>
+            {" "}
+            {strings.changePassword}{" "}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
 }
-const Styles = StyleSheet.create({
-  ImageContainer: {flex: 0.2, justifyContent: 'center', alignItems: 'center'},
-  logoStyle: {width: 100, height: 100},
-  formStyle: {
-    justifyContent: 'center',
-    width: '90%',
-    alignSelf: 'center',
-  },
-  inputStyle: {marginVertical: 10, marginVertical: 10},
-  lineStyle: {
-    flex: 1,
-    backgroundColor: 'black',
-    height: 1,
-    width: '100%',
-  },
-  socialButton: {
-    justifyContent: 'center',
-  },
-});
 
-export default ForgotPassword;
+const styles = StyleSheet.create({
+  ViewStyle: {
+    justifyContent: "center",
+    flex: 1,
+    width: "90%",
+    alignSelf: "center"
+  },
+  textInputStyle: { flex: 1, paddingLeft: 15 },
+
+  inputStyle: {
+    flexDirection: "row",
+    marginVertical: 10,
+    borderBottomColor: Theme.TEXTINPUT_BORDER_COLOR,
+    borderBottomWidth: 1,
+    // justifyContent: 'center',
+    alignItems: "center",
+    width: "90%",
+    alignSelf: "center"
+  },
+  fStyle: {
+    marginHorizontal: 15,
+    top: 70,
+    color: Theme.THEME_COLOR,
+    fontSize: 30,
+    fontWeight: "bold"
+  },
+
+  textStyle: {
+    marginTop: 100,
+    marginHorizontal: 22,
+    color: "grey"
+  },
+
+  emailStyle: {
+    top: 50,
+    borderBottomColor: "black",
+    borderBottomWidth: 0.8,
+    margin: 39
+  },
+
+  emailIconStyle: {
+    top: 100,
+    marginHorizontal: 40
+  },
+
+  emailTextStyle: {
+    fontSize: 16,
+    marginHorizontal: 50,
+    bottom: 10
+  },
+
+  signInBackground: {
+    backgroundColor: Theme.THEME_COLOR,
+    height: 45,
+
+    borderRadius: 6,
+    marginHorizontal: 39
+  },
+
+  signInTextBackground: {
+    height: "100%",
+    width: "100%",
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center"
+  },
+
+  signInColorTextBackground: {
+    fontSize: 16,
+    color: "white"
+    // fontWeight: "bold"
+  }
+})
+
+export default RecoverPassword

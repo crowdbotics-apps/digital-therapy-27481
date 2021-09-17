@@ -1,120 +1,89 @@
-import React, {Component} from 'react';
+import React from "react"
 import {
   View,
-  Platform,
-  ActivityIndicator,
-  ImageBackground,
-  Image,
-  StyleSheet,
-} from 'react-native';
-import MainStyle from '../../Styles/ButtonStyle';
-// import Button from '../../src/component/Button';
-import axios from 'axios';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import {
-  Container,
-  Content,
-  Form,
-  Item,
-  Input,
-  Label,
-  Button,
-  Toast,
   Text,
-  Icon,
-} from 'native-base';
-import Theme from '../../Styles/Theme';
-import qs from 'qs';
-import strings from '../../Localization';
-import {NavigationActions, StackActions} from 'react-navigation';
-import {
-  BaseURL,
-  Header,
-  iosConfig,
-  androidConfig,
-} from '../../Connection/index';
+  TextInput,
+  StyleSheet,
+  Button,
+  TouchableOpacity
+} from "react-native"
+import OTPInputView from "@twotalltotems/react-native-otp-input"
+import Theme from "../../Styles/Theme"
+import strings from "../../Localization"
 
-class OtpScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {email: '', password: '', loading: false};
-  }
-  render() {
-    return (
-      <View style={{flex: 1, justifyContent: 'center'}}>
-        <View style={Styles.ImageContainer}>
-          <Image
-            source={require('../../assets/logo.png')}
-            style={Styles.logoStyle}
-            resizeMode="contain"
-          />
-        </View>
-        <Form style={Styles.formStyle}>
-          <Text style={{textAlign: 'center'}}>{strings.otpText}</Text>
+const OTPScreen = ({ navigation }) => {
+  return (
+    <View>
+      <Text style={styles.forgotStyling}>
+        Please Enter {"\n"}
+        The Code{" "}
+      </Text>
 
-          <Form>
-            <Text style={{marginLeft: 15, color: 'gray', fontSize: 12}}>
-              {strings.phonefull}
-            </Text>
-            <Item>
-              <Input
-                style={Styles.inputStyle}
-                placeholder="Phone Number"
-                keyboardType="phone-pad"
-                defaultValue="+49"
-              />
-            </Item>
-
-            <Button
-              info
-              style={{
-                width: '100%',
-                marginVertical: 20,
-                justifyContent: 'center',
-              }}>
-              <Text style={{textAlign: 'center'}}>{strings.otpButton}</Text>
-            </Button>
-          </Form>
-          <Form
-            style={{
-              alignItems: 'center',
-              width: '100%',
-              marginTop: 0,
-            }}>
-            <TouchableOpacity style={{marginTop: 0}}>
-              <Text style={{}}>{strings.dataRates}</Text>
-            </TouchableOpacity>
-          </Form>
-          <TouchableOpacity
-            onPress={() => this.props.navigation.goBack()}
-            style={{marginTop: 0}}>
-            <Text style={{textAlign: 'center'}}>{strings.backLogin}</Text>
-          </TouchableOpacity>
-        </Form>
+      <View>
+        <OTPInputView
+          code="123456"
+          style={{ width: "80%", height: 200 }}
+          pinCount={4}
+          codeInputFieldStyle={styles.underlineStyleBase}
+        />
       </View>
-    );
-  }
-}
-const Styles = StyleSheet.create({
-  ImageContainer: {flex: 0.2, justifyContent: 'center', alignItems: 'center'},
-  logoStyle: {width: 100, height: 100},
-  formStyle: {
-    justifyContent: 'space-evenly',
-    flex: 0.5,
-    width: '90%',
-    alignSelf: 'center',
-    marginVertical: 20,
-  },
-  inputStyle: {marginVertical: 5},
-  lineStyle: {
-    flex: 1,
-    backgroundColor: 'black',
-    height: 1,
-    width: '100%',
-  },
-  socialButton: {
-    justifyContent: 'center',
-  },
-});
 
-export default OtpScreen;
+      <TouchableOpacity
+        style={styles.continueTextButtonStyle}
+        onPress={() => navigation.navigate("RecoverPassword")}
+      >
+        <Text style={styles.continueTextColor}> {strings.continue} </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => navigation.navigate("ForgotScreen")}>
+        <Text style={styles.resendCodeStyling}>{strings.resendCode}</Text>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  forgotStyling: {
+    marginHorizontal: 20,
+    marginTop: 50,
+    fontSize: 30,
+    fontWeight: "bold",
+    color: Theme.THEME_COLOR
+  },
+  underlineStyleBase: {
+    left: 35,
+    width: 35,
+    height: 45,
+    borderBottomColor: "black",
+    borderWidth: 0,
+    borderBottomWidth: 3
+  },
+
+  continueTextButtonStyle: {
+    backgroundColor: Theme.THEME_COLOR,
+    height: 45,
+    borderRadius: 5,
+    margin: 30,
+    bottom: 30
+  },
+
+  continueTextColor: {
+    fontSize: 20,
+    color: "white",
+    fontWeight: "100",
+    flexDirection: "row",
+    alignSelf: "center",
+    right: 10,
+    top: 10
+  },
+
+  resendCodeStyling: {
+    fontSize: 15,
+    fontWeight: "bold",
+    color: Theme.THEME_COLOR,
+    flexDirection: "row",
+    alignSelf: "center"
+  }
+})
+
+export default OTPScreen
