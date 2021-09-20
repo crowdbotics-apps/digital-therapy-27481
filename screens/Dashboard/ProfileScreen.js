@@ -21,6 +21,7 @@ import {
 import { getNavigationScreen } from "@screens"
 import Theme from "../../Styles/Theme"
 import HeaderWhite from "../../Component/HeaderWhite"
+// edited
 export class ProfileScreen extends React.Component {
   constructor(props) {
     super(props)
