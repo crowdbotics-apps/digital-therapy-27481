@@ -20,6 +20,8 @@ import {
 } from "react-native-responsive-screen"
 import { getNavigationScreen } from "@screens"
 import Theme from "../../Styles/Theme"
+
+// edited
 export class Blank extends React.Component {
   constructor(props) {
     super(props)
