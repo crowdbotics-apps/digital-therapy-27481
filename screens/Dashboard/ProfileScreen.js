@@ -36,7 +36,12 @@ export class ProfileScreen extends React.Component {
         style={styles.ScrollView_1}
       >
         <View style={{ flex: 1 }}>
-          <HeaderWhite text="Profile Info" />
+          <HeaderWhite
+            onPress={() => {
+              this.props.navigation.goBack()
+            }}
+            text="Profile Info"
+          />
           <View
             style={{
               flex: 0.2,

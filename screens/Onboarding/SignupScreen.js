@@ -135,7 +135,7 @@ class SignupScreen extends Component {
           backgroundColor: Theme.THEME_WHITE
         }}
       >
-        <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, alignItems: "center" }}>
           <View style={[Styles.ViewStyle, { flex: 0.3, alignSelf: "center" }]}>
             <Text style={MainStyle.textStyleHeading}>{strings.signup}</Text>
             {/* <Image
@@ -147,7 +147,10 @@ class SignupScreen extends Component {
           <View
             style={[
               Styles.ViewStyle,
-              { justifyContent: "flex-start", flex: 0.7 }
+              {
+                justifyContent: "flex-start",
+                flex: 0.7
+              }
             ]}
           >
             {/* name */}
