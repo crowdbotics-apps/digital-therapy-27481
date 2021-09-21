@@ -12,6 +12,7 @@
     "web-build": "react-app-rewired build && mkdir -p backend/web_build && cp -R build/* backend/web_build"
   },
   "dependencies": {
+    "@ptomasroos/react-native-multi-slider": "^2.2.2",
     "@react-native-async-storage/async-storage": "^1.15.7",
     "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/google-signin": "^5.0.0",
@@ -27,9 +28,12 @@
     "native-base": "^3.1.0",
     "react": "17.0.1",
     "react-native": "0.64.0",
+    "react-native-android-keyboard-adjust": "^1.2.0",
+    "react-native-camera": "^4.2.0",
     "react-native-dotenv": "^2.5.3",
     "react-native-dropdown-picker": "^5.1.27",
     "react-native-elements": "^3.4.2",
+    "react-native-fs": "^2.18.0",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-localization": "^2.1.7",
     "react-native-reanimated": "^2.0.0",
@@ -39,6 +43,7 @@
     "react-native-storage": "^1.0.1",
     "react-native-toast-message": "^1.6.0",
     "react-native-vector-icons": "^8.1.0",
+    "react-native-video": "^5.1.1",
     "react-redux": "^7.2.5",
     "redux": "^4.1.1"
   },

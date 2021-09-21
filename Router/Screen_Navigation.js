@@ -12,6 +12,7 @@ import RecoverPassword from "../screens/Onboarding/RecoverPassword"
 import HomeScreen from "../screens/Dashboard/HomeScreen"
 import ProfileScreen from "../screens/Dashboard/ProfileScreen"
 import NewConversation from "../screens/Dashboard/NewConversation"
+import Camera from "../screens/Record/Camera"
 
 const Stack = createStackNavigator()
 
@@ -65,6 +66,11 @@ function App() {
         options={{ headerShown: false }}
         name="NewConversation"
         component={NewConversation}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="Camera"
+        component={Camera}
       />
     </Stack.Navigator>
   )

@@ -1,9 +1,12 @@
 import React from "react"
 import { StyleSheet, View, Text } from "react-native"
 import ScreenNavigation from "../Router/Screen_Navigation"
+import Toast from "react-native-toast-message"
 const YourApp = () => {
   return (
     <View style={styles.container}>
+      <Toast ref={ref => Toast.setRef(ref)} />
+
       <ScreenNavigation />
     </View>
   )

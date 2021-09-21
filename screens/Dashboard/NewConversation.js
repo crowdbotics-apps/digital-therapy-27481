@@ -198,7 +198,12 @@ export class NewConversation extends React.Component {
                 alignItems: "center"
               }}
             >
-              <TouchableOpacity style={{}}>
+              <TouchableOpacity
+                style={{}}
+                onPress={() => {
+                  this.props.navigation.navigate("Camera")
+                }}
+              >
                 <View
                   style={{
                     width: 80,
