@@ -117,7 +117,12 @@ export class Blank extends React.Component {
                   justifyContent: "space-between"
                 }}
               >
-                <TouchableOpacity style={styles.roundButtonLarge}>
+                <TouchableOpacity
+                  style={styles.roundButtonLarge}
+                  onPress={() => {
+                    this.props.navigation.navigate("NewConversation")
+                  }}
+                >
                   <View
                     style={{
                       borderWidth: 2,

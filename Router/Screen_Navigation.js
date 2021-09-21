@@ -11,6 +11,7 @@ import ForgotScreen from "../screens/Onboarding/ForgotPassword"
 import RecoverPassword from "../screens/Onboarding/RecoverPassword"
 import HomeScreen from "../screens/Dashboard/HomeScreen"
 import ProfileScreen from "../screens/Dashboard/ProfileScreen"
+import NewConversation from "../screens/Dashboard/NewConversation"
 
 const Stack = createStackNavigator()
 
@@ -59,6 +60,11 @@ function App() {
         options={{ headerShown: false }}
         name="ProfileScreen"
         component={ProfileScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="NewConversation"
+        component={NewConversation}
       />
     </Stack.Navigator>
   )
