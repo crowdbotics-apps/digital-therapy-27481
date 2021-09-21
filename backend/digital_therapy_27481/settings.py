@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
-import os
-import environ
 import logging
+import os
+
+import environ
 
 env = environ.Env()
 
@@ -51,6 +52,7 @@ LOCAL_APPS = [
     'home',
     'modules',
     'users.apps.UsersConfig',
+    'conversation'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -162,7 +164,8 @@ AUTHENTICATION_BACKENDS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'web_build/static')]
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(
+    BASE_DIR, 'web_build/static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # allauth / users
@@ -178,7 +181,8 @@ LOGIN_REDIRECT_URL = "users:redirect"
 ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 ACCOUNT_ALLOW_REGISTRATION = env.bool("ACCOUNT_ALLOW_REGISTRATION", True)
-SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool("SOCIALACCOUNT_ALLOW_REGISTRATION", True)
+SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool(
+    "SOCIALACCOUNT_ALLOW_REGISTRATION", True)
 
 REST_AUTH_SERIALIZERS = {
     # Replace password reset serializer to fix 500 error
@@ -187,6 +191,14 @@ REST_AUTH_SERIALIZERS = {
 REST_AUTH_REGISTER_SERIALIZERS = {
     # Use custom serializer that has no username and matches web signup
     "REGISTER_SERIALIZER": "home.api.v1.serializers.SignupSerializer",
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 25
 }
 
 # Custom user model
@@ -221,9 +233,9 @@ if USE_S3:
     DEFAULT_FILE_STORAGE = env.str(
         "DEFAULT_FILE_STORAGE", "home.storage_backends.MediaStorage"
     )
+    AWS_S3_SIGNATURE_VERSION = 's3v4'
     MEDIA_URL = '/mediafiles/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-
 
 
 # start fcm_django push notifications
@@ -241,5 +253,6 @@ SWAGGER_SETTINGS = {
 if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
     # output email to console instead of sending
     if not DEBUG:
-        logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+        logging.warning(
+            "You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
