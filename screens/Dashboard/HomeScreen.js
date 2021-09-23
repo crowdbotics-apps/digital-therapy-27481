@@ -45,7 +45,12 @@ export class Blank extends React.Component {
               justifyContent: "space-evenly"
             }}
           >
-            <TouchableOpacity style={styles.roundButton}>
+            <TouchableOpacity
+              onPress={() => {
+                this.props.navigation.navigate("GuideScreen")
+              }}
+              style={styles.roundButton}
+            >
               <Icon name="more-horiz" size={30} color={"#666666"} />
             </TouchableOpacity>
             <View>
@@ -140,7 +145,12 @@ export class Blank extends React.Component {
                     />
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.roundButtonLarge}>
+                <TouchableOpacity
+                  style={styles.roundButtonLarge}
+                  onPress={() => {
+                    this.props.navigation.navigate("ReceivedVideos")
+                  }}
+                >
                   <View
                     style={{
                       borderWidth: 2,
@@ -173,6 +183,9 @@ export class Blank extends React.Component {
                   elevation: 0
                 }
               ]}
+              onPress={() => {
+                this.props.navigation.navigate("SentVideos")
+              }}
             >
               <View
                 style={{
@@ -272,6 +285,8 @@ export class Blank extends React.Component {
                 }}
                 onPress={() => {
                   this.setState({ home: false, account: true, profile: false })
+
+                  this.props.navigation.navigate("SelfVideos")
                 }}
               >
                 <Image

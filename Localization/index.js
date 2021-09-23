@@ -45,7 +45,7 @@ let strings = new LocalizedStrings({
     other: "Other",
     home: "HOME",
     favorites: "FAVORITES",
-    invitefriends: "INVITE FRIENDS",
+    invite: "INVITE",
     settings: "SETTINGS",
     about: "ABOUT",
     phone: "Phone",

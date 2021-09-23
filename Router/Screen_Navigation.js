@@ -13,6 +13,12 @@ import HomeScreen from "../screens/Dashboard/HomeScreen"
 import ProfileScreen from "../screens/Dashboard/ProfileScreen"
 import NewConversation from "../screens/Dashboard/NewConversation"
 import Camera from "../screens/Record/Camera"
+import SelfVideos from "../screens/Dashboard/SelfVideos"
+import SentVideos from "../screens/Dashboard/SentVideos"
+import ReceivedVideos from "../screens/Dashboard/ReceivedVideos"
+import InviteScreen from "../screens/Dashboard/InviteScreen"
+import SpeakerScreen from "../screens/Dashboard/SpeakerScreen"
+import GuideScreen from "../screens/Dashboard/GuideScreen"
 
 const Stack = createStackNavigator()
 
@@ -71,6 +77,36 @@ function App() {
         options={{ headerShown: false }}
         name="Camera"
         component={Camera}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="SelfVideos"
+        component={SelfVideos}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="SentVideos"
+        component={SentVideos}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="ReceivedVideos"
+        component={ReceivedVideos}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="InviteScreen"
+        component={InviteScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="SpeakerScreen"
+        component={SpeakerScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="GuideScreen"
+        component={GuideScreen}
       />
     </Stack.Navigator>
   )

@@ -26,7 +26,7 @@ export default StyleSheet.create({
     padding: 5,
     elevation: 3,
     height: 50,
-    width: 250
+    width: "90%"
   },
   inputStyle: {
     width: 200,
@@ -90,8 +90,8 @@ export default StyleSheet.create({
     textAlign: "center"
   },
   textStyleHeading: {
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 26,
+    fontWeight: "800",
     color: Theme.THEME_TEXT,
     marginVertical: 10
   },

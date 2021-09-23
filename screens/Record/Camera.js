@@ -124,19 +124,20 @@ class CameraView extends Component {
     } else {
       this.setState({ isAuthorized: true, isAuthorizationChecked: true })
     }
-    BackHandler.addEventListener(
-      "hardwareBackPress",
-      this.handleBackButtonClick
-    )
+    // BackHandler.addEventListener(
+    //   "hardwareBackPress"
+    //   // this.handleBackButtonClick
+    // )
   }
-  componentWillUnmount() {
-    BackHandler.removeEventListener(
-      "hardwareBackPress",
-      this.handleBackButtonClick
-    )
-  }
+  // componentWillUnmount() {
+  //   BackHandler.removeEventListener(
+  //     "hardwareBackPress"
+  //     // this.handleBackButtonClick
+  //   )
+  // }
   handleBackButtonClick() {
-    this.props.navigation.goBack(null)
+    console.warn("dsafasd")
+    // this.props.navigation.goBack()
     // return true
   }
   deleteListing() {}

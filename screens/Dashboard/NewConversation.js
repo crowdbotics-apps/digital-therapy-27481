@@ -21,7 +21,8 @@ import {
 import { getNavigationScreen } from "@screens"
 import Theme from "../../Styles/Theme"
 import DropDownPicker from "react-native-dropdown-picker"
-
+import HeaderWhite from "../../Component/HeaderWhite"
+import ButtonStyle from "../../Styles/ButtonStyle"
 // edited
 export class NewConversation extends React.Component {
   constructor(props) {
@@ -64,20 +65,16 @@ export class NewConversation extends React.Component {
         style={styles.ScrollView_1}
       >
         <View style={{ flex: 1 }}>
+          <HeaderWhite
+            text="New Conversation"
+            onPress={() => this.props.navigation.goBack()}
+            hideIcon
+            navigation={this.props.navigation}
+          />
+
           <View
             style={{
-              flexDirection: "row",
-              flex: 0.1,
-              backgroundColor: "white",
-              alignItems: "center",
-              justifyContent: "space-evenly"
-            }}
-          >
-            <Text>New Conversation</Text>
-          </View>
-          <View
-            style={{
-              flex: 0.5,
+              flex: 0.3,
               width: "90%",
               alignSelf: "center"
             }}
@@ -186,14 +183,23 @@ export class NewConversation extends React.Component {
                 <Text style={{ fontStyle: "italic", color: Theme.GRAY }}>
                   Resolve{"? "}
                 </Text>
-                <Text style={{ color: Theme.THEME_COLOR, fontWeight: "bold" }}>
-                  Invite them
-                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.props.navigation.navigate("InviteScreen")
+                  }}
+                >
+                  <Text
+                    style={{ color: Theme.THEME_COLOR, fontWeight: "bold" }}
+                  >
+                    Invite them
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
             <View
               style={{
-                flex: 0.5,
+                // flex: 0.5,
+                marginVertical: 10,
                 justifyContent: "center",
                 alignItems: "center"
               }}
@@ -206,8 +212,8 @@ export class NewConversation extends React.Component {
               >
                 <View
                   style={{
-                    width: 80,
-                    height: 80,
+                    width: 70,
+                    height: 70,
                     borderRadius: 100,
                     backgroundColor: Theme.THEME_COLOR,
                     justifyContent: "center",
@@ -239,20 +245,28 @@ export class NewConversation extends React.Component {
               </Text>
             </View>
           </View>
+          <View style={{ marginVertical: 20, justifyContent: "center" }}>
+            <TouchableOpacity style={ButtonStyle.button}>
+              <Text style={{ color: "white" }}>Mark it as resolved</Text>
+            </TouchableOpacity>
+          </View>
           <View
             style={{
-              flex: 0.3,
+              // flex: 0.3,
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              paddingVertical: 10,
+              marginBottom: 10
             }}
           >
             <View
               style={{
                 flexDirection: "row",
-                flex: 0.8,
+                // flex: 0.8,
+                height: 70,
                 width: "85%",
                 backgroundColor: "white",
-                elevation: 3,
+                elevation: 5,
                 borderBottomLeftRadius: 35,
                 borderTopRightRadius: 35
               }}
