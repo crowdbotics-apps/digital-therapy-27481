@@ -90,6 +90,7 @@ class AppleLogin(ViewSet):
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
+    queryset = User.objects.all()
     authentication_classes = (
         authentication.TokenAuthentication,
     )
@@ -99,9 +100,6 @@ class UserViewSet(ModelViewSet):
         context = super().get_serializer_context()
         context.update({"request": self.request})
         return context
-
-    def get_queryset(self):
-        return User.objects.filter(id=self.request.user.id)
 
     @action(detail=False, methods=['get'])
     def get_user_profile(self, request):
@@ -115,3 +113,8 @@ class UserViewSet(ModelViewSet):
         request.user.save()
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def get_users(self, request, pk=None):
+        users = User.objects.all().exclude(id=request.user.id)
+        return Response(self.serializer_class(users, many=True).data)
