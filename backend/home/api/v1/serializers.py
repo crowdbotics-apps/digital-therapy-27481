@@ -22,7 +22,8 @@ User = get_user_model()
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password')
+        fields = ('id', 'name', 'email', 'password',
+                  'age', 'surname', 'location')
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -54,6 +55,9 @@ class SignupSerializer(serializers.ModelSerializer):
         user = User(
             email=validated_data.get('email'),
             name=validated_data.get('name'),
+            age=validated_data.get('age'),
+            location=validated_data.get('location'),
+            surname=validated_data.get('surname'),
             username=generate_unique_username([
                 validated_data.get('name'),
                 validated_data.get('email'),
@@ -74,7 +78,8 @@ class SignupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'surname', 'age', 'location', 'profile_picture']
+        fields = ['id', 'email', 'name', 'surname',
+                  'age', 'location', 'profile_picture']
 
 
 class PasswordSerializer(PasswordResetSerializer):
@@ -94,7 +99,8 @@ class AppleSocialLoginSerializer(SocialLoginSerializer):
 
         adapter_class = getattr(view, 'adapter_class', None)
         if not adapter_class:
-            raise serializers.ValidationError(_('Define adapter_class in view'))
+            raise serializers.ValidationError(
+                _('Define adapter_class in view'))
 
         adapter = adapter_class(request)
         # app = adapter.get_provider().get_app(request)
@@ -144,11 +150,13 @@ class AppleSocialLoginSerializer(SocialLoginSerializer):
             raise serializers.ValidationError(
                 _('Incorrect input. access_token or code is required.'))
 
-        social_token = adapter.parse_token(token)  # The important change is here.
+        # The important change is here.
+        social_token = adapter.parse_token(token)
         social_token.app = app
 
         try:
-            login = self.get_social_login(adapter, app, social_token, access_token)
+            login = self.get_social_login(
+                adapter, app, social_token, access_token)
             complete_social_login(request, login)
         except Exception:
             raise serializers.ValidationError(_('Incorrect value'))
@@ -161,7 +169,8 @@ class AppleSocialLoginSerializer(SocialLoginSerializer):
             if allauth_settings.UNIQUE_EMAIL:
                 # Do we have an account already with this email address?
                 if get_user_model().objects.filter(email=login.user.email).exists():
-                    raise serializers.ValidationError(_('E-mail already registered using different signup method.'))
+                    raise serializers.ValidationError(
+                        _('E-mail already registered using different signup method.'))
 
             login.lookup()
             login.save(request, connect=True)
@@ -172,7 +181,7 @@ class AppleSocialLoginSerializer(SocialLoginSerializer):
 
 class SocialSerializer(serializers.Serializer):
     access_token = serializers.CharField()
-    
+
     def social_login(self, user_info, social_platform):
         social_id = user_info.pop("id")
         request = self.context.get("request")
@@ -201,5 +210,5 @@ class SocialSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email not found")
         user = UserSerializer().update(instance=user,
                                        validated_data=update_data)
-        
+
         return user
