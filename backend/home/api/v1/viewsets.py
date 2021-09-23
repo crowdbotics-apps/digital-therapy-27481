@@ -113,3 +113,8 @@ class UserViewSet(ModelViewSet):
         request.user.save()
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def get_users(self, request, pk=None):
+        users = User.objects.all().exclude(id=request.user.id)
+        return Response(self.serializer_class(users, many=True).data)
