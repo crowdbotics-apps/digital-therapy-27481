@@ -5,9 +5,8 @@ import Toast from "react-native-toast-message"
 const YourApp = () => {
   return (
     <View style={styles.container}>
-      <Toast ref={ref => Toast.setRef(ref)} />
-
       <ScreenNavigation />
+      <Toast ref={ref => Toast.setRef(ref)} />
     </View>
   )
 }

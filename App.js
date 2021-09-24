@@ -46,7 +46,8 @@ const getStore = slices => {
   const appState = {
     name: "digital_therapy_27481Identifier",
     url: "https://digital_therapy_27481Identifier.botics.co",
-    version: "1.0.0"
+    version: "1.0.0",
+    userName: ""
   }
 
   const appReducer = createReducer(appState, _ => {

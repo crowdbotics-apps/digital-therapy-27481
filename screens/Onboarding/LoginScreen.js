@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { useEffect, Component, useState } from "react"
 import {
   View,
   PlatView,
@@ -33,33 +33,18 @@ import {
   BaseURL,
   Header,
   iosConfig,
-  androidConfig
+  androidConfig,
+  SET_TOKEN,
+  GET_TOKEN
 } from "../../Connection/index"
 import Storage from "react-native-storage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Toast from "react-native-toast-message"
-class LoginScreen extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      email: "",
-      password: "",
-      loading: false,
-      submitting: false,
-      googleSignedIn: false,
-      checkingLoggedIn: true,
-      submittingGoogle: false,
-      submittingFacebook: false,
-      hidePassword: true
-    }
-  }
-  componentDidMount() {
-    var self = this
-    GoogleSignin.configure()
-    GoogleSignin.isSignedIn().then(data => {
-      self.setState({ googleSignedIn: data })
-    })
+import { createAction, OutputSelector } from "@reduxjs/toolkit"
+
+function LoginScreen(props) {
+  useEffect(() => {
     global.storage = new Storage({
       // maximum capacity, default 1000
       size: 1000,
@@ -82,282 +67,259 @@ class LoginScreen extends Component {
         // we'll talk about the details later.
       }
     })
-    this.checkLoggedin()
-  }
-  checkLoggedin = () => {
-    var self = this
-    storage
-      .load({
-        key: "loginState"
-      })
-      .then(ret => {
-        self.props.actionSignup("user", ret)
-        // self.setState({checkingLoggedIn: false});
-        self.props.navigation.replace("Dashboard")
-      })
-      .catch(err => {
-        self.setState({ checkingLoggedIn: false })
-        // any exception including data not found
-        // goes to catch()
-        //  console.warn(err.message);
-        switch (err.name) {
-          case "NotFoundError":
-            // TODO;
-            break
-          case "ExpiredError":
-            // TODO
-            break
-        }
-      })
-  }
-  render() {
-    if (this.state.checkingLoggedIn) {
-      return (
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <ActivityIndicator size="large" color={Theme.THEME_COLOR} />
-        </View>
-      )
-    }
-    return (
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "space-evenly",
-          backgroundColor: Theme.THEME_WHITE
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <View style={[Styles.ViewStyle, { flex: 0.5 }]}>
-            <Text style={MainStyle.textStyleHeading}>{strings.login}</Text>
-            {/* <Image
-              source={require('../../assets/logo.png')}
-              style={Styles.logoStyle}
-              resizeMode="contain"
-            /> */}
-          </View>
-          <View style={[Styles.ViewStyle, { justifyContent: "flex-start" }]}>
-            <View style={Styles.inputStyle}>
-              <Icon name="alternate-email" size={18} />
-              <Input
-                placeholder="Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={text => {
-                  this.setState({ email: text })
-                }}
-                style={Styles.textInputStyle}
-              />
-            </View>
-            <View style={Styles.inputStyle}>
-              <Icon name="lock" size={18} />
+    // checkLoggedin()
+  })
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [emailError, setEmailError] = useState(false)
+  const [passError, setPasswordError] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [googleSignedIn, setGoogleSignIn] = useState(false)
+  const [checkingLoggedIn, setCheckingLoggedIn] = useState(false)
+  const [submittingGoogle, setSubmittingGoogle] = useState(false)
+  const [submittingFacebook, setSubmittingFacebook] = useState(false)
+  const [hidePassword, setHidePassword] = useState(true)
 
-              <Input
-                style={Styles.textInputStyle}
-                placeholder="Password"
-                secureTextEntry={this.state.hidePassword}
-                onChangeText={text => {
-                  this.setState({ password: text })
-                }}
-                autoCapitalize="none"
-              />
-              <TouchableOpacity
-                style={{ padding: 10 }}
-                onPressIn={() => this.setState({ hidePassword: false })}
-                onPressOut={() => this.setState({ hidePassword: true })}
-              >
-                <Icon name="visibility" size={18} />
-              </TouchableOpacity>
-            </View>
+  if (checkingLoggedIn) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" color={Theme.THEME_COLOR} />
+      </View>
+    )
+  }
+  return (
+    <ScrollView
+      contentContainerStyle={{
+        flexGrow: 1,
+        justifyContent: "space-evenly",
+        backgroundColor: Theme.THEME_WHITE
+      }}
+    >
+      <View style={{ flex: 1 }}>
+        <View style={[Styles.ViewStyle, { flex: 0.5 }]}>
+          <Text style={MainStyle.textStyleHeading}>{strings.login}</Text>
+          {/* <Image
+            source={require('../../assets/logo.png')}
+            style={Styles.logoStyle}
+            resizeMode="contain"
+          /> */}
+        </View>
+        <View style={[Styles.ViewStyle, { justifyContent: "flex-start" }]}>
+          <View style={Styles.inputStyle}>
+            <Icon name="alternate-email" size={18} />
+            <Input
+              placeholder="Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              onChangeText={text => {
+                setEmail(text)
+              }}
+              style={Styles.textInputStyle}
+            />
+          </View>
+          <View style={Styles.inputStyle}>
+            <Icon name="lock" size={18} />
+
+            <Input
+              style={Styles.textInputStyle}
+              placeholder="Password"
+              secureTextEntry={hidePassword}
+              onChangeText={text => {
+                setPassword(text)
+              }}
+              autoCapitalize="none"
+            />
+            <TouchableOpacity
+              style={{ padding: 10 }}
+              onPressIn={() => setHidePassword(false)}
+              onPressOut={() => setHidePassword(true)}
+            >
+              <Icon name="visibility" size={18} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              // this.props.navigation.navigate("ForgotPassword")
+            }}
+            style={{ alignItems: "flex-end", marginVertical: 20 }}
+          >
+            <Text style={MainStyle.textStyle}>{strings.forgotPassword}</Text>
+          </TouchableOpacity>
+
+          <View
+            style={{
+              justifyContent: "center",
+              flex: 0.2
+            }}
+          >
             <TouchableOpacity
               onPress={() => {
-                // this.props.navigation.navigate("ForgotPassword")
+                // props.navigation.navigate("HomeScreen")
+
+                if (!submitting) {
+                  if (email != "") {
+                    signIn(email)
+                  } else {
+                    Toast.show({
+                      text1: "Input email address ",
+                      position: "bottom",
+                      visibilityTime: 3000
+                    })
+                  }
+                }
               }}
-              style={{ alignItems: "flex-end", marginVertical: 20 }}
+              info
+              style={MainStyle.button}
             >
-              <Text style={MainStyle.textStyle}>{strings.forgotPassword}</Text>
+              {submitting ? (
+                <ActivityIndicator size="small" color="white" />
+              ) : (
+                <Text style={{ textAlign: "center", color: "white" }}>
+                  {strings.login}
+                </Text>
+              )}
             </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 0.5,
+              justifyContent: "flex-end",
+              alignItems: "center"
+            }}
+          >
+            <Text style={{ fontSize: 12, color: "gray", marginVertical: 10 }}>
+              Or connect with
+            </Text>
 
             <View
               style={{
-                justifyContent: "center",
-                flex: 0.2
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center"
               }}
             >
               <TouchableOpacity
+                style={[Styles.socialButton]}
                 onPress={() => {
-                  this.props.navigation.navigate("HomeScreen")
-                  // if (!this.state.submitting) {
-                  //   if (this.state.email != "") {
-                  //     this.signIn(this.state.email)
-                  //   } else {
-                  //     Toast.show({
-                  //       text1: "Input email address ",
-                  //       position: "bottom",
-                  //       visibilityTime: 3000
-                  //     })
-                  //   }
-                  // }
-                  // this.props.navigation.navigate('Dashboard');
+                  signUpFacebook()
                 }}
-                info
-                style={MainStyle.button}
               >
-                {this.state.submitting ? (
+                {submittingFacebook ? (
                   <ActivityIndicator size="small" color="white" />
                 ) : (
-                  <Text style={{ textAlign: "center", color: "white" }}>
-                    {strings.login}
-                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{
+                        backgroundColor: Theme.LIGHT_GRAY,
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Image
+                        source={require("../../assets/facebook.png")}
+                        style={{ width: "100%", height: "100%" }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[Styles.socialButton]}
+                onPress={() => {
+                  // this.signUpFacebook();
+                }}
+              >
+                {submittingFacebook ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{
+                        backgroundColor: Theme.LIGHT_GRAY,
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Image
+                        source={require("../../assets/google.png")}
+                        style={{ width: "80%", height: "80%" }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[Styles.socialButton]}
+                onPress={() => {
+                  signUpFacebook()
+                }}
+              >
+                {submittingFacebook ? (
+                  <ActivityIndicator size="small" color="white" />
+                ) : (
+                  <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <View
+                      style={{
+                        backgroundColor: Theme.LIGHT_GRAY,
+                        height: 30,
+                        width: 30,
+                        borderRadius: 15,
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <Image
+                        source={require("../../assets/applelogo.png")}
+                        style={{ width: "80%", height: "60%" }}
+                        resizeMode="contain"
+                      />
+                    </View>
+                  </View>
                 )}
               </TouchableOpacity>
             </View>
             <View
               style={{
-                flex: 0.5,
-                justifyContent: "flex-end",
-                alignItems: "center"
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: 20
               }}
             >
-              <Text style={{ fontSize: 12, color: "gray", marginVertical: 10 }}>
-                Or connect with
-              </Text>
-
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center"
+              <Text style={{ fontSize: 14 }}>{strings.newCust}</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  props.navigation.navigate("SignupScreen")
                 }}
               >
-                <TouchableOpacity
-                  style={[Styles.socialButton]}
-                  onPress={() => {
-                    this.signUpFacebook()
+                <Text
+                  style={{
+                    fontSize: 14,
+                    fontWeight: "bold",
+                    color: Theme.THEME_COLOR,
+                    marginLeft: 5
                   }}
                 >
-                  {this.state.submittingFacebook ? (
-                    <ActivityIndicator size="small" color="white" />
-                  ) : (
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <View
-                        style={{
-                          backgroundColor: Theme.LIGHT_GRAY,
-                          height: 30,
-                          width: 30,
-                          borderRadius: 15,
-                          justifyContent: "center",
-                          alignItems: "center"
-                        }}
-                      >
-                        <Image
-                          source={require("../../assets/facebook.png")}
-                          style={{ width: "100%", height: "100%" }}
-                          resizeMode="contain"
-                        />
-                      </View>
-                    </View>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[Styles.socialButton]}
-                  onPress={() => {
-                    // this.signUpFacebook();
-                  }}
-                >
-                  {this.state.submittingFacebook ? (
-                    <ActivityIndicator size="small" color="white" />
-                  ) : (
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <View
-                        style={{
-                          backgroundColor: Theme.LIGHT_GRAY,
-                          height: 30,
-                          width: 30,
-                          borderRadius: 15,
-                          justifyContent: "center",
-                          alignItems: "center"
-                        }}
-                      >
-                        <Image
-                          source={require("../../assets/google.png")}
-                          style={{ width: "80%", height: "80%" }}
-                          resizeMode="contain"
-                        />
-                      </View>
-                    </View>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[Styles.socialButton]}
-                  onPress={() => {
-                    this.signUpFacebook()
-                  }}
-                >
-                  {this.state.submittingFacebook ? (
-                    <ActivityIndicator size="small" color="white" />
-                  ) : (
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
-                      <View
-                        style={{
-                          backgroundColor: Theme.LIGHT_GRAY,
-                          height: 30,
-                          width: 30,
-                          borderRadius: 15,
-                          justifyContent: "center",
-                          alignItems: "center"
-                        }}
-                      >
-                        <Image
-                          source={require("../../assets/applelogo.png")}
-                          style={{ width: "80%", height: "60%" }}
-                          resizeMode="contain"
-                        />
-                      </View>
-                    </View>
-                  )}
-                </TouchableOpacity>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginTop: 20
-                }}
-              >
-                <Text style={{ fontSize: 14 }}>{strings.newCust}</Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    this.props.navigation.navigate("SignupScreen")
-                  }}
-                >
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      fontWeight: "bold",
-                      color: Theme.THEME_COLOR,
-                      marginLeft: 5
-                    }}
-                  >
-                    {strings.createAccount}
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                  {strings.createAccount}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
-      </ScrollView>
-    )
-  }
-  validateEmail(text) {
+      </View>
+    </ScrollView>
+  )
+
+  function validateEmail(text) {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     if (reg.test(text) === false) {
       Toast.show({
@@ -365,27 +327,28 @@ class LoginScreen extends Component {
         position: "bottom",
         visibilityTime: 3000
       })
-      this.setState({ emailError: true })
+      setEmailError(true)
       return false
     } else {
-      this.setState({ emailError: false })
+      setEmailError(false)
 
       return true
     }
   }
-  signOut = async () => {
+  async function signOut() {
     try {
       await GoogleSignin.revokeAccess()
       await GoogleSignin.signOut()
       this.props.actionSignup("user", "")
-      this.setState({ googleSignedIn: false }) // Remember to remove the user from your app's state as well
+      setGoogleSignIn(false)
+      // Remember to remove the user from your app's state as well
     } catch (error) {
       console.error(error)
     }
   }
-  signUpGoogle = async () => {
+  async function signUpGoogle() {
     var self = this
-    self.setState({ submittingGoogle: true })
+    setSubmittingGoogle(true)
     try {
       await GoogleSignin.hasPlayServices()
 
@@ -425,14 +388,15 @@ class LoginScreen extends Component {
             position: "bottom",
             visibilityTime: 3000
           })
-          self.setState({ loading: false })
+          setLoading(false)
         })
-        .finally(() =>
-          self.setState({ submitting: false, submittingGoogle: false })
-        )
+        .finally(() => {
+          setSubmitting(false)
+          setSubmittingGoogle(false)
+        })
     } catch (error) {
       console.warn(error)
-      self.setState({ submittingGoogle: false })
+      setSubmittingGoogle(false)
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
       } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -445,8 +409,7 @@ class LoginScreen extends Component {
     }
   }
 
-  saveUser(data) {
-    var self = this
+  function saveUser(data) {
     storage.save({
       key: "loginState", // Note: Do not use underscore("_") in key!
       data,
@@ -460,9 +423,10 @@ class LoginScreen extends Component {
         key: "loginState"
       })
       .then(ret => {
+        console.warn(ret)
         // found data goes to then()
-        self.props.actionSignup("user", ret)
-        self.props.navigation.replace("Dashboard")
+        // self.props.actionSignup("user", ret)
+        props.navigation.replace("HomeScreen")
         // self.props.actionSignup('profileStatus', ret.ProfileStatus);
         Toast.show({
           text1: "Login successful",
@@ -471,6 +435,7 @@ class LoginScreen extends Component {
         })
       })
       .catch(err => {
+        console.warn(err)
         // any exception including data not found
         // goes to catch()
         //  console.warn(err.messagce);
@@ -484,81 +449,83 @@ class LoginScreen extends Component {
         }
       })
   }
-  signIn(email) {
-    if (this.validateEmail(email)) {
-      if (this.state.password != "") {
+  function signIn(email) {
+    if (validateEmail(email)) {
+      if (password != "") {
         var self = this
-        self.setState({ submitting: true })
+        setSubmitting(true)
+
         axios({
-          method: "get",
-          url: BaseURL.concat(
-            "api/ShoeCleaning/SignIn?Email=" +
-              email +
-              "&Password=" +
-              this.state.password
-          ),
-          params: {
-            Email: email,
-            Password: this.state.password
-          },
+          method: "post",
+          url: BaseURL.concat("/login/"),
+          data: { username: email, password: password },
           headers: Header
         })
           .then(res => {
-            if (res.data.success) {
-              console.warn(res.data)
-              self.props.actionSignup("user", res.data.data[0])
-              self.saveUser(res.data.data[0])
-              // self.props.navigation.replace('Dashboard');
-            } else {
-              Toast.show({
-                text1: "Login successful",
-                position: "bottom",
-                visibilityTime: 3000
-              })
-              Toast.show({ text: res.data.message }, 3000)
-            }
+            SET_TOKEN(res.data.token)
+            // console.warn(GET_TOKEN())
+
+            // self.props.actionSignup("user", res.data.data[0])
+            saveUser(res.data)
+            // self.props.navigation.replace('Dashboard');
+
+            Toast.show({
+              type: "success",
+              text1: "Login successful",
+              position: "bottom",
+              visibilityTime: 3000
+            })
+            // Toast.show({ text: res.data.message }, 3000)
           })
           .catch(function (error) {
-            console.warn(error)
-            Toast.show({ text: "Network Error", duration: 4000 })
-
-            self.setState({ loading: false })
+            console.warn(error.response.data.non_field_errors[0])
+            Toast.show({
+              type: "error",
+              text1: error.response.data.non_field_errors[0],
+              position: "bottom",
+              visibilityTime: 3000
+            })
+            setLoading(false)
           })
-          .finally(() => self.setState({ submitting: false }))
+          .finally(() => {
+            setSubmitting(false)
+          })
       } else {
-        this.setState({ passError: true })
+        setPasswordError(true)
         Toast.show({
-          text: "Enter Password",
-          buttonText: "Okay",
-          duration: 3000
+          text1: "Enter Password",
+          position: "bottom",
+          visibilityTime: 3000
         })
       }
     } else {
-      Toast.show({ text: "Email is invalid" }, 3000)
+      Toast.show({
+        text1: "Input valid email address",
+        position: "bottom",
+        visibilityTime: 3000
+      })
     }
   }
-  signUpFacebook() {
-    // var self = this;
-    // self.setState({submittingFacebook: true});
-    // LoginManager.logInWithPermissions(['public_profile', 'email']).then(
-    //   function (result) {
-    //     if (result.isCancelled) {
-    //       console.warn('Login cancelled');
-    //       self.setState({submittingFacebook: false});
-    //     } else {
-    //       AccessToken.getCurrentAccessToken().then(data => {
-    //         self.initUser(data.accessToken);
-    //       });
-    //     }
-    //   },
-    //   function (error) {
-    //     console.warn('Login fail with error: ' + error);
-    //   },
-    // );
+  function signUpFacebook() {
+    setSubmittingFacebook(true)
+    LoginManager.logInWithPermissions(["public_profile", "email"]).then(
+      function (result) {
+        if (result.isCancelled) {
+          console.warn("Login cancelled")
+          setSubmittingFacebook(false)
+        } else {
+          AccessToken.getCurrentAccessToken().then(data => {
+            initUser(data.accessToken)
+          })
+        }
+      },
+      function (error) {
+        console.warn("Login fail with error: " + error)
+      }
+    )
   }
 
-  initUser(token) {
-    var self = this
+  function initUser(token) {
     fetch(
       "https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=" +
         token
@@ -566,7 +533,6 @@ class LoginScreen extends Component {
       .then(response => response.json())
       .then(json => {
         // Some user object has been set up somewhere, build that user here
-        var self = this
 
         axios({
           method: "post",
@@ -584,7 +550,7 @@ class LoginScreen extends Component {
         })
           .then(function (response) {
             if (response.data.success) {
-              self.props.actionSignup("user", response.data.data[0])
+              props.actionSignup("user", response.data.data[0])
               // self.props.navigation.replace('Dashboard');
               self.saveUser(response.data.data[0])
             } else {
@@ -602,11 +568,12 @@ class LoginScreen extends Component {
               buttonText: "Okay",
               duration: 3000
             })
-            self.setState({ loading: false })
+            setLoading(false)
           })
-          .finally(() =>
-            self.setState({ submitting: false, submittingFacebook: false })
-          )
+          .finally(() => {
+            setSubmitting(false)
+            setSubmittingFacebook(false)
+          })
       })
       .catch(() => {
         Toast.show({
@@ -615,6 +582,34 @@ class LoginScreen extends Component {
           duration: 3000
         })
         reject("ERROR GETTING DATA FROM FACEBOOK")
+      })
+  }
+  function checkLoggedin() {
+    var self = this
+    storage
+      .load({
+        key: "loginState"
+      })
+      .then(ret => {
+        // self.props.actionSignup("user", ret)
+        console.warn(ret)
+        props.navigation.replace("HomeScreen")
+      })
+      .catch(err => {
+        // console.warn(err)
+        console(err)
+        setCheckingLoggedIn(false)
+        // any exception including data not found
+        // goes to catch()
+        //  console.warn(err.message);
+        switch (err.name) {
+          case "NotFoundError":
+            // TODO;
+            break
+          case "ExpiredError":
+            // TODO
+            break
+        }
       })
   }
 }
@@ -650,8 +645,8 @@ const Styles = StyleSheet.create({
   }
 })
 const mapStateToProps = state => {
-  const { MainReducer } = state
-  return { MainReducer }
+  const { app } = state
+  return { app }
 }
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
