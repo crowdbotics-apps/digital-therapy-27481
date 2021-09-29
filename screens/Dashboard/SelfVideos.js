@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   View,
   Image,
@@ -25,50 +25,9 @@ import HeaderWhite from "../../Component/HeaderWhite"
 import ButtonStyle from "../../Styles/ButtonStyle"
 import { FlatList } from "react-native-gesture-handler"
 // edited
-export class SelfVideos extends React.Component {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      selfVideos: [1, 2, 3, 4, 5]
-    }
-  }
-
-  render() {
-    const { selfVideos } = this.state
-    return (
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
-        style={styles.ScrollView_1}
-      >
-        <View style={{ flex: 1 }}>
-          <HeaderWhite
-            text="Profile info"
-            onPress={() => this.props.navigation.goBack()}
-            showRecord
-            navigation={this.props.navigation}
-          />
-
-          <View
-            style={{
-              flex: 1,
-              width: "90%",
-              alignSelf: "center"
-            }}
-          >
-            <Text style={ButtonStyle.textStyleHeading}>Self Videos</Text>
-            <FlatList
-              data={selfVideos}
-              renderItem={this.renderItem}
-              extraData={selfVideos}
-              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-            />
-          </View>
-        </View>
-      </ScrollView>
-    )
-  }
-  renderItem = () => {
+function SelfVideos(props) {
+  const [selfVideos] = useState([1, 2, 3, 4, 5])
+  const renderItem = () => {
     return (
       <View
         style={{
@@ -126,6 +85,38 @@ export class SelfVideos extends React.Component {
       </View>
     )
   }
+
+  return (
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
+      style={styles.ScrollView_1}
+    >
+      <View style={{ flex: 1 }}>
+        <HeaderWhite
+          text="Profile info"
+          onPress={() => props.navigation.goBack()}
+          showRecord
+          navigation={props.navigation}
+        />
+
+        <View
+          style={{
+            flex: 1,
+            width: "90%",
+            alignSelf: "center"
+          }}
+        >
+          <Text style={ButtonStyle.textStyleHeading}>Self Videos</Text>
+          <FlatList
+            data={selfVideos}
+            renderItem={renderItem}
+            extraData={selfVideos}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          />
+        </View>
+      </View>
+    </ScrollView>
+  )
 }
 
 const styles = StyleSheet.create({

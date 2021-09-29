@@ -12,9 +12,10 @@ import {
 import { screens } from "@screens"
 import { hooks, slices, navigators, initialRoute } from "@modules"
 import { connectors } from "@store"
+import userReducer from "./features/user"
+import conversationReducer from "./features/conversation"
 
 const Stack = createStackNavigator()
-
 const getNavigation = (modules, screens, initialRoute) => {
   const Navigation = () => {
     const routes = modules.concat(screens).map(([name, navigator]) => {
@@ -67,8 +68,10 @@ const getStore = slices => {
 
 const App = () => {
   const Navigation = getNavigation(navigators, screens, initialRoute)
-  const store = getStore([...slices, ...connectors])
-
+  // const store = getStore([...slices, ...connectors])
+  const store = configureStore({
+    reducer: { user: userReducer, conversationReducer }
+  })
   let effects = {}
   hooks.map(([_, hook]) => {
     effects[hook.name] = hook()

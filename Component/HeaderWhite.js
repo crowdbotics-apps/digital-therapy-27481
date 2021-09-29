@@ -15,8 +15,9 @@ export default class HeaderWhite extends Component {
           {
             justifyContent: "center",
             alignItems: "center",
-            elevation: 0,
+            // elevation: 0,
             height: 50
+            // backgroundColor: "red"
           }
         ]}
       >
@@ -28,33 +29,28 @@ export default class HeaderWhite extends Component {
               position: "absolute",
               width: 50,
               height: 50,
-              left: 15
+              left: 15,
+              justifyContent: "center",
+              alignItems: "center",
+
+              elevation: 2
             }}
             onPress={this.props.onPress}
           >
-            <View
-              style={{
-                alignItems: "flex-start",
-                width: "100%",
-                height: "100%",
-                justifyContent: "center"
-              }}
-            >
-              {this.props.icon ? (
-                this.props.icon
-              ) : (
-                <Image
-                  resizeMode={"contain"}
-                  style={{
-                    width: 20,
-                    height: 20,
-                    tintColor: "black"
-                  }}
-                  tintColor={"black"}
-                  source={require("../assets/nav_back.png")}
-                />
-              )}
-            </View>
+            {this.props.icon ? (
+              this.props.icon
+            ) : (
+              <Image
+                resizeMode={"contain"}
+                style={{
+                  width: 20,
+                  height: 20,
+                  tintColor: "black"
+                }}
+                tintColor={"black"}
+                source={require("../assets/nav_back.png")}
+              />
+            )}
           </TouchableOpacity>
         )}
         <Text
@@ -121,7 +117,7 @@ export default class HeaderWhite extends Component {
               height: 60,
               right: 15
             }}
-            onPress={this.props.onPress}
+            onPress={this.props.updateUser}
           >
             <View
               style={{

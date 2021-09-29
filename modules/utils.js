@@ -2,6 +2,10 @@ import React from "react"
 import { StyleSheet, View, Text } from "react-native"
 import ScreenNavigation from "../Router/Screen_Navigation"
 import Toast from "react-native-toast-message"
+import { configureStore } from "@reduxjs/toolkit"
+import { Provider } from "react-redux"
+import userReducer from "./../features/user"
+
 const YourApp = () => {
   return (
     <View style={styles.container}>

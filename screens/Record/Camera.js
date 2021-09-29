@@ -21,7 +21,7 @@ import VideoView from "../../lib/video-view/VideoView"
 import ToggleButton from "../../lib/toggle-button/ToggleButton"
 import MultiClipManager from "../../lib/multiclip-manager/MultiClipManager"
 import RNFS from "react-native-fs"
-import { Header, BaseURL } from "../../Connection/index"
+import { BaseURL, GET_HEADER } from "../../Connection/index"
 import axios from "axios"
 import Theme from "../../Styles/Theme"
 import Icon from "react-native-vector-icons/MaterialIcons"
@@ -68,20 +68,12 @@ class CameraView extends Component {
     this.popVideoClip = this.popVideoClip.bind(this)
     this.submitVideo = this.submitVideo.bind(this)
     this.submitPicture = this.submitPicture.bind(this)
-    this.upload = this.upload.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
   }
   async componentWillMount() {
+    console.warn(this.props.route.params.data)
     results = []
-
     if (Platform.OS === "ios") {
-      // let check = hasVideoAndAudio
-      //   ? Camera.checkDeviceAuthorizationStatus
-      //   : Camera.checkVideoAuthorizationStatus;
-      // if (check) {
-      //   const isAuthorized = await check();
-      //   this.setState({isAuthorized, isAuthorizationChecked: true});
-      // }
     } else if (Platform.OS === "android") {
       const camera_granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -313,7 +305,7 @@ class CameraView extends Component {
     })
   }
 
-  submitVideo(caption, muted) {
+  async submitVideo(caption, muted) {
     var self = this
     if (caption.text == undefined) {
       caption.text = ""
@@ -322,33 +314,56 @@ class CameraView extends Component {
     if (this.state.video != null && this.mcManager == null) {
       //@TODO submit to backend & navigate
       const filename = Date.now().toString()
-      if (Platform.OS == "ios") {
-        //here you can upload the video...
-        const file = {
-          uri: self.state.video.uri,
-          type: "video/mp4",
-          name: "filename"
-        }
 
-        self.uploadAsyncAxios(
-          file,
-          0,
-          1,
-          self.state.video.caption != undefined ? self.state.video.caption : ""
-        )
+      //here you can upload the video...
+      const file = {
+        uri: self.state.video.uri,
+        type: "video/mp4",
+        name: "filename"
+      }
+      var createdConversation = false
+      if (this.props.route.params.data.createConversation) {
+        createdConversation = await this.createConversation()
+      }
+
+      const uploaded = await self.uploadAsyncAxios(
+        file,
+        0,
+        1,
+        this.props.route.params.data.createConversation
+          ? createdConversation.data
+          : this.props.route.params.data
+      )
+      if (uploaded) {
+        Toast.show({
+          type: "success",
+          position: "bottom",
+          text1: "Upload complete",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40,
+          onShow: () => {},
+          onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+          onPress: () => {},
+          props: {} // any custom props passed to the Toast component
+        })
+
+        this.props.navigation.popToTop()
       } else {
-        const file = {
-          uri: self.state.video.uri,
-          type: "video/mp4",
-          name: "filename"
-        }
-        console.warn("called no mp4")
-        self.uploadAsyncAxios(
-          file,
-          0,
-          1,
-          self.state.video.caption != undefined ? self.state.video.caption : ""
-        )
+        Toast.show({
+          type: "error",
+          position: "bottom",
+          text1: "Error while uploading video",
+          visibilityTime: 4000,
+          autoHide: true,
+          topOffset: 30,
+          bottomOffset: 40,
+          onShow: () => {},
+          onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+          onPress: () => {},
+          props: {} // any custom props passed to the Toast component
+        })
       }
     } else if (self.mcManager != null && self.mcManager.getClips().length > 0) {
       var count = 0
@@ -386,7 +401,30 @@ class CameraView extends Component {
       }
     }
   }
-  uploadAsyncAxios(file, count, total, annotation) {
+  async createConversation() {
+    const { categoryValue, personValue, topic } = this.props.route.params.data
+    return axios({
+      method: "POST",
+      url: BaseURL.concat("/conversation/conversation/"),
+      headers: await GET_HEADER(),
+      data: { category: categoryValue, person_to: personValue, topic: topic }
+    })
+      .then(res => {
+        return res
+      })
+      .catch(function (error) {
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        return false
+      })
+      .finally(() => {})
+  }
+
+  async uploadAsyncAxios(file, count, total, data) {
     var self = this
     self.setState({
       videoSubmitting: true,
@@ -395,22 +433,22 @@ class CameraView extends Component {
     })
 
     const formData = new FormData()
-    formData.append("file", file)
+    formData.append("video", file)
     // formData.append(
     //   "listing_id",
     //   "" + self.props.addListingReducer.addedListingID
     // )
-    formData.append("annotation", annotation == undefined ? "" : annotation)
-    formData.append("sequence_id", count)
+    formData.append("conversation", data.id) // conversation id
+    formData.append("argument", self.props.route.params.data.argument)
 
     axios.defaults.timeout = 300000
     const filename = Date.now().toString()
 
     axios({
       method: "post",
-      url: BaseURL.concat("/api/upload"),
+      url: BaseURL.concat("/conversation/items/"),
       data: formData,
-      headers: Header,
+      headers: await GET_HEADER(),
 
       onUploadProgress: progressEvent => {
         if (progressEvent.lengthComputable) {
@@ -429,50 +467,19 @@ class CameraView extends Component {
       }
     })
       .then(response => {
-        if (count == total - 1) {
-          // alert('Video Uploaded Successfully');
-          self.setState({
-            videoSubmitting: false,
-            videoSubmitted: true,
-            currentVideoCount: 0,
-            totalVideosCount: 0,
-            disableSubmit: false
-          })
-          // self.props.navigation.replace('UploadedListingDetail');
-        } else {
-          if (self.mcManager != null) {
-            count = count + 1
-            if (Platform.OS == "ios") {
-              const file = {
-                uri: self.mcManager.getClips()[count].uri,
-                type: "video/mp4",
-                name: "filename"
-              }
-              self.uploadAsyncAxios(
-                file,
-                count,
-                total,
-                self.mcManager.getClips()[count].caption
-              )
-            } else {
-              const file = {
-                uri: self.mcManager.getClips()[count].uri,
-                type: "video/mp4",
-                name: "filename"
-              }
-              self.uploadAsyncAxios(
-                file,
-                count,
-                total,
-                self.mcManager.getClips()[count].caption
-              )
-            }
-          }
-        }
+        console.warn(response)
+        // alert('Video Uploaded Successfully');
+        self.setState({
+          videoSubmitting: false,
+          videoSubmitted: true,
+          currentVideoCount: 0,
+          totalVideosCount: 0,
+          disableSubmit: false
+        })
       })
 
       .catch(error => {
-        console.error(error)
+        console.warn(error.response)
         self.setState({ videoSubmitting: false, videoSubmitted: false })
       })
   }
@@ -548,7 +555,7 @@ class CameraView extends Component {
           onPress={this.state.disableSubmit ? null : this.submitVideo}
         >
           {this.state.disableSubmit ? (
-            <ActivityIndicator size="small" color={"white"} />
+            <ActivityIndicator size="small" color={Theme.THEME_COLOR} />
           ) : (
             <Icon name={"send"} size={34} color="#FFF" />
           )}
@@ -754,21 +761,10 @@ class CameraView extends Component {
     }
   }
   render() {
-    // if (this.state.videoProcessing) {
-    //   return (
-    //     <ActivityIndicator
-    //       style={{alignSelf: 'center'}}
-    //       size="small"
-    //       color="white"
-    //     />
-    //   );
-    // }
-
     if (this.state.videoSubmitted) {
       setTimeout(() => {
         this.setState({ videoSubmitted: false })
-        this.props.navigation.replace("ImageSelection")
-        // this.props.navigation.replace('UploadedListingDetail');
+        this.props.navigation.popToTop()
       }, 3000)
       return (
         <Modal transparent visible={this.state.videoSubmitted}>
@@ -795,7 +791,7 @@ class CameraView extends Component {
               <Icon
                 name="check-circle"
                 style={{ fontSize: 70 }}
-                size="large"
+                size={70}
                 color={Theme.THEME_COLOR}
               />
             </View>
@@ -972,39 +968,6 @@ class CameraView extends Component {
       })
       .catch(err => {
         console.warn(err.message)
-      })
-  }
-
-  upload(file, annotation) {
-    var self = this
-    this.setState({ videoSubmitting: true })
-
-    const formData = new FormData()
-    formData.append("file", file)
-    // formData.append(
-    //   "listing_id",
-    //   "" + self.props.addListingReducer.addedListingID
-    // )
-    formData.append("annotation", annotation)
-    fetch(BaseURL.concat.concat("/api/upload"), {
-      method: "POST",
-      headers: {
-        "Content-Type": "multipart/form-data"
-      },
-      body: formData
-    })
-      .then(response => {
-        response.json()
-      })
-      .then(responseJson => {
-        self.props.navigation.replace("UploadedListingDetail")
-      })
-      .catch(error => {
-        console.warn(error)
-        // alert('Upload unsuccessful');
-      })
-      .finally(() => {
-        self.setState({ videoSubmitting: false })
       })
   }
 

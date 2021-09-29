@@ -20,7 +20,6 @@ import axios from "axios"
 
 import Theme from "../../Styles/Theme"
 import strings from "../../Localization"
-import { actionSignup } from "../../Actions/index"
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -29,6 +28,8 @@ import {
 
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
+import { actionSignup } from "../../Actions/index"
+
 import {
   BaseURL,
   Header,
@@ -43,6 +44,8 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import Toast from "react-native-toast-message"
 import { createAction, OutputSelector } from "@reduxjs/toolkit"
 
+import { useSelector, useDispatch } from "react-redux"
+import { login } from "../../features/user"
 function LoginScreen(props) {
   useEffect(() => {
     global.storage = new Storage({
@@ -67,7 +70,7 @@ function LoginScreen(props) {
         // we'll talk about the details later.
       }
     })
-    // checkLoggedin()
+    checkLoggedin()
   })
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -80,6 +83,7 @@ function LoginScreen(props) {
   const [submittingGoogle, setSubmittingGoogle] = useState(false)
   const [submittingFacebook, setSubmittingFacebook] = useState(false)
   const [hidePassword, setHidePassword] = useState(true)
+  const dispatch = useDispatch()
 
   if (checkingLoggedIn) {
     return (
@@ -140,7 +144,7 @@ function LoginScreen(props) {
           </View>
           <TouchableOpacity
             onPress={() => {
-              // this.props.navigation.navigate("ForgotPassword")
+              props.navigation.navigate("ForgotPassword")
             }}
             style={{ alignItems: "flex-end", marginVertical: 20 }}
           >
@@ -423,7 +427,6 @@ function LoginScreen(props) {
         key: "loginState"
       })
       .then(ret => {
-        console.warn(ret)
         // found data goes to then()
         // self.props.actionSignup("user", ret)
         props.navigation.replace("HomeScreen")
@@ -464,7 +467,7 @@ function LoginScreen(props) {
           .then(res => {
             SET_TOKEN(res.data.token)
             // console.warn(GET_TOKEN())
-
+            dispatch(login(res.data))
             // self.props.actionSignup("user", res.data.data[0])
             saveUser(res.data)
             // self.props.navigation.replace('Dashboard');
@@ -592,12 +595,13 @@ function LoginScreen(props) {
       })
       .then(ret => {
         // self.props.actionSignup("user", ret)
-        console.warn(ret)
+        SET_TOKEN(ret.token)
+        dispatch(login(ret))
         props.navigation.replace("HomeScreen")
       })
       .catch(err => {
         // console.warn(err)
-        console(err)
+        console.warn(err)
         setCheckingLoggedIn(false)
         // any exception including data not found
         // goes to catch()

@@ -19,6 +19,10 @@ import ReceivedVideos from "../screens/Dashboard/ReceivedVideos"
 import InviteScreen from "../screens/Dashboard/InviteScreen"
 import SpeakerScreen from "../screens/Dashboard/SpeakerScreen"
 import GuideScreen from "../screens/Dashboard/GuideScreen"
+import AccountSetting from "../screens/Dashboard/AccountSetting"
+import ViewConversionVideo from "../screens/Conversation/ViewConversationVideo"
+import TermsandConditionScreen from "../screens/Dashboard/TermsandConditionScreen"
+import PrivacyScreen from "../screens/Dashboard/PrivacyScreen"
 
 const Stack = createStackNavigator()
 
@@ -107,6 +111,26 @@ function App() {
         options={{ headerShown: false }}
         name="GuideScreen"
         component={GuideScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="AccountSetting"
+        component={AccountSetting}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="ViewVideo"
+        component={ViewConversionVideo}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="PrivacyScreen"
+        component={PrivacyScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="TermsandConditionScreen"
+        component={TermsandConditionScreen}
       />
     </Stack.Navigator>
   )

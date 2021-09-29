@@ -266,13 +266,12 @@ function SignupScreen(props) {
             // Toast.show({ text: res.data.message }, 3000)
           })
           .catch(function (error) {
-            console.warn(error)
-            // Toast.show({
-            //   type: "error",
-            //   text1: error,
-            //   position: "bottom",
-            //   visibilityTime: 3000
-            // })
+            Toast.show({
+              type: "error",
+              text1: error.response.data.email[0],
+              position: "bottom",
+              visibilityTime: 3000
+            })
             setLoading(false)
           })
           .finally(() => {
