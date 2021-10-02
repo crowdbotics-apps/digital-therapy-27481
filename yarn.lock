@@ -6726,6 +6726,11 @@ react-native-storage@^1.0.1:
     opencollective "^1.0.3"
     opencollective-postinstall "^2.0.2"
 
+react-native-text-input-mask@^3.1.4:
+  version "3.1.4"
+  resolved "https://registry.yarnpkg.com/react-native-text-input-mask/-/react-native-text-input-mask-3.1.4.tgz#9b09d97a910ce8c24024d6187256b07c73e173ac"
+  integrity sha512-XhTPL1/Pv0kyuH8TMJGaxfnq5su9e+4G2PLngiismZ4xbP8+W/1ZEH4KQJQV+QkE2I5Oi+lPJXB2E47s60/OBA==
+
 react-native-toast-message@^1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/react-native-toast-message/-/react-native-toast-message-1.6.0.tgz#863466ff78429902c7182bc08dd8d879476c0a3b"

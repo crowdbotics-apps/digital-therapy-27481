@@ -61,7 +61,12 @@ function HomeScreen(props) {
               resizeMode="contain"
             />
           </View>
-          <TouchableOpacity style={styles.roundButton}>
+          <TouchableOpacity
+            style={styles.roundButton}
+            onPress={() => {
+              props.navigation.navigate("Notification")
+            }}
+          >
             <Icon name="notifications" size={30} />
           </TouchableOpacity>
         </View>

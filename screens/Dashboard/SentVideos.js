@@ -65,11 +65,67 @@ function SentVideos(props) {
       })
   }
   const renderText = item => {
+    if (item.resolved) {
+      return (
+        <View style={{ flex: 0.4, flexDirection: "row" }}>
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Image
+              source={require("../../assets/emoji.png")}
+              style={{ width: 20, height: 20 }}
+              resizeMode="contain"
+            />
+          </View>
+          <View style={{ flex: 3, justifyContent: "center" }}>
+            <Text style={{ color: "gray", fontSize: 16 }}>
+              {item.listener.name} resolved your explanation
+            </Text>
+            {/* <Text>You resolved {item.speaker.name}'s explanation</Text> */}
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "center"
+            }}
+          >
+            <View
+              style={{
+                width: 60,
+                height: 60,
+                borderRadius: 30,
+                // backgroundColor: Theme.THEME_COLOR,
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <Image
+                source={require("../../assets/logo.png")}
+                resizeMode="contain"
+                style={{ height: "100%", width: "100%" }}
+              />
+            </View>
+          </View>
+        </View>
+      )
+    }
     if (
       item.argument &&
-      item.should_resolve &&
+      !item.should_resolve &&
       user.id == item.conversation.person_from
     ) {
+      return (
+        <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
+          You resolved {item.listener.name}'s explanation
+        </Text>
+      )
+    }
+    if (item.argument && item.should_resolve && user.id == item.speaker.id) {
       return (
         <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
           {item.listener.name} has not responded yet to this argument
@@ -78,8 +134,9 @@ function SentVideos(props) {
     } else if (
       !item.argument &&
       !item.should_resolve &&
-      user.id == item.conversation.person_from
+      user.id == item.speaker.id
     ) {
+      //  switched the role and replied back
       return (
         <Text
           style={{
@@ -89,8 +146,9 @@ function SentVideos(props) {
             fontSize: 14
           }}
         >
-          {item.speaker.name} has approved your explanation, you are the speaker
-          now! Record your video and bring your word to the table!"
+          <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
+            Waiting for {item.listener.name} to approve
+          </Text>
         </Text>
       )
     }
@@ -120,7 +178,7 @@ function SentVideos(props) {
     ) {
       return (
         <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-          waiting for {item.listener.name} to reply
+          Waiting for {item.listener.name} to approve
         </Text>
       )
     } else if (
@@ -216,30 +274,32 @@ function SentVideos(props) {
           <View style={{ flex: 3, justifyContent: "center" }}>
             {renderText(item)}
           </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
+          {!item.resolved ? (
             <View
               style={{
-                width: 40,
-                height: 40,
-                borderRadius: 30,
-                backgroundColor: Theme.THEME_COLOR,
+                flex: 1,
                 alignItems: "center",
                 justifyContent: "center"
               }}
             >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                resizeMode="contain"
-                style={{ height: "70%", width: "70%" }}
-              />
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 30,
+                  backgroundColor: Theme.THEME_COLOR,
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <Image
+                  source={require("../../assets/soundwaves.png")}
+                  resizeMode="contain"
+                  style={{ height: "70%", width: "70%" }}
+                />
+              </View>
             </View>
-          </View>
+          ) : null}
         </View>
       </TouchableOpacity>
     )

@@ -16,7 +16,8 @@ export default class HeaderWhite extends Component {
             justifyContent: "center",
             alignItems: "center",
             // elevation: 0,
-            height: 50
+            height: 50,
+            width: "100%"
             // backgroundColor: "red"
           }
         ]}
@@ -26,7 +27,7 @@ export default class HeaderWhite extends Component {
         ) : (
           <TouchableOpacity
             style={{
-              position: "absolute",
+              // position: "absolute",
               width: 50,
               height: 50,
               left: 15,
@@ -45,9 +46,9 @@ export default class HeaderWhite extends Component {
                 style={{
                   width: 20,
                   height: 20,
-                  tintColor: "black"
+                  tintColor: Theme.THEME_COLOR
                 }}
-                tintColor={"black"}
+                tintColor={Theme.THEME_COLOR}
                 source={require("../assets/nav_back.png")}
               />
             )}
@@ -64,7 +65,7 @@ export default class HeaderWhite extends Component {
               color: "black",
               fontSize: 16,
               flex: 1,
-              marginLeft: 0
+              marginLeft: -20
             }
           ]}
         >

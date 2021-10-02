@@ -19,11 +19,14 @@ import ReceivedVideos from "../screens/Dashboard/ReceivedVideos"
 import InviteScreen from "../screens/Dashboard/InviteScreen"
 import SpeakerScreen from "../screens/Dashboard/SpeakerScreen"
 import GuideScreen from "../screens/Dashboard/GuideScreen"
-import AccountSetting from "../screens/Dashboard/AccountSetting"
 import ViewConversionVideo from "../screens/Conversation/ViewConversationVideo"
-import TermsandConditionScreen from "../screens/Dashboard/TermsandConditionScreen"
-import PrivacyScreen from "../screens/Dashboard/PrivacyScreen"
 
+import AccountSetting from "../screens/Dashboard/AccountSettings/AccountSetting"
+import TermsandConditionScreen from "../screens/Dashboard/AccountSettings/TermsandConditionScreen"
+import PrivacyScreen from "../screens/Dashboard/AccountSettings/PrivacyScreen"
+import SendFeedback from "../screens/Dashboard/AccountSettings/SendFeedback"
+import Membership from "../screens/Dashboard/AccountSettings/Membership"
+import Notification from "../screens/Dashboard/Notification"
 const Stack = createStackNavigator()
 
 function App() {
@@ -131,6 +134,21 @@ function App() {
         options={{ headerShown: false }}
         name="TermsandConditionScreen"
         component={TermsandConditionScreen}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="Notification"
+        component={Notification}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="SendFeedback"
+        component={SendFeedback}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="Membership"
+        component={Membership}
       />
     </Stack.Navigator>
   )

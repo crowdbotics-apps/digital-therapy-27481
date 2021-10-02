@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   View,
   Image,
@@ -9,7 +9,8 @@ import {
   Switch,
   TextInput,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  FlatList
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { Avatar, CheckBox } from "react-native-elements"
@@ -23,21 +24,58 @@ import Theme from "../../Styles/Theme"
 import DropDownPicker from "react-native-dropdown-picker"
 import HeaderWhite from "../../Component/HeaderWhite"
 import ButtonStyle from "../../Styles/ButtonStyle"
-import { FlatList } from "react-native-gesture-handler"
+import { GET_HEADER, BaseURL } from "../../Connection/index"
+
+import axios from "axios"
+import Toast from "react-native-toast-message"
+import { useSelector } from "react-redux"
+
 // edited
 function SelfVideos(props) {
-  const [selfVideos] = useState([1, 2, 3, 4, 5])
-  const renderItem = () => {
+  const [selfVideos, setSelfVideos] = useState([])
+  const [loading, setLoading] = useState(false)
+  const user = useSelector(state => state.user.value.user)
+
+  useEffect(() => {
+    getSelfVideos()
+  }, [])
+  async function getSelfVideos() {
+    axios({
+      method: "get",
+      url: BaseURL.concat("/conversation/conversation/"),
+      headers: await GET_HEADER()
+    })
+      .then(res => {
+        setSelfVideos(res.data.results)
+        // dispatch(actionCategories(res.data.results))
+      })
+      .catch(function (error) {
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        // setSubmitting(false)
+      })
+  }
+  const renderItem = ({ item, index }) => {
     return (
-      <View
+      <TouchableOpacity
         style={{
           flex: 1,
           height: 100,
           backgroundColor: "white",
           borderRadius: 15,
           elevation: 4,
-          flexDirection: "row"
+          flexDirection: "row",
+          marginVertical: 5,
+          marginHorizontal: 5
         }}
+        onPress={() => {}}
       >
         <View
           style={{
@@ -51,12 +89,14 @@ function SelfVideos(props) {
             size="medium"
             source={{
               uri:
-                "https://s3-alpha-sig.figma.com/img/3c2f/1872/437fddc501ce01f3f7a70545c7daaa66?Expires=1633305600&Signature=DOzLldsYGkT06HECu5zulRNrf9rtoa~n62nG1fH3xsog6Qh6LfCMhlF3FBv6kmQnjL9oSTn1kI-kt~iTl8uDqwPgvjMFwrImrId-WkWQNAUABEkvHeetfr29pmGTQp6-l30rrcHkKha7geyjikuq2JNpzncskaqm0SMbF7CRNArXMWqIS29iP10QzRN-fDdMANmBcjbRDZd8v3PD~6v4MTQ8CoCa-vtZaOdGmvD~m3goTaRAmffLLA8Bf55YWhPqO66L5ngR68GC78xsWTDUHHotIXdddlYstNgqK2OwXysIqpfvc1rkoRc~W1h997HZoLsD0lGPlTRUoAZlOCz2RA__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                user.profile_picture != null
+                  ? user.profile_picture
+                  : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
             }}
           ></Avatar>
         </View>
         <View style={{ flex: 2, justifyContent: "center" }}>
-          <Text style={{ fontWeight: "bold" }}>Video 1</Text>
+          <Text style={{ fontWeight: "bold" }}>{item.topic}</Text>
           <Text
             style={{
               marginTop: 5,
@@ -82,7 +122,7 @@ function SelfVideos(props) {
             color={Theme.THEME_COLOR}
           />
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 
@@ -107,12 +147,25 @@ function SelfVideos(props) {
           }}
         >
           <Text style={ButtonStyle.textStyleHeading}>Self Videos</Text>
-          <FlatList
-            data={selfVideos}
-            renderItem={renderItem}
-            extraData={selfVideos}
-            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-          />
+          {selfVideos.length > 0 ? (
+            <FlatList
+              data={selfVideos}
+              renderItem={renderItem}
+              extraData={selfVideos}
+              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+              style={{}}
+            />
+          ) : (
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <Text>You have no self video </Text>
+            </View>
+          )}
         </View>
       </View>
     </ScrollView>

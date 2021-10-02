@@ -33,7 +33,6 @@ function ProfileScreen(props) {
   const dispatch = useDispatch()
   const user = useSelector(state => state.user.value.user)
   const state = useSelector(state => state.user)
-  console.warn(state)
   const [imageData, setImageData] = useState("")
   const [imageUri, SetImageUri] = useState(
     user.profile_picture != null
@@ -54,6 +53,7 @@ function ProfileScreen(props) {
     })
       .then(res => {
         console.warn(res) // dispatch(actionCategories(res.data.results))
+        dispatch(update(res.data))
         return res
       })
       .catch(function (error) {
@@ -82,7 +82,6 @@ function ProfileScreen(props) {
       }
     })
       .then(res => {
-        console.warn(res.data)
         dispatch(update(res.data))
         Toast.show({
           type: "success",
@@ -93,7 +92,6 @@ function ProfileScreen(props) {
         // dispatch(actionCategories(res.data.results))
       })
       .catch(function (error) {
-        console.warn(error.response)
         Toast.show({
           type: "error",
           text1: error,
@@ -118,7 +116,7 @@ function ProfileScreen(props) {
             props.navigation.goBack()
           }}
           updateUser={async () => {
-            // await uploadProfilePicture()
+            await uploadProfilePicture()
             await updateUser()
           }}
           text="Profile Info"
@@ -147,7 +145,7 @@ function ProfileScreen(props) {
                   includeBase64: true,
                   cropping: false
                 }).then(image => {
-                  setImageData("jpeg;base64," + image.data)
+                  setImageData(image.mime + ";base64," + image.data)
                   SetImageUri(image.path)
                 })
               }}
@@ -232,7 +230,12 @@ function ProfileScreen(props) {
           }}
         >
           <View style={{}}>
-            <TouchableOpacity style={styles.roundButtonLarge}>
+            <TouchableOpacity
+              style={styles.roundButtonLarge}
+              onPress={() => {
+                props.navigation.navigate("Membership")
+              }}
+            >
               <Image
                 source={require("../../assets/crown.png")}
                 style={{ width: 35, height: 35 }}

@@ -344,6 +344,7 @@ function NewConversation(props) {
                 setProfile(false)
                 setHome(true)
                 setAccount(false)
+                props.navigation.goBack()
               }}
             >
               <Image
@@ -370,6 +371,7 @@ function NewConversation(props) {
                 setProfile(false)
                 setHome(false)
                 setAccount(true)
+                props.navigation.navigate("AccountSetting")
               }}
             >
               <Image
