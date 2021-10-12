@@ -1,7 +1,10 @@
+from random import randint
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from home.models import DateTimeInfo
 
 
 class User(AbstractUser):
@@ -32,3 +35,18 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+
+
+class Token(DateTimeInfo):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=6)
+
+    @staticmethod
+    def generate_token(digits=6):
+        return ''.join("{}".format(randint(0, 9)) for _ in range(digits))
+
+    @staticmethod
+    def verify(user, token):
+        token_obj = Token.objects.filter(
+            user=user).order_by('-created_at').first()
+        return bool(token_obj and token_obj.token == token)
