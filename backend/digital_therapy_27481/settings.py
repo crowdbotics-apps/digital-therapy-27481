@@ -259,5 +259,5 @@ SWAGGER_SETTINGS = {
 
 EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
-# if DEBUG:
-#     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
