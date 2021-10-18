@@ -210,9 +210,11 @@ EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
 EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = env.str(
+    "DEFAULT_FROM_EMAIL", "no-reply@mg.speaklistenresolve.com")
 
 ANYMAIL = {
-    "MAILGUN_API_KEY": "",
+    "MAILGUN_API_KEY": env.str("MAILGUN_API_KEY", ""),
 }
 
 
