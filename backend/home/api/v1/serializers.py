@@ -8,6 +8,7 @@ from allauth.socialaccount.helpers import complete_social_login
 from allauth.utils import email_address_exists, generate_unique_username
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
 from home.api.v1.user_utils import UserUtils
@@ -15,6 +16,7 @@ from rest_auth.registration.serializers import SocialLoginSerializer
 from rest_auth.serializers import PasswordResetSerializer
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
+from users.models import Token as UserToken
 
 User = get_user_model()
 
@@ -82,9 +84,65 @@ class UserSerializer(serializers.ModelSerializer):
                   'age', 'location', 'profile_picture']
 
 
+class CustomResetPasswordForm(ResetPasswordForm):
+    def save(self, request, **kwargs):
+        current_site = get_current_site(request)
+        email = self.cleaned_data["email"]
+
+        for user in self.users:
+            token = UserToken.objects.create(
+                user=user, token=UserToken.generate_token())
+            context = {
+                "current_site": current_site,
+                "user": user,
+                "token": token.token,
+                "request": request,
+            }
+
+            get_adapter(request).send_mail(
+                "account/email/password_reset_key", email, context
+            )
+        return self.cleaned_data["email"]
+
+
 class PasswordSerializer(PasswordResetSerializer):
     """Custom serializer for rest_auth to solve reset password error"""
-    password_reset_form_class = ResetPasswordForm
+    password_reset_form_class = CustomResetPasswordForm
+
+    def get_email_options(self):
+        return {
+            "extra_email_context": {
+                "token": "lol"
+            }
+        }
+
+    def save(self):
+        request = self.context.get('request')
+        # Set some values to trigger the send_email method.
+        opts = {
+            'use_https': request.is_secure(),
+            'from_email': getattr(settings, 'DEFAULT_FROM_EMAIL'),
+            'request': request,
+        }
+
+        opts.update(self.get_email_options())
+        self.reset_form.save(**opts)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    token = serializers.CharField()
+    password = serializers.CharField(max_length=150)
+
+    def create(self, validated_data):
+        user = User.objects.get(email=validated_data['email'])
+        is_verified = UserToken.verify(user, validated_data['token'])
+        if is_verified:
+            user.set_password(validated_data['password'])
+            user.save()
+            return user
+        else:
+            raise serializers.ValidationError("Token does not match")
 
 
 class AppleSocialLoginSerializer(SocialLoginSerializer):
