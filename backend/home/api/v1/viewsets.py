@@ -51,7 +51,7 @@ class FacebookLogin(SocialLoginView):
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = "https://nubu-app.firebaseapp.com/__/auth/handler"
+    callback_url = "https://developers.google.com/oauthplayground"
 
 
 class AppleLogin(ViewSet):
