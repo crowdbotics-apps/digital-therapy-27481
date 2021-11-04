@@ -65,7 +65,8 @@ export default class HeaderWhite extends Component {
               color: "black",
               fontSize: 16,
               flex: 1,
-              marginLeft: -20
+              marginLeft: -75,
+              fontWeight: "bold"
             }
           ]}
         >

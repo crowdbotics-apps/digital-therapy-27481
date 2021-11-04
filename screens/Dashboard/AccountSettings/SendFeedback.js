@@ -82,6 +82,7 @@ function SendFeedback(props) {
               onChangeText={text => {
                 setEmail(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           <Text>Content</Text>
@@ -100,6 +101,7 @@ function SendFeedback(props) {
               onChangeText={text => {
                 setFeedback(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           <View
@@ -284,9 +286,13 @@ const Styles = StyleSheet.create({
     width: "100%",
     alignSelf: "flex-start",
     backgroundColor: "white",
-    elevation: 3
+    elevation: 3,
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
-  textInputStyle: { flex: 1, paddingLeft: 15 },
+  textInputStyle: { flex: 1, paddingLeft: 15, minHeight: 50 },
   lineStyle: {
     flex: 1,
     backgroundColor: "black",

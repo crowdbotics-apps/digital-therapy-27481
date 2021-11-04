@@ -46,16 +46,7 @@ function ProfileScreen(props) {
   const [lastname, setLastName] = useState(user.surname)
   const [email, setEmail] = useState(user.email)
   const [notifications, setNotifications] = useState([
-    1,
-    2,
-    1,
-    2,
-    1,
-    2,
-    1,
-    2,
-    1,
-    2
+    1, 2, 1, 2, 1, 2, 1, 2, 1, 2
   ])
   const renderItem = () => {
     return (
@@ -67,7 +58,11 @@ function ProfileScreen(props) {
           backgroundColor: "white",
           borderRadius: 15,
           elevation: 4,
-          flexDirection: "row"
+          flexDirection: "row",
+          shadowColor: "black",
+          shadowRadius: 3,
+          shadowOffset: { x: 3, y: 3 },
+          shadowOpacity: 0.2
         }}
       >
         <View
@@ -81,8 +76,7 @@ function ProfileScreen(props) {
             rounded
             size={60}
             source={{
-              uri:
-                "https://s3-alpha-sig.figma.com/img/3c2f/1872/437fddc501ce01f3f7a70545c7daaa66?Expires=1633305600&Signature=DOzLldsYGkT06HECu5zulRNrf9rtoa~n62nG1fH3xsog6Qh6LfCMhlF3FBv6kmQnjL9oSTn1kI-kt~iTl8uDqwPgvjMFwrImrId-WkWQNAUABEkvHeetfr29pmGTQp6-l30rrcHkKha7geyjikuq2JNpzncskaqm0SMbF7CRNArXMWqIS29iP10QzRN-fDdMANmBcjbRDZd8v3PD~6v4MTQ8CoCa-vtZaOdGmvD~m3goTaRAmffLLA8Bf55YWhPqO66L5ngR68GC78xsWTDUHHotIXdddlYstNgqK2OwXysIqpfvc1rkoRc~W1h997HZoLsD0lGPlTRUoAZlOCz2RA__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+              uri: "https://s3-alpha-sig.figma.com/img/3c2f/1872/437fddc501ce01f3f7a70545c7daaa66?Expires=1633305600&Signature=DOzLldsYGkT06HECu5zulRNrf9rtoa~n62nG1fH3xsog6Qh6LfCMhlF3FBv6kmQnjL9oSTn1kI-kt~iTl8uDqwPgvjMFwrImrId-WkWQNAUABEkvHeetfr29pmGTQp6-l30rrcHkKha7geyjikuq2JNpzncskaqm0SMbF7CRNArXMWqIS29iP10QzRN-fDdMANmBcjbRDZd8v3PD~6v4MTQ8CoCa-vtZaOdGmvD~m3goTaRAmffLLA8Bf55YWhPqO66L5ngR68GC78xsWTDUHHotIXdddlYstNgqK2OwXysIqpfvc1rkoRc~W1h997HZoLsD0lGPlTRUoAZlOCz2RA__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
             }}
           ></Avatar>
           <View
@@ -148,7 +142,16 @@ function ProfileScreen(props) {
         <TouchableOpacity
           style={[
             styles.roundButton,
-            { position: "absolute", right: 20, top: 70, elevation: 4 }
+            {
+              position: "absolute",
+              right: 20,
+              top: 70,
+              elevation: 4,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
+            }
           ]}
           onPress={() => {
             props.navigation.goBack()
@@ -197,7 +200,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -207,7 +214,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 4,
     backgroundColor: "white",
-    alignSelf: "center"
+    alignSelf: "center",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   textInputStyle: {
     flex: 0.44,
@@ -215,7 +226,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     elevation: 3,
     paddingHorizontal: 10,
-    color: "white"
+    color: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   }
 })
 

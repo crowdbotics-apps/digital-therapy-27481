@@ -14,7 +14,7 @@ export default {
   TEXTINPUT_BORDER_COLOR: "gray",
   LIGHT_GRAY: "#ECECEC",
   GRAY: "gray",
-
+  PlaceHolderTextColor: "#5a5b5c",
   CONTAINER_PADDING: 20,
   INPUT_BACKGROUND: "#f2f3f3",
   INPUT_BORDERCOLOR: "#1B0DA866", ///#8721FD66

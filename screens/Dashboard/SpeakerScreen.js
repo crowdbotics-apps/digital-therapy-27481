@@ -58,14 +58,15 @@ function speakerScreen(props) {
             padding: 10,
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
-            shadowOffset: { x: 0, y: 10 },
-            shadowColor: "black",
-            shadowOpacity: 0.6,
-            shadowRadius: 5,
+
             elevation: 0,
             width: "100%",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
           }}
         >
           <View style={styles.roundButtonLarge}>
@@ -93,11 +94,12 @@ function speakerScreen(props) {
               padding: 10,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
-              shadowOffset: { x: 0, y: 10 },
+
+              elevation: 1,
               shadowColor: "black",
-              shadowOpacity: 0.6,
-              shadowRadius: 5,
-              elevation: 1
+              shadowRadius: 2,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <View style={{ flex: 3 }}>
@@ -142,7 +144,11 @@ function speakerScreen(props) {
                     backgroundColor: Theme.THEME_COLOR,
                     justifyContent: "center",
                     alignItems: "center",
-                    elevation: 20
+                    elevation: 20,
+                    shadowColor: "black",
+                    shadowRadius: 3,
+                    shadowOffset: { x: 3, y: 3 },
+                    shadowOpacity: 0.2
                   }}
                 >
                   <View
@@ -179,11 +185,12 @@ function speakerScreen(props) {
               padding: 10,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
-              shadowOffset: { x: 0, y: 10 },
+
+              elevation: 1,
               shadowColor: "black",
-              shadowOpacity: 0.6,
-              shadowRadius: 5,
-              elevation: 1
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <View style={{ flex: 3 }}>
@@ -227,7 +234,11 @@ function speakerScreen(props) {
                     backgroundColor: Theme.THEME_COLOR,
                     justifyContent: "center",
                     alignItems: "center",
-                    elevation: 20
+                    elevation: 20,
+                    shadowColor: "black",
+                    shadowRadius: 3,
+                    shadowOffset: { x: 3, y: 3 },
+                    shadowOpacity: 0.2
                   }}
                 >
                   <View
@@ -263,11 +274,12 @@ function speakerScreen(props) {
               padding: 10,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
-              shadowOffset: { x: 0, y: 10 },
+
+              elevation: 1,
               shadowColor: "black",
-              shadowOpacity: 0.6,
-              shadowRadius: 5,
-              elevation: 1
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <View style={{ flex: 3 }}>
@@ -297,11 +309,12 @@ function speakerScreen(props) {
               padding: 10,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
-              shadowOffset: { x: 0, y: 10 },
+
+              elevation: 1,
               shadowColor: "black",
-              shadowOpacity: 0.6,
-              shadowRadius: 5,
-              elevation: 1
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <View style={{ flex: 3 }}>
@@ -329,10 +342,10 @@ function speakerScreen(props) {
               padding: 10,
               borderBottomLeftRadius: 20,
               borderBottomRightRadius: 20,
-              shadowOffset: { x: 0, y: 10 },
               shadowColor: "black",
-              shadowOpacity: 0.6,
-              shadowRadius: 5,
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2,
               elevation: 1
             }}
           >
@@ -726,7 +739,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.speaker.name}</Text>
@@ -798,7 +815,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.listener.profile_picture != null
+                      ? conversation.listener.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={
@@ -850,7 +869,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.speaker.name}</Text>
@@ -922,7 +945,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.listener.profile_picture != null
+                      ? conversation.listener.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={130}
@@ -966,7 +991,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.speaker.name}</Text>
@@ -1038,7 +1067,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.listener.profile_picture != null
+                      ? conversation.listener.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={
@@ -1090,7 +1121,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.listener.name}</Text>
@@ -1163,7 +1198,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.speaker.profile_picture != null
+                      ? conversation.speaker.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={100}
@@ -1203,7 +1240,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.speaker.name}</Text>
@@ -1275,7 +1316,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.listener.profile_picture != null
+                      ? conversation.listener.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={130}
@@ -1314,7 +1357,11 @@ function speakerScreen(props) {
               flex: 1,
               alignItems: "center",
               marginRight: -50,
-              elevation: 2
+              elevation: 2,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <Text>{conversation.speaker.name}</Text>
@@ -1386,7 +1433,9 @@ function speakerScreen(props) {
               <Avatar
                 source={{
                   uri:
-                    "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+                    conversation.listener.profile_picture != null
+                      ? conversation.listener.profile_picture
+                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
                 }}
                 rounded
                 size={130}
@@ -1446,7 +1495,11 @@ function speakerScreen(props) {
               backgroundColor: "white",
               borderRadius: 5,
               padding: 10,
-              justifyContent: "space-evenly"
+              justifyContent: "space-evenly",
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <View>
@@ -1487,7 +1540,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -1496,7 +1553,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })

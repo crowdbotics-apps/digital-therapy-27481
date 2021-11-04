@@ -5,15 +5,23 @@ import {
   TextInput,
   StyleSheet,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  SegmentedControlIOSComponent
 } from "react-native"
 import Theme from "../../Styles/Theme"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import strings from "../../Localization"
+import { url, BaseURL, GET_HEADER } from "../../Connection"
+import Toast from "react-native-toast-message"
+import axios from "axios"
 
 const ForgotScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [email, setEmail] = useState("")
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <View
         style={{
           flex: 0.4,
@@ -43,19 +51,60 @@ const ForgotScreen = ({ navigation }) => {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
+            placeholderTextColor={Theme.PlaceHolderTextColor}
+            onChangeText={text => {
+              setEmail(text)
+            }}
+            value={email}
           />
         </View>
       </View>
       <View style={styles.signInBackground}>
         <TouchableOpacity
           style={styles.signInTextBackground}
-          onPress={() => navigation.navigate("OTPScreen")}
+          onPress={() => {
+            sendOTP()
+          }}
         >
           <Text style={styles.signInColorTextBackground}> {strings.sent} </Text>
         </TouchableOpacity>
       </View>
     </View>
   )
+
+  async function sendOTP() {
+    axios({
+      method: "post",
+      url: url.concat("/rest-auth/password/reset/"),
+      headers: await GET_HEADER(),
+      data: {
+        email: email
+      }
+    })
+      .then(res => {
+        navigation.navigate("OTPScreen")
+        Toast.show({
+          type: "success",
+          text1: res.data.detail,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+  }
 }
 
 const styles = StyleSheet.create({
@@ -73,7 +122,8 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
     alignItems: "center",
     width: "90%",
-    alignSelf: "center"
+    alignSelf: "center",
+    height: 50
   },
   fStyle: {
     marginHorizontal: 15,
@@ -122,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  textInputStyle: { flex: 1, paddingLeft: 15 },
+  textInputStyle: { flex: 1, paddingLeft: 15, color: "black" },
 
   signInColorTextBackground: {
     fontSize: 16,

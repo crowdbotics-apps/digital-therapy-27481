@@ -170,7 +170,11 @@ function Membership(props) {
                 borderRadius: 40,
                 justifyContent: "center",
                 alignItems: "center",
-                elevation: 3
+                elevation: 3,
+                shadowColor: "black",
+                shadowRadius: 3,
+                shadowOffset: { x: 3, y: 3 },
+                shadowOpacity: 0.2
               }}
             >
               <Image
@@ -359,7 +363,11 @@ const Styles = StyleSheet.create({
     width: "100%",
     alignSelf: "flex-start",
     backgroundColor: "white",
-    elevation: 3
+    elevation: 3,
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   textInputStyle: { flex: 1, paddingLeft: 15 },
   lineStyle: {

@@ -30,6 +30,7 @@ import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
 import Slider from "@ptomasroos/react-native-multi-slider"
 import Toast from "react-native-toast-message"
+import { duration } from "./config"
 var results = []
 
 class CameraView extends Component {
@@ -189,7 +190,7 @@ class CameraView extends Component {
           })
           .catch(error => {
             if (this.captureButton) {
-              this.captureButton.resetTimer(30000)
+              this.captureButton.resetTimer(duration)
             }
           })
           .finally(() => {
@@ -209,7 +210,7 @@ class CameraView extends Component {
     if (this.RNCamera != null) {
       this.RNCamera.stopRecording()
       this.setState({ recording: false, torch: "off" })
-      this.captureButton.resetTimer(30000)
+      this.captureButton.resetTimer(duration)
     }
 
     this.setState({ videoProcessing: false })
@@ -539,42 +540,18 @@ class CameraView extends Component {
   }
 
   renderRightCameraControl(hide, opacity) {
-    if (this.state.multiClipMode) {
-      return (
-        // <LoaderButton
-        //   disabled={hide}
-        //   style={styles.iconButton}
-        //   iconStyle={opacity}
-        //   iconSize={34}
-        //   color="#FFF"
-        //   icon={'stop-circle-outline'}
-        //   onPress={this.stitchClips.bind(this)}
-        // />
-        <TouchableOpacity
-          style={[styles.iconButton, styles.floatingBottomRightButton]}
-          onPress={this.state.disableSubmit ? null : this.submitVideo}
-        >
-          {this.state.disableSubmit ? (
-            <ActivityIndicator size="small" color={Theme.THEME_COLOR} />
-          ) : (
-            <Icon name={"send"} size={34} color="#FFF" />
-          )}
-        </TouchableOpacity>
-      )
-    } else {
-      return (
-        <ToggleButton
-          disabled={hide}
-          style={styles.iconButton}
-          iconSize={34}
-          color="#FFF"
-          icon={"camera-party-mode"}
-          toggledIcon={"emoticon-tongue"}
-          forceDefault={this.state.facing == "front"}
-          onPress={this.switchFacing.bind(this)}
-        />
-      )
-    }
+    return (
+      <ToggleButton
+        disabled={hide}
+        style={styles.iconButton}
+        iconSize={34}
+        color="#FFF"
+        icon={"camera-party-mode"}
+        toggledIcon={"emoticon-tongue"}
+        forceDefault={this.state.facing == "front"}
+        onPress={this.switchFacing.bind(this)}
+      />
+    )
   }
   renderExposureSlider() {
     return (
@@ -611,7 +588,11 @@ class CameraView extends Component {
                   height: 25,
                   borderRadius: 15,
                   elevation: 1,
-                  backgroundColor: "white"
+                  backgroundColor: "white",
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
                 }}
               />
               <Text style={{ color: "white", marginVertical: 5 }}>
@@ -660,9 +641,9 @@ class CameraView extends Component {
             onTimerEnd={this.stopRecording.bind(this)}
             onLongPressOut={this.stopRecording.bind(this)}
             onLongPressIn={this.startRecording.bind(this)}
-            maxTimerDuration={30000}
+            maxTimerDuration={duration}
           />
-          {/* {this.renderRightCameraControl(hide, opacity)} */}
+          {this.renderRightCameraControl(hide, opacity)}
         </View>
       </View>
     )

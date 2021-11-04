@@ -104,7 +104,11 @@ class VideoView extends Component {
                     // right: 0,
                     elevation: 2,
                     justifyContent: "center",
-                    alignItems: "center"
+                    alignItems: "center",
+                    shadowColor: "black",
+                    shadowRadius: 3,
+                    shadowOffset: { x: 3, y: 3 },
+                    shadowOpacity: 0.2
                   }
                 ]}
                 onPress={() => {

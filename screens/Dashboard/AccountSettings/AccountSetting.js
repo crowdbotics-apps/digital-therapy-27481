@@ -225,7 +225,11 @@ function AccountSettings(props) {
               backgroundColor: "white",
               elevation: 3,
               borderBottomLeftRadius: 35,
-              borderTopRightRadius: 35
+              borderTopRightRadius: 35,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <TouchableOpacity
@@ -349,7 +353,11 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     elevation: 3,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -358,7 +366,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })

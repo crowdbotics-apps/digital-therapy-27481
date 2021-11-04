@@ -204,7 +204,11 @@ function SentVideos(props) {
           justifyContent: "space-evenly",
           backgroundColor: "white",
           marginHorizontal: 5,
-          marginVertical: 5
+          marginVertical: 5,
+          shadowColor: "black",
+          shadowRadius: 3,
+          shadowOffset: { x: 3, y: 3 },
+          shadowOpacity: 0.2
           // height: 100
         }}
         onPress={() => {
@@ -305,47 +309,47 @@ function SentVideos(props) {
     )
   }
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
-      style={styles.ScrollView_1}
-    >
-      <View style={{ flex: 1 }}>
-        <HeaderWhite
-          text="Sent videos"
-          onPress={() => props.navigation.goBack()}
-          hideIcon
-          navigation={props.navigation}
-        />
+    // <ScrollView
+    //   contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
+    //   style={styles.ScrollView_1}
+    // >
+    <View style={{ flex: 1 }}>
+      <HeaderWhite
+        text="Sent videos"
+        onPress={() => props.navigation.goBack()}
+        hideIcon
+        navigation={props.navigation}
+      />
 
-        <View
-          style={{
-            flex: 1,
-            width: "90%",
-            alignSelf: "center"
-          }}
-        >
-          <Text style={ButtonStyle.textStyleHeading}>Sent Videos</Text>
-          {sentVideos.length > 0 ? (
-            <FlatList
-              data={sentVideos}
-              renderItem={renderItem}
-              extraData={sentVideos}
-              // ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text>You have no sent conversation</Text>
-            </View>
-          )}
-        </View>
+      <View
+        style={{
+          flex: 1,
+          width: "90%",
+          alignSelf: "center"
+        }}
+      >
+        <Text style={ButtonStyle.textStyleHeading}>Sent Videos</Text>
+        {sentVideos.length > 0 ? (
+          <FlatList
+            data={sentVideos}
+            renderItem={renderItem}
+            extraData={sentVideos}
+            // ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text>You have no sent conversation</Text>
+          </View>
+        )}
       </View>
-    </ScrollView>
+    </View>
+    // </ScrollView>
   )
 }
 
@@ -358,7 +362,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -367,7 +375,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })

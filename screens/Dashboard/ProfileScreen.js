@@ -35,13 +35,14 @@ function ProfileScreen(props) {
   const state = useSelector(state => state.user)
   const [imageData, setImageData] = useState("")
   const [imageUri, SetImageUri] = useState(
-    user.profile_picture != null
+    user?.profile_picture != null
       ? user.profile_picture
       : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
   )
-  const [firstname, setFirstName] = useState(user.name)
-  const [lastname, setLastName] = useState(user.surname)
-  const [email, setEmail] = useState(user.email)
+  const [firstname, setFirstName] = useState(user?.name)
+  const [lastname, setLastName] = useState(user?.surname)
+  const [email, setEmail] = useState(user?.email)
+  const [submitting, setSubmitting] = useState(false)
 
   async function uploadProfilePicture() {
     SetUploadingImage(true)
@@ -52,18 +53,17 @@ function ProfileScreen(props) {
       data: { image: imageData }
     })
       .then(res => {
-        console.warn(res) // dispatch(actionCategories(res.data.results))
+        // dispatch(actionCategories(res.data.results))
         dispatch(update(res.data))
         return res
       })
       .catch(function (error) {
-        console.warn(error)
-        Toast.show({
-          type: "error",
-          text1: error,
-          position: "bottom",
-          visibilityTime: 3000
-        })
+        // Toast.show({
+        //   type: "error",
+        //   text1: error,
+        //   position: "bottom",
+        //   visibilityTime: 3000
+        // })
         SetUploadingImage(false)
       })
       .finally(() => {
@@ -116,8 +116,10 @@ function ProfileScreen(props) {
             props.navigation.goBack()
           }}
           updateUser={async () => {
+            setSubmitting(true)
             await uploadProfilePicture()
             await updateUser()
+            setSubmitting(false)
           }}
           text="Profile Info"
         />
@@ -138,6 +140,11 @@ function ProfileScreen(props) {
             }}
           >
             <TouchableOpacity
+              style={{
+                borderWidth: 0.5,
+                borderColor: "gray",
+                borderRadius: 10
+              }}
               onPress={() => {
                 ImagePicker.openPicker({
                   width: 300,
@@ -151,7 +158,9 @@ function ProfileScreen(props) {
               }}
             >
               <Image
-                source={{ uri: imageUri }}
+                source={{
+                  uri: imageUri
+                }}
                 style={{
                   height: 120,
                   width: 120,
@@ -291,7 +300,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -301,7 +314,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 4,
     backgroundColor: "white",
-    alignSelf: "center"
+    alignSelf: "center",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   textInputStyle: {
     flex: 0.44,
@@ -309,7 +326,12 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     elevation: 3,
     paddingHorizontal: 10,
-    color: "white"
+    color: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2,
+    height: 50
   }
 })
 

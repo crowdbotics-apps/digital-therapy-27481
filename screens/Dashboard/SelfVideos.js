@@ -73,7 +73,11 @@ function SelfVideos(props) {
           elevation: 4,
           flexDirection: "row",
           marginVertical: 5,
-          marginHorizontal: 5
+          marginHorizontal: 5,
+          shadowColor: "black",
+          shadowRadius: 3,
+          shadowOffset: { x: 3, y: 3 },
+          shadowOpacity: 0.2
         }}
         onPress={() => {}}
       >
@@ -127,48 +131,48 @@ function SelfVideos(props) {
   }
 
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
-      style={styles.ScrollView_1}
-    >
-      <View style={{ flex: 1 }}>
-        <HeaderWhite
-          text="Profile info"
-          onPress={() => props.navigation.goBack()}
-          showRecord
-          navigation={props.navigation}
-        />
+    // <ScrollView
+    //   contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
+    //   style={styles.ScrollView_1}
+    // >
+    <View style={{ flex: 1 }}>
+      <HeaderWhite
+        text="Profile info"
+        onPress={() => props.navigation.goBack()}
+        showRecord
+        navigation={props.navigation}
+      />
 
-        <View
-          style={{
-            flex: 1,
-            width: "90%",
-            alignSelf: "center"
-          }}
-        >
-          <Text style={ButtonStyle.textStyleHeading}>Self Videos</Text>
-          {selfVideos.length > 0 ? (
-            <FlatList
-              data={selfVideos}
-              renderItem={renderItem}
-              extraData={selfVideos}
-              ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-              style={{}}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text>You have no self video </Text>
-            </View>
-          )}
-        </View>
+      <View
+        style={{
+          flex: 1,
+          width: "90%",
+          alignSelf: "center"
+        }}
+      >
+        <Text style={ButtonStyle.textStyleHeading}>Self Videos</Text>
+        {selfVideos.length > 0 ? (
+          <FlatList
+            data={selfVideos}
+            renderItem={renderItem}
+            extraData={selfVideos}
+            ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+            style={{}}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text>You have no self video </Text>
+          </View>
+        )}
       </View>
-    </ScrollView>
+    </View>
+    // </ScrollView>
   )
 }
 
@@ -181,7 +185,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -190,7 +198,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })

@@ -10,10 +10,12 @@ import {
 import OTPInputView from "@twotalltotems/react-native-otp-input"
 import Theme from "../../Styles/Theme"
 import strings from "../../Localization"
+import Toast from "react-native-toast-message"
 
 const OTPScreen = ({ navigation }) => {
+  const [code, setCode] = useState("")
   return (
-    <View>
+    <View style={{ flex: 1, backgroundColor: "white" }}>
       <Text style={styles.forgotStyling}>
         Please Enter {"\n"}
         The Code{" "}
@@ -21,16 +23,30 @@ const OTPScreen = ({ navigation }) => {
 
       <View>
         <OTPInputView
-          code="123456"
-          style={{ width: "80%", height: 200 }}
-          pinCount={4}
+          style={{ width: "80%", height: 200, color: "black" }}
+          pinCount={6}
+          code={code}
           codeInputFieldStyle={styles.underlineStyleBase}
+          placeholderTextColor={Theme.PlaceHolderTextColor}
+          onCodeChanged={code => {
+            setCode(code)
+          }}
         />
       </View>
 
       <TouchableOpacity
         style={styles.continueTextButtonStyle}
-        onPress={() => navigation.navigate("RecoverPassword")}
+        onPress={() => {
+          if (code.length == 6) {
+            navigation.navigate("RecoverPassword", { code })
+          } else {
+            Toast.show({
+              text1: "Enter complete code to continue",
+              visibilityTime: 3000,
+              position: "bottom"
+            })
+          }
+        }}
       >
         <Text style={styles.continueTextColor}> {strings.continue} </Text>
       </TouchableOpacity>
@@ -56,7 +72,8 @@ const styles = StyleSheet.create({
     height: 45,
     borderBottomColor: "black",
     borderWidth: 0,
-    borderBottomWidth: 3
+    borderBottomWidth: 3,
+    color: "black"
   },
 
   continueTextButtonStyle: {
@@ -70,7 +87,7 @@ const styles = StyleSheet.create({
   continueTextColor: {
     fontSize: 20,
     color: "white",
-    fontWeight: "100",
+    // fontWeight: "100",
     flexDirection: "row",
     alignSelf: "center",
     right: 10,

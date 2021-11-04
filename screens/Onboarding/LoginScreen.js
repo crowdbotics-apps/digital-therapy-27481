@@ -14,7 +14,7 @@ import {
 } from "react-native"
 import MainStyle from "../../Styles/ButtonStyle"
 // import Button from '../../src/component/Button';
-// import {LoginButton, AccessToken, LoginManager} from 'react-native-fbsdk';
+import { LoginManager, AccessToken, LoginButton } from "react-native-fbsdk-next"
 
 import axios from "axios"
 
@@ -24,8 +24,12 @@ import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes
-} from "@react-native-community/google-signin"
-
+} from "@react-native-google-signin/google-signin"
+import appleAuth, {
+  AppleAuthRequestScope,
+  AppleAuthRequestOperation
+} from "@invertase/react-native-apple-authentication"
+import RNFirebaseAuth from "@react-native-firebase/auth"
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
 import { actionSignup } from "../../Actions/index"
@@ -36,7 +40,8 @@ import {
   iosConfig,
   androidConfig,
   SET_TOKEN,
-  GET_TOKEN
+  GET_TOKEN,
+  GET_HEADER
 } from "../../Connection/index"
 import Storage from "react-native-storage"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -82,6 +87,8 @@ function LoginScreen(props) {
   const [checkingLoggedIn, setCheckingLoggedIn] = useState(false)
   const [submittingGoogle, setSubmittingGoogle] = useState(false)
   const [submittingFacebook, setSubmittingFacebook] = useState(false)
+  const [submittingApple, setSubmittingApple] = useState(false)
+
   const [hidePassword, setHidePassword] = useState(true)
   const dispatch = useDispatch()
 
@@ -120,6 +127,7 @@ function LoginScreen(props) {
                 setEmail(text)
               }}
               style={Styles.textInputStyle}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           <View style={Styles.inputStyle}>
@@ -133,6 +141,7 @@ function LoginScreen(props) {
                 setPassword(text)
               }}
               autoCapitalize="none"
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
             <TouchableOpacity
               style={{ padding: 10 }}
@@ -144,7 +153,7 @@ function LoginScreen(props) {
           </View>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate("ForgotPassword")
+              props.navigation.navigate("ForgotScreen")
             }}
             style={{ alignItems: "flex-end", marginVertical: 20 }}
           >
@@ -236,6 +245,7 @@ function LoginScreen(props) {
                 style={[Styles.socialButton]}
                 onPress={() => {
                   // this.signUpFacebook();
+                  signUpGoogle()
                 }}
               >
                 {submittingFacebook ? (
@@ -264,7 +274,8 @@ function LoginScreen(props) {
               <TouchableOpacity
                 style={[Styles.socialButton]}
                 onPress={() => {
-                  signUpFacebook()
+                  // signUpFacebook()
+                  onAppleSignin()
                 }}
               >
                 {submittingFacebook ? (
@@ -357,47 +368,10 @@ function LoginScreen(props) {
       await GoogleSignin.hasPlayServices()
 
       const userInfo = await GoogleSignin.signIn()
-      console.warn(userInfo)
-      axios({
-        method: "post",
-        url: BaseURL.concat("api/ShoeCleaning/Signup?IsSocial=true"),
-        data: {
-          Name: userInfo.user.name,
-          Email: userInfo.user.email,
-          Password: userInfo.user.id,
-          PhoneNumber: "",
-          UserAddresses: [],
-          isSocial: true,
-          socialId: userInfo.user.id
-        },
-        headers: Header
-      })
-        .then(function (response) {
-          if (response.data.success) {
-            self.props.actionSignup("user", response.data.data[0])
-            self.saveUser(response.data.data[0])
-            // self.props.navigation.replace('Dashboard');
-          } else {
-            Toast.show({
-              text1: response.data.message,
-              position: "bottom",
-              visibilityTime: 3000
-            })
-          }
-        })
-        .catch(function (error) {
-          console.warn(error)
-          Toast.show({
-            text1: "Network Error",
-            position: "bottom",
-            visibilityTime: 3000
-          })
-          setLoading(false)
-        })
-        .finally(() => {
-          setSubmitting(false)
-          setSubmittingGoogle(false)
-        })
+
+      console.log(userInfo.serverAuthCode)
+      console.log("--------------userinfogoogle-----------")
+      googleLogin(userInfo.serverAuthCode)
     } catch (error) {
       console.warn(error)
       setSubmittingGoogle(false)
@@ -438,7 +412,7 @@ function LoginScreen(props) {
         })
       })
       .catch(err => {
-        console.warn(err)
+        // console.warn(err)
         // any exception including data not found
         // goes to catch()
         //  console.warn(err.messagce);
@@ -450,6 +424,42 @@ function LoginScreen(props) {
             // TODO
             break
         }
+      })
+  }
+  async function GetUserDetails() {
+    axios({
+      method: "get",
+      url: BaseURL.concat("/user/get_user_profile/"),
+      headers: await GET_HEADER()
+    })
+      .then(res => {
+        console.warn(res.data)
+        var data = { token: GET_TOKEN(), user: res.data }
+        dispatch(login(data))
+
+        // self.props.actionSignup("user", res.data.data[0])
+        saveUser(data)
+
+        Toast.show({
+          type: "success",
+          text1: "Login successful",
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
       })
   }
   function signIn(email) {
@@ -466,11 +476,10 @@ function LoginScreen(props) {
         })
           .then(res => {
             SET_TOKEN(res.data.token)
-            // console.warn(GET_TOKEN())
             dispatch(login(res.data))
+
             // self.props.actionSignup("user", res.data.data[0])
             saveUser(res.data)
-            // self.props.navigation.replace('Dashboard');
 
             Toast.show({
               type: "success",
@@ -529,63 +538,160 @@ function LoginScreen(props) {
   }
 
   function initUser(token) {
-    fetch(
-      "https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=" +
-        token
-    )
-      .then(response => response.json())
-      .then(json => {
-        // Some user object has been set up somewhere, build that user here
+    // fetch(
+    //   "https://graph.facebook.com/v2.5/me?fields=email,name,friends&access_token=" +
+    //     token
+    // )
+    //   .then(response => response.json())
+    //   .then(json => {
+    // Some user object has been set up somewhere, build that user here
 
-        axios({
-          method: "post",
-          url: BaseURL.concat("api/ShoeCleaning/Signup?IsSocial=true"),
-          data: {
-            Name: json.name,
-            Email: json.email,
-            Password: json.id,
-            PhoneNumber: "",
-            UserAddresses: [],
-            isSocial: true,
-            socialId: json.id
-          },
-          headers: Header
+    axios({
+      method: "post",
+      url: BaseURL.concat("/login/facebook/"),
+      data: {
+        access_token: token
+      }
+    })
+      .then(async res => {
+        SET_TOKEN(res.data.key)
+        // // console.warn(GET_TOKEN())
+        // dispatch(login(res.data))
+        // // self.props.actionSignup("user", res.data.data[0])
+        await storage.save({
+          key: "loginState", // Note: Do not use underscore("_") in key!
+          data: { token: res.data.key },
+          expires: null
         })
-          .then(function (response) {
-            if (response.data.success) {
-              props.actionSignup("user", response.data.data[0])
-              // self.props.navigation.replace('Dashboard');
-              self.saveUser(response.data.data[0])
-            } else {
-              Toast.show({
-                text: response.data.message,
-                buttonText: "Okay",
-                duration: 3000
-              })
-            }
-          })
-          .catch(function (error) {
-            console.warn(error)
-            Toast.show({
-              text: "Network Error",
-              buttonText: "Okay",
-              duration: 3000
-            })
-            setLoading(false)
-          })
-          .finally(() => {
-            setSubmitting(false)
-            setSubmittingFacebook(false)
-          })
+        await GetUserDetails()
+        // Toast.show({ text: res.data.message }, 3000)
       })
-      .catch(() => {
+      .catch(function (error) {
+        console.error(error.response)
+        // Toast.show({
+        //   type: "error",
+        //   text1: error.response.data.email[0],
+        //   position: "bottom",
+        //   visibilityTime: 3000
+        // })
+        setLoading(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+        setSubmittingFacebook(false)
+      })
+    // })
+    // .catch(() => {
+    //   Toast.show({
+    //     text: "ERROR GETTING DATA FROM FACEBOOK",
+    //     buttonText: "Okay",
+    //     duration: 3000
+    //   })
+    //   reject("ERROR GETTING DATA FROM FACEBOOK")
+    // })
+  }
+  function googleLogin(token) {
+    axios({
+      method: "post",
+      url: BaseURL.concat("/login/google/"),
+      data: {
+        code: token
+      }
+    })
+      .then(async res => {
+        SET_TOKEN(res.data.key)
+        // // console.warn(GET_TOKEN())
+        // dispatch(login(res.data))
+        // // self.props.actionSignup("user", res.data.data[0])
+        await storage.save({
+          key: "loginState", // Note: Do not use underscore("_") in key!
+          data: { token: res.data.key },
+          expires: null
+        })
+        await GetUserDetails()
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        console.warn(error.response)
         Toast.show({
-          text: "ERROR GETTING DATA FROM FACEBOOK",
-          buttonText: "Okay",
-          duration: 3000
+          type: "error",
+          text1: "Something went wrong",
+          text2: error?.response?.data?.non_field_errors?.[0],
+          position: "bottom",
+          visibilityTime: 3000
         })
-        reject("ERROR GETTING DATA FROM FACEBOOK")
+        setLoading(false)
       })
+      .finally(() => {
+        setSubmitting(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+        setSubmittingFacebook(false)
+      })
+    // })
+    // .catch(() => {
+    //   Toast.show({
+    //     text: "ERROR GETTING DATA FROM FACEBOOK",
+    //     buttonText: "Okay",
+    //     duration: 3000
+    //   })
+    //   reject("ERROR GETTING DATA FROM FACEBOOK")
+    // })
+  }
+  function appleLogin(token) {
+    setSubmittingApple(true)
+    axios({
+      method: "post",
+      url: BaseURL.concat("/login/apple/"),
+      data: {
+        access_token: token
+      }
+    })
+      .then(async res => {
+        console.warn(res)
+        SET_TOKEN(res.data.key)
+        // // console.warn(GET_TOKEN())
+        // dispatch(login(res.data))
+        // // self.props.actionSignup("user", res.data.data[0])
+        await storage.save({
+          key: "loginState", // Note: Do not use underscore("_") in key!
+          data: { token: res.data.key },
+          expires: null
+        })
+        await GetUserDetails()
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        // Toast.show({
+        //   type: "error",
+        //   text1: "error",
+        //   text2: error.response.data.non_field_errors[0],
+        //   position: "bottom",
+        //   visibilityTime: 3000
+        // })
+        setLoading(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+      })
+      .finally(() => {
+        setSubmitting(false)
+        setSubmittingApple(false)
+      })
+    // })
+    // .catch(() => {
+    //   Toast.show({
+    //     text: "ERROR GETTING DATA FROM FACEBOOK",
+    //     buttonText: "Okay",
+    //     duration: 3000
+    //   })
+    //   reject("ERROR GETTING DATA FROM FACEBOOK")
+    // })
   }
   function checkLoggedin() {
     var self = this
@@ -616,7 +722,70 @@ function LoginScreen(props) {
         }
       })
   }
+  function loginWithApple(identityToken, nonce) {
+    const appleCredential = RNFirebaseAuth.auth.AppleAuthProvider.credential(
+      identityToken,
+      nonce
+    )
+
+    RNFirebaseAuth.auth()
+      .signInWithCredential(appleCredential)
+      .then(response => {
+        console.log(response)
+
+        appleLogin(response.access_token)
+      })
+      .catch(_error => {
+        console.log(_error)
+        Toast.show({
+          type: "error",
+          text1: "Something went wrong",
+          position: "bottom",
+          visibilityTime: 3000
+        })
+      })
+  }
+  function onAppleSignin() {
+    return new Promise(async (resolve, _reject) => {
+      try {
+        const appleAuthRequestResponse = await appleAuth.performRequest({
+          requestedOperation: appleAuth.Operation.LOGIN,
+          requestedScopes: [appleAuth.Scope.EMAIL]
+        })
+
+        const { identityToken, nonce } = appleAuthRequestResponse
+        console.log("identity token")
+        console.log(appleAuthRequestResponse.identityToken)
+        console.log("nonce")
+        console.log(nonce)
+        appleLogin(appleAuthRequestResponse.nonce)
+
+        // loginWithApple(identityToken, nonce)
+        // sending entire auth response to server in `fetch` request
+        // const { ack, response } = await authFetch({
+        //   uri: "/sign-in-with-apple",
+        //   body: {
+        //     ...appleAuthRequestResponse
+        //   }
+        // })
+        // .then(async response => {
+        //   response
+        //   if (response?.user) {
+        //     //handle successful login
+        //     resolve({ success: true })
+        //   } else {
+        //     //handle unsuccessful login
+        //     resolve({ success: false })
+        //   }
+        // })
+      } catch (error) {
+        console.log(error)
+        resolve({ success: false })
+      }
+    })
+  }
 }
+
 const Styles = StyleSheet.create({
   ImageContainer: { flex: 0.3, justifyContent: "center", alignItems: "center" },
   logoStyle: { width: 100, height: 100 },
@@ -632,7 +801,8 @@ const Styles = StyleSheet.create({
     borderBottomColor: Theme.TEXTINPUT_BORDER_COLOR,
     borderBottomWidth: 1,
     // justifyContent: 'center',
-    alignItems: "center"
+    alignItems: "center",
+    height: 50
   },
   textInputStyle: { flex: 1, paddingLeft: 15 },
 

@@ -34,7 +34,6 @@ function ReceivedVideos(props) {
   const [receivedVideos, setReceivedVideos] = useState([])
   const [loading, setLoading] = useState(false)
   const user = useSelector(state => state.user.value.user)
-  console.warn(user.id)
   useEffect(() => {
     getReceivedVideos()
   }, [])
@@ -64,7 +63,6 @@ function ReceivedVideos(props) {
   const renderText = item => {
     console.warn("argument:" + item.argument)
     console.warn("should_resolve:" + item.should_resolve)
-    console.warn("my user id " + user.id)
     // I am not the initiator of this conversation
     if (item.resolved) {
       return (
@@ -171,7 +169,7 @@ function ReceivedVideos(props) {
     if (
       item.argument &&
       item.should_resolve &&
-      item.conversation.person_from != user.id
+      item.conversation.person_from != user?.id
     ) {
       return (
         <View style={{ flex: 0.4, flexDirection: "row" }}>
@@ -224,7 +222,7 @@ function ReceivedVideos(props) {
     if (
       item.argument &&
       item.should_resolve &&
-      item.conversation.person_from == user.id
+      item.conversation.person_from == user?.id
     ) {
       return (
         <View style={{ flex: 0.4, flexDirection: "row" }}>
@@ -389,7 +387,11 @@ function ReceivedVideos(props) {
           justifyContent: "space-evenly",
           backgroundColor: "white",
           marginHorizontal: 5,
-          marginVertical: 5
+          marginVertical: 5,
+          shadowColor: "black",
+          shadowRadius: 3,
+          shadowOffset: { x: 3, y: 3 },
+          shadowOpacity: 0.2
           // height: 100
         }}
         onPress={() => {
@@ -419,8 +421,8 @@ function ReceivedVideos(props) {
               size="medium"
               source={{
                 uri:
-                  item.listener.profile_picture != null
-                    ? item.listener.profile_picture
+                  item.speaker.profile_picture != null
+                    ? item.speaker.profile_picture
                     : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
               }}
             ></Avatar>
@@ -472,49 +474,49 @@ function ReceivedVideos(props) {
     )
   }
   return (
-    <ScrollView
-      contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
-      style={styles.ScrollView_1}
-    >
-      <View style={{ flex: 1 }}>
-        <HeaderWhite
-          text="Received videos"
-          onPress={() => props.navigation.goBack()}
-          hideIcon
-          navigation={props.navigation}
-        />
+    // <ScrollView
+    //   contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
+    //   style={styles.ScrollView_1}
+    // >
+    <View style={{ flex: 1 }}>
+      <HeaderWhite
+        text="Received videos"
+        onPress={() => props.navigation.goBack()}
+        hideIcon
+        navigation={props.navigation}
+      />
 
-        <View
-          style={{
-            flex: 1,
-            //   width: "90%",
-            width: "100%",
-            paddingHorizontal: 15,
-            alignSelf: "center"
-          }}
-        >
-          <Text style={ButtonStyle.textStyleHeading}>Videos</Text>
-          {receivedVideos.length > 0 ? (
-            <FlatList
-              data={receivedVideos}
-              renderItem={renderItem}
-              extraData={receivedVideos}
-              // ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-            />
-          ) : (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Text>You have no received conversation</Text>
-            </View>
-          )}
-        </View>
+      <View
+        style={{
+          flex: 1,
+          //   width: "90%",
+          width: "100%",
+          paddingHorizontal: 15,
+          alignSelf: "center"
+        }}
+      >
+        <Text style={ButtonStyle.textStyleHeading}>Videos</Text>
+        {receivedVideos.length > 0 ? (
+          <FlatList
+            data={receivedVideos}
+            renderItem={renderItem}
+            extraData={receivedVideos}
+            // ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+          />
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Text>You have no received conversation</Text>
+          </View>
+        )}
       </View>
-    </ScrollView>
+    </View>
+    // </ScrollView>
   )
 }
 
@@ -527,7 +529,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -536,7 +542,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })

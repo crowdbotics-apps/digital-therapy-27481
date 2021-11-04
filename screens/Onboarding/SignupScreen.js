@@ -25,7 +25,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes
-} from "@react-native-community/google-signin"
+} from "@react-native-google-signin/google-signin"
 
 import { connect } from "react-redux"
 import { bindActionCreators } from "redux"
@@ -95,6 +95,7 @@ function SignupScreen(props) {
               onChangeText={text => {
                 setName(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           {/* last name */}
@@ -107,6 +108,7 @@ function SignupScreen(props) {
               onChangeText={text => {
                 setLastName(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           {/* name */}
@@ -120,6 +122,7 @@ function SignupScreen(props) {
               onChangeText={text => {
                 setAge(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           {/* Email */}
@@ -133,6 +136,7 @@ function SignupScreen(props) {
               onChangeText={text => {
                 setEmail(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           {/* Location */}
@@ -145,6 +149,7 @@ function SignupScreen(props) {
               onChangeText={text => {
                 setLocation(text)
               }}
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>
           <View style={Styles.inputStyle}>
@@ -158,6 +163,7 @@ function SignupScreen(props) {
                 setPassword(text)
               }}
               autoCapitalize="none"
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
             <TouchableOpacity
               style={{ padding: 10 }}
@@ -180,6 +186,7 @@ function SignupScreen(props) {
                 setConfirmPassword(text)
               }}
               autoCapitalize="none"
+              placeholderTextColor={Theme.PlaceHolderTextColor}
             />
             <TouchableOpacity
               style={{ padding: 10 }}
@@ -210,10 +217,20 @@ function SignupScreen(props) {
                     if (password == confirmPassword) {
                       register()
                     } else {
-                      Toast.show({ text: "Password does not match" }, 3000)
+                      Toast.show({
+                        type: "error",
+                        text1: "Password does not match",
+                        visibilityTime: 3000,
+                        position: "bottom"
+                      })
                     }
                   } else {
-                    Toast.show({ text: "Input all fields" }, 3000)
+                    Toast.show({
+                      type: "error",
+                      text1: "Input all fields",
+                      visibilityTime: 3000,
+                      position: "bottom"
+                    })
                   }
                 }
                 // this.props.navigation.navigate('Dashboard');
@@ -280,6 +297,7 @@ function SignupScreen(props) {
       } else {
         setPasswordError(true)
         Toast.show({
+          type: "error",
           text1: "Enter Password",
           position: "bottom",
           visibilityTime: 3000
@@ -297,9 +315,10 @@ function SignupScreen(props) {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
     if (reg.test(text) === false) {
       Toast.show({
-        text: "Input valid email",
-        buttonText: "Okay",
-        duration: 3000
+        type: "error",
+        text1: "Input valid email",
+        visibilityTime: 3000,
+        position: "bottom"
       })
       setEmailError(true)
       return false
@@ -329,6 +348,7 @@ function SignupScreen(props) {
         props.navigation.replace("HomeScreen")
         // self.props.actionSignup('profileStatus', ret.ProfileStatus);
         Toast.show({
+          type: "success",
           text1: "Registration successful",
           position: "bottom",
           visibilityTime: 3000
@@ -368,7 +388,8 @@ const Styles = StyleSheet.create({
     // justifyContent: 'center',
     alignItems: "center",
     width: "90%",
-    alignSelf: "flex-start"
+    alignSelf: "flex-start",
+    height: 50
   },
   textInputStyle: { flex: 1, paddingLeft: 15 },
   lineStyle: {

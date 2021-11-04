@@ -105,7 +105,11 @@ function NewConversation(props) {
                   borderWidth: 0,
                   marginTop: 10,
                   elevation: 4,
-                  borderRadius: 3
+                  borderRadius: 3,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
                 }}
                 textStyle={{ color: Theme.THEME_COLOR }}
                 ArrowDownIconComponent={() => (
@@ -143,7 +147,11 @@ function NewConversation(props) {
                   borderWidth: 0,
                   marginTop: 10,
                   elevation: 4,
-                  borderRadius: 3
+                  borderRadius: 3,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
                 }}
                 textStyle={{ color: Theme.THEME_COLOR }}
                 ArrowDownIconComponent={() => (
@@ -184,11 +192,17 @@ function NewConversation(props) {
                   elevation: 4,
                   borderRadius: 3,
                   color: Theme.THEME_COLOR,
-                  fontSize: 16
+                  fontSize: 16,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2,
+                  paddingLeft: 10
                 }}
                 value={topic}
                 placeholder="Please write down the topic"
                 onChangeText={text => setTopic(text)}
+                placeholderTextColor={Theme.PlaceHolderTextColor}
               />
             </View>
             <View
@@ -252,7 +266,11 @@ function NewConversation(props) {
                   backgroundColor: Theme.THEME_COLOR,
                   justifyContent: "center",
                   alignItems: "center",
-                  elevation: 20
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
                 }}
               >
                 <View
@@ -284,7 +302,7 @@ function NewConversation(props) {
             <Text style={{ color: "white" }}>Mark it as resolved</Text>
           </TouchableOpacity>
         </View> */}
-        <View
+        {/* <View
           style={{
             // flex: 0.3,
             justifyContent: "center",
@@ -302,7 +320,11 @@ function NewConversation(props) {
               backgroundColor: "white",
               elevation: 5,
               borderBottomLeftRadius: 35,
-              borderTopRightRadius: 35
+              borderTopRightRadius: 35,
+              shadowColor: "black",
+              shadowRadius: 3,
+              shadowOffset: { x: 3, y: 3 },
+              shadowOpacity: 0.2
             }}
           >
             <TouchableOpacity
@@ -386,7 +408,9 @@ function NewConversation(props) {
               <Text style={{ color: account ? "black" : "gray" }}>Account</Text>
             </TouchableOpacity>
           </View>
-        </View>
+       
+       
+        </View> */}
       </View>
     </ScrollView>
   )
@@ -401,6 +425,7 @@ function NewConversation(props) {
         // dispatch(actionCategories(res.data.results))
       })
       .catch(function (error) {
+        console.warn(error.response)
         Toast.show({
           type: "error",
           text1: error.response.data.non_field_errors[0],
@@ -447,7 +472,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   roundButtonLarge: {
     height: 80,
@@ -456,7 +485,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 2,
-    backgroundColor: "white"
+    backgroundColor: "white",
+    shadowColor: "black",
+    shadowRadius: 3,
+    shadowOffset: { x: 3, y: 3 },
+    shadowOpacity: 0.2
   },
   pickerContainerStyle: { marginVertical: 10 }
 })
