@@ -64,6 +64,7 @@ THIRD_PARTY_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
     'django_extensions',
     'drf_yasg',
     'storages',
@@ -209,6 +210,12 @@ EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
 EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = env.str(
+    "DEFAULT_FROM_EMAIL", "no-reply@mg.speaklistenresolve.com")
+
+ANYMAIL = {
+    "MAILGUN_API_KEY": env.str("MAILGUN_API_KEY", ""),
+}
 
 
 # AWS S3 config
@@ -250,9 +257,7 @@ SWAGGER_SETTINGS = {
     "DEFAULT_INFO": f"{ROOT_URLCONF}.api_info",
 }
 
-if DEBUG or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
-    # output email to console instead of sending
-    if not DEBUG:
-        logging.warning(
-            "You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+
+if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

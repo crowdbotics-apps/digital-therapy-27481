@@ -4,7 +4,8 @@ from allauth.socialaccount.providers.facebook.views import \
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.contrib.auth import get_user_model
-from home.api.v1.serializers import (SignupSerializer, SocialSerializer,
+from home.api.v1.serializers import (PasswordResetConfirmSerializer,
+                                     SignupSerializer, SocialSerializer,
                                      UserSerializer)
 from home.api.v1.user_utils import UserUtils
 from home.utils import convert_base64_to_file
@@ -14,7 +15,7 @@ from rest_framework.authentication import (SessionAuthentication,
                                            TokenAuthentication)
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework.decorators import action
+from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
@@ -50,7 +51,7 @@ class FacebookLogin(SocialLoginView):
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
-    callback_url = "https://nubu-app.firebaseapp.com/__/auth/handler"
+    callback_url = "https://speak-listen-resolve.firebaseapp.com/__/auth/handler"
 
 
 class AppleLogin(ViewSet):
@@ -118,3 +119,10 @@ class UserViewSet(ModelViewSet):
     def get_users(self, request, pk=None):
         users = User.objects.all().exclude(id=request.user.id)
         return Response(self.serializer_class(users, many=True).data)
+
+    @action(methods=['post'], detail=False, permission_classes=[])
+    def password_reset_confirm(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid()
+        serializer.save()
+        return Response({"details": "Password reset"})
