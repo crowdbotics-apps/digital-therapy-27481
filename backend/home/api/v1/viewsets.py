@@ -60,18 +60,10 @@ class AppleLogin(ViewSet):
     def create(self, request):
         social_serializer = SocialSerializer(data=request.data)
         social_serializer.is_valid(raise_exception=True)
-        res_status = UserUtils.verify_apple_details(
-            request.data["access_token"])
-        if res_status.status_code != 200:
-            return Response({
-                'success': False,
-                'result': "Invalid Token!",
-            }, status=status.HTTP_400_BAD_REQUEST)
-        user_info = res_status.json()
-        id_token = user_info.get('id_token', None)  # request.data["id_token"]
+        id_token = jwt.decode(request.data.get('access_token'), options={"verify_signature": False})
         response_data = {}
         if id_token:
-            decoded = jwt.decode(id_token, '', verify=False)
+            decoded = id_token
             response_data.update(
                 {'email': decoded['email'] if 'email' in decoded else None})
             response_data.update(
