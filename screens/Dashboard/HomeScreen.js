@@ -844,15 +844,9 @@ function HomeScreen(props) {
                 backgroundColor: profile ? Theme.HOME_SELECTION : "white"
               }}
               onPress={() => {
-                if (account) {
-                  setProfile(false)
-                  setHome(false)
-                  setAccount(true)
-                } else {
-                  setProfile(false)
-                  setHome(true)
-                  setAccount(false)
-                }
+                // setProfile(false)
+                // setHome(false)
+                // setAccount(true)
 
                 props.navigation.navigate("ProfileScreen")
               }}

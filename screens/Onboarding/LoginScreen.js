@@ -653,13 +653,13 @@ function LoginScreen(props) {
     })
       .then(async res => {
         console.warn(res)
-        SET_TOKEN(res.data.key)
+        SET_TOKEN(res.data.token)
         // // console.warn(GET_TOKEN())
         // dispatch(login(res.data))
         // // self.props.actionSignup("user", res.data.data[0])
         await storage.save({
           key: "loginState", // Note: Do not use underscore("_") in key!
-          data: { token: res.data.key },
+          data: { token: res.data.token },
           expires: null
         })
         await GetUserDetails()
@@ -722,43 +722,16 @@ function LoginScreen(props) {
         }
       })
   }
-  function loginWithApple(identityToken, nonce) {
-    const appleCredential = RNFirebaseAuth.auth.AppleAuthProvider.credential(
-      identityToken,
-      nonce
-    )
 
-    RNFirebaseAuth.auth()
-      .signInWithCredential(appleCredential)
-      .then(response => {
-        console.log(response)
-
-        appleLogin(response.access_token)
-      })
-      .catch(_error => {
-        console.log(_error)
-        Toast.show({
-          type: "error",
-          text1: "Something went wrong",
-          position: "bottom",
-          visibilityTime: 3000
-        })
-      })
-  }
   function onAppleSignin() {
     return new Promise(async (resolve, _reject) => {
       try {
         const appleAuthRequestResponse = await appleAuth.performRequest({
           requestedOperation: appleAuth.Operation.LOGIN,
-          requestedScopes: [appleAuth.Scope.EMAIL]
+          requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME]
         })
-
-        const { identityToken, nonce } = appleAuthRequestResponse
-        console.log("identity token")
         console.log(appleAuthRequestResponse.identityToken)
-        console.log("nonce")
-        console.log(nonce)
-        appleLogin(appleAuthRequestResponse.nonce)
+        appleLogin(appleAuthRequestResponse.identityToken)
 
         // loginWithApple(identityToken, nonce)
         // sending entire auth response to server in `fetch` request
