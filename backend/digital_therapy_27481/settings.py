@@ -261,3 +261,14 @@ EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+APPLE_KEY_ID = os.environ.get('APPLE_KEY_ID', '')
+
+APPLE_TEAM_ID = os.environ.get('APPLE_TEAM_ID', '')
+APPLE_CLIENT_ID = os.environ.get('APPLE_CLIENT_ID', '')
+try:
+    APPLE_SECRET_KEY = os.environ.get(
+        'APPLE_SECRET_KEY').replace("||n||", '\n')
+except:
+    APPLE_SECRET_KEY = ""

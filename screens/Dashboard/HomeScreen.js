@@ -32,13 +32,13 @@ import HeaderWhite from "../../Component/HeaderWhite"
 import * as Animatable from "react-native-animatable"
 import axios from "axios"
 import DropDownPicker from "react-native-dropdown-picker"
-
+import Toast from "react-native-toast-message"
 // edited
 function HomeScreen(props) {
   const [home, setHome] = useState(true)
 
   const [account, setAccount] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState(false)
   const [isHome, setIsHome] = useState(true)
   const [isNewProfile, setIsNewProfile] = useState(true)
