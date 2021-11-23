@@ -89,7 +89,11 @@ class CustomResetPasswordForm(ResetPasswordForm):
         current_site = get_current_site(request)
         email = self.cleaned_data["email"]
 
+        index = 0
         for user in self.users:
+            if index > 0:
+                break
+            index += 1
             token = UserToken.objects.create(
                 user=user, token=UserToken.generate_token())
             context = {

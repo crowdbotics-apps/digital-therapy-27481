@@ -114,7 +114,9 @@ class UserViewSet(ModelViewSet):
 
     @action(methods=['post'], detail=False, permission_classes=[])
     def password_reset_confirm(self, request):
+        print(request.data)
         serializer = PasswordResetConfirmSerializer(data=request.data)
+
         serializer.is_valid()
         serializer.save()
         return Response({"details": "Password reset"})
