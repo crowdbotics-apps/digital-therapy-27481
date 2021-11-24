@@ -52,7 +52,8 @@ LOCAL_APPS = [
     'home',
     'modules',
     'users.apps.UsersConfig',
-    'conversation'
+    'conversation',
+    'contact',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',

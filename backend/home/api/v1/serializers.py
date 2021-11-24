@@ -17,15 +17,18 @@ from rest_auth.serializers import PasswordResetSerializer
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from users.models import Token as UserToken
+from contact.models import Contact
 
 User = get_user_model()
 
 
 class SignupSerializer(serializers.ModelSerializer):
+    invite_code = serializers.CharField(max_length=6, required=False)
+
     class Meta:
         model = User
         fields = ('id', 'name', 'email', 'password',
-                  'age', 'surname', 'location')
+                  'age', 'surname', 'location', 'invite_code')
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -53,6 +56,18 @@ class SignupSerializer(serializers.ModelSerializer):
                     _("A user is already registered with this e-mail address."))
         return email
 
+    def validate_invite_code(self, invite_code):
+        if invite_code:
+            if len(invite_code) != 6:
+                raise serializers.ValidationError(
+                    "Ensure this field has no more than 6 characters.")
+
+            if not Contact.objects.filter(invite_code=invite_code).exists():
+                raise serializers.ValidationError(
+                    "Invite code does not exist."
+                )
+        return invite_code
+
     def create(self, validated_data):
         user = User(
             email=validated_data.get('email'),
@@ -68,6 +83,13 @@ class SignupSerializer(serializers.ModelSerializer):
         )
         user.set_password(validated_data.get('password'))
         user.save()
+        invite_code = validated_data.get('invite_code')
+        if invite_code:
+            friend = Contact.objects.get(invite_code=invite_code)
+            friend.friends.add(user)
+            contact = Contact.objects.create(user=user)
+            contact.friends.add(friend.user)
+
         request = self._get_request()
         setup_user_email(request, user, [])
         return user

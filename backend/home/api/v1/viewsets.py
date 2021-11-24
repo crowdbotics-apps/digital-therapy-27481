@@ -89,6 +89,12 @@ class UserViewSet(ModelViewSet):
     )
     permission_classes = [IsAuthenticated]
 
+    def get_queryset(self):
+        if self.request.query_params.get('contact'):
+            friends = [i.id for i in self.request.user.contacts.friends.all()]
+            return User.objects.filter(id__in=friends)
+        return User.objects.all()
+
     def get_serializer_context(self):
         context = super().get_serializer_context()
         context.update({"request": self.request})
@@ -114,7 +120,6 @@ class UserViewSet(ModelViewSet):
 
     @action(methods=['post'], detail=False, permission_classes=[])
     def password_reset_confirm(self, request):
-        print(request.data)
         serializer = PasswordResetConfirmSerializer(data=request.data)
 
         serializer.is_valid()
