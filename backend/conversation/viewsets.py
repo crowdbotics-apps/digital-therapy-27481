@@ -2,7 +2,8 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework import filters
+from django_filters.rest_framework import DjangoFilterBackend
 from conversation.models import Conversation, Item
 from conversation.serializers import (
     ConversationSerializer, ItemSerializer,
@@ -40,9 +41,11 @@ class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['category', 'id']
 
-    def get_queryset(self):
-        return Conversation.objects.filter(person_from=self.request.user)
+    # def get_queryset(self):
+    #     return Conversation.objects.filter(person_from=self.request.user)
 
     def perform_create(self, serializer):
         user = self.request.user

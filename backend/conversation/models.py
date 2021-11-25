@@ -14,9 +14,8 @@ Categories_enum = (
 
 
 class Conversation(DateTimeInfo):
-    # TODO: rename to category
     category = models.CharField('Category', choices=Categories_enum, default=CategoryEnum.couple.value,
-                                             max_length=25)
+                                max_length=25)
     person_from = models.ForeignKey(
         User, related_name='conversation_from', on_delete=models.CASCADE)
     person_to = models.ForeignKey(
