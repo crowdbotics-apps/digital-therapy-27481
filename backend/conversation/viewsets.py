@@ -1,40 +1,17 @@
-
-
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from conversation.models import Category, Conversation, Item, Video
-from conversation.serializers import (CategorySerializer,
-                                      ConversationSerializer, ItemSerializer,
-                                      VideoSerializer)
-
-# Create your views here.
-
-
-class VideoViewSet(viewsets.ModelViewSet):
-
-    queryset = Video.objects.all()
-    serializer_class = VideoSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return Video.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-
-class CatergoryViewSet(viewsets.ModelViewSet):
-
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-    permission_classes = [IsAuthenticated]
-
+from conversation.models import Conversation, Item
+from conversation.serializers import (
+    ConversationSerializer, ItemSerializer,
+)
+from contact.models import Contact
+from core.utils import send_invitation_code
+from users.models import User
 
 class ItemViewSet(viewsets.ModelViewSet):
-
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
     permission_classes = [IsAuthenticated]
@@ -60,7 +37,6 @@ class ItemViewSet(viewsets.ModelViewSet):
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
-
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated]
@@ -69,4 +45,20 @@ class ConversationViewSet(viewsets.ModelViewSet):
         return Conversation.objects.filter(person_from=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(person_from=self.request.user)
+        user = self.request.user
+
+        instance = serializer.save(person_from=user)
+        user_qs = User.objects.filter(email=instance.invited_email)
+        if user_qs.exists():
+            # add user as friend and send a notification
+            Contact.objects.add_friend(user, user_qs.first())
+            instance.person_to = user_qs.first()
+            instance.save()
+        else:
+            # send an email invitation
+            if hasattr(user, 'contacts'):
+                invite_code = user.contacts.invite_code
+            else:
+                instance = Contact.objects.create(user=user)
+                invite_code = instance.invite_code
+            send_invitation_code(user, invite_code, instance.invited_email)

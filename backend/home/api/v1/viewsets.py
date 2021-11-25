@@ -91,7 +91,10 @@ class UserViewSet(ModelViewSet):
 
     def get_queryset(self):
         if self.request.query_params.get('contact'):
-            friends = [i.id for i in self.request.user.contacts.friends.all()]
+            friends = []
+            if hasattr(self.request.user, 'contacts'):
+                friends = [i.id for i in self.request.user.contacts.friends.all()]
+
             return User.objects.filter(id__in=friends)
         return User.objects.all()
 

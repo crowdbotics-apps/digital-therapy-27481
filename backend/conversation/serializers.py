@@ -1,32 +1,7 @@
 from home.api.v1.serializers import UserSerializer
 from rest_framework import serializers
 
-from .models import Category, Conversation, Item, Video
-
-
-class VideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Video
-        exclude = ['user']
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-
-class ConversationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Conversation
-        fields = '__all__'
-
-    def get_fields(self):
-        fields = super().get_fields()
-        request = self.context.get('request')
-        if request.method != 'GET':
-            del fields['person_from']
-        return fields
+from .models import Conversation, Item
 
 
 class ItemSerializer(serializers.ModelSerializer):
@@ -59,3 +34,29 @@ class ItemSerializer(serializers.ModelSerializer):
         Item.objects.filter(conversation=conversation,
                             listener=other_user).delete()
         return Item.objects.create(speaker=user, listener=other_user, **validated_data)
+
+
+class ItemsSerializer(serializers.ModelSerializer):
+    speaker = UserSerializer(read_only=True)
+    listener = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Item
+        fields = "__all__"
+
+
+class ConversationSerializer(serializers.ModelSerializer):
+    items = ItemsSerializer(many=True, read_only=True)
+    from_user = UserSerializer(read_only=True)
+    to_user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Conversation
+        fields = '__all__'
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        if request.method != 'GET':
+            del fields['person_from']
+        return fields

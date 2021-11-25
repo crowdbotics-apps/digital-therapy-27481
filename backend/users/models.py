@@ -33,6 +33,9 @@ class User(AbstractUser):
                                 null=True)
     profile_picture = models.ImageField(blank=True, null=True)
 
+    def fullname(self):
+        return f'{self.first_name} {self.last_name}'
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
 

@@ -18,7 +18,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from users.models import Token as UserToken
 from contact.models import Contact
-
+from conversation.models import  Conversation
 User = get_user_model()
 
 
@@ -27,8 +27,8 @@ class SignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password',
-                  'age', 'surname', 'location', 'invite_code')
+        fields = ('id', 'email', 'password', 'last_name', 'first_name',
+                  'age', 'location', 'invite_code')
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -71,10 +71,10 @@ class SignupSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User(
             email=validated_data.get('email'),
-            name=validated_data.get('name'),
+            last_name=validated_data.get('last_name'),
             age=validated_data.get('age'),
             location=validated_data.get('location'),
-            surname=validated_data.get('surname'),
+            first_name=validated_data.get('first_name'),
             username=generate_unique_username([
                 validated_data.get('name'),
                 validated_data.get('email'),
@@ -90,6 +90,11 @@ class SignupSerializer(serializers.ModelSerializer):
             contact = Contact.objects.create(user=user)
             contact.friends.add(friend.user)
 
+            conversation_qs = Conversation.objects.filter(person_from=friend.user, invited_email=validated_data.get('email'))
+            for conversation in conversation_qs:
+                conversation.person_to = user
+                conversation.save()
+
         request = self._get_request()
         setup_user_email(request, user, [])
         return user
@@ -102,7 +107,7 @@ class SignupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'surname',
+        fields = ['id', 'email', 'first_name', 'last_name',
                   'age', 'location', 'profile_picture']
 
 

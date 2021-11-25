@@ -1,43 +1,31 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 from home.models import DateTimeInfo
-
-# Create your models here.
+from .enums import CategoryEnum
 
 User = get_user_model()
 
-
-class Video(DateTimeInfo):
-    user = models.ForeignKey(
-        User, related_name='videos', on_delete=models.CASCADE)
-    video = models.FileField()
-
-    class Meta:
-        verbose_name = ("Video")
-        verbose_name_plural = ("Videos")
-
-    def __str__(self):
-        return self.name
-
-
-class Category(models.Model):
-    name = models.CharField(max_length=250)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+Categories_enum = (
+    (CategoryEnum.couple.name, CategoryEnum.couple.value),
+    (CategoryEnum.family.name, CategoryEnum.family.value),
+    (CategoryEnum.friend.name, CategoryEnum.friend.value),
+    (CategoryEnum.self.name, CategoryEnum.self.value),
+)
 
 
 class Conversation(DateTimeInfo):
-    category = models.ForeignKey('Category', on_delete=models.CASCADE)
-    person_to = models.ForeignKey(
-        User, related_name="conversation_to", on_delete=models.CASCADE)
+    # TODO: rename to category
+    conversation_category = models.CharField('Category', choices=Categories_enum, default=CategoryEnum.couple.value,
+                                             max_length=25)
     person_from = models.ForeignKey(
         User, related_name='conversation_from', on_delete=models.CASCADE)
+    person_to = models.ForeignKey(
+        User, related_name="conversation_to", on_delete=models.CASCADE, null=True, blank=True)
     topic = models.CharField(max_length=350)
+    invited_email = models.CharField(max_length=125, null=True, blank=True)
+
+    class Meta:
+        ordering = ('-id',)
 
 
 class Item(DateTimeInfo):

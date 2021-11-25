@@ -1,8 +1,9 @@
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.core.mail import send_mail
-from django.conf import settings
+
 from rest_framework import viewsets, serializers, authentication, views, permissions, response
+
+from core.utils import send_email_local, send_invitation_code
 from .serializers import ContactSerializer
 from contact.models import Contact
 
@@ -40,14 +41,6 @@ class InviteUserAPIView(views.APIView):
         else:
             instance = Contact.objects.create(user=user)
             invite_code = instance.invite_code
-
-        send_mail(
-            'Get Resolve',
-            f'{user.email} sent you a Resolve invitation code. Follow this link to download the app https://digital-therapy-27481.botics.co/. '
-            f'Please use {invite_code} invitation code when signing in the app to be automatically added into the {user.email} contact list.',
-            settings.DEFAULT_FROM_EMAIL,
-            [self.request.data.get('email')],
-            fail_silently=False,
-        )
+        send_invitation_code(user, invite_code, self.request.data.get('email'))
 
         return response.Response('Success')

@@ -1,12 +1,10 @@
-from django.urls import include, path, re_path
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .viewsets import (CatergoryViewSet, ConversationViewSet, ItemViewSet,
-                       VideoViewSet)
+from .viewsets import (ConversationViewSet, ItemViewSet,
+                       )
 
 router = DefaultRouter()
-router.register("video", VideoViewSet, basename="video")
-router.register("category", CatergoryViewSet, basename="category")
 router.register("conversation", ConversationViewSet, basename="conversation")
 router.register("items", ItemViewSet, basename="items")
 
