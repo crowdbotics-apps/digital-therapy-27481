@@ -32,3 +32,4 @@ pytest = "==6.2.3"
 factory-boy = "==3.2.0"
 django-anymail = {extras = ["mailgun"],version = "*"}
 django-filter = "*"
+django-model-utils = "*"

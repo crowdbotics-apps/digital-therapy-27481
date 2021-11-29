@@ -10,7 +10,10 @@ from conversation.serializers import (
 )
 from contact.models import Contact
 from core.utils import send_invitation_code
+from notification.signal import notification_saved
 from users.models import User
+from notification.models import Notification
+
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
@@ -43,6 +46,17 @@ class ItemViewSet(viewsets.ModelViewSet):
         obj = self.get_object()
         obj.resolved = True
         obj.save()
+        user = request.user
+        notification = Notification.objects.create(
+            title='Resolved',
+            description=f'{user.first_name or user.last_name  or user.username} resolved the conversation',
+            recipient=obj.person_from if user is not obj.person_from else obj.person_to,
+            sender=obj.person_to if user is not obj.person_to else obj.person_from,
+            level='resolved'
+        )
+        notification.save()
+        notification_saved.send(sender=Notification, notification=notification)
+
         return Response(self.serializer_class(obj, context={'request': request}).data)
 
 

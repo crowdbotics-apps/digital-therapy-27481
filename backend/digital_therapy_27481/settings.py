@@ -54,6 +54,7 @@ LOCAL_APPS = [
     'users.apps.UsersConfig',
     'conversation',
     'contact',
+    'notification',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -273,3 +274,9 @@ try:
         'APPLE_SECRET_KEY').replace("||n||", '\n')
 except:
     APPLE_SECRET_KEY = ""
+
+ONESIGNAL = {
+    'app_id': env.str('ONE_SIGNAL_APP_ID', ''),
+    'rest_api_key': env.str('ONE_SIGNAL_REST_API_KEY', ''),
+    'user_auth_key': env.str('ONE_SIGNAL_USER_AUTH_KEY', '')
+}

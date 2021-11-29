@@ -110,7 +110,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name',
-                  'age', 'location', 'profile_picture']
+                  'age', 'location', 'profile_picture', 'onesignal_user_id', 'allow_push_notification']
 
 
 class CustomResetPasswordForm(ResetPasswordForm):
