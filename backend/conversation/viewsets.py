@@ -18,11 +18,20 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Item.objects.filter(listener=self.request.user)
+        return Item.objects.exclude(conversation__category='self').filter(listener=self.request.user)
 
     @action(["get"], detail=False)
     def sent(self, request):
-        items = Item.objects.filter(speaker=request.user)
+        items = Item.objects.exclude(conversation__category='self').filter(speaker=request.user)
+        page = self.paginate_queryset(items)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        return Response(self.serializer_class(items, many=True).data)
+
+    @action(["get"], detail=False)
+    def self(self, request):
+        items = Item.objects.filter(conversation__category='self').filter(speaker=request.user)
         page = self.paginate_queryset(items)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

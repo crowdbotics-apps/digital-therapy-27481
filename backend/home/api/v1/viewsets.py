@@ -6,11 +6,11 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.contrib.auth import get_user_model
 from home.api.v1.serializers import (PasswordResetConfirmSerializer,
                                      SignupSerializer, SocialSerializer,
-                                     UserSerializer)
+                                     UserSerializer, VerifyTokenSerializer)
 from home.api.v1.user_utils import UserUtils
 from home.utils import convert_base64_to_file
 from rest_auth.registration.views import SocialLoginView
-from rest_framework import authentication, status
+from rest_framework import authentication, status, serializers
 from rest_framework.authentication import (SessionAuthentication,
                                            TokenAuthentication)
 from rest_framework.authtoken.models import Token
@@ -120,6 +120,14 @@ class UserViewSet(ModelViewSet):
     def get_users(self, request, pk=None):
         users = User.objects.all().exclude(id=request.user.id)
         return Response(self.serializer_class(users, many=True).data)
+
+    @action(methods=['post'], detail=False, permission_classes=[])
+    def verify_token(self, request):
+        serializer = VerifyTokenSerializer(data=request.data)
+        if not serializer.is_valid():
+            raise serializers.ValidationError(serializer.errors)
+        serializer.save()
+        return Response('Success')
 
     @action(methods=['post'], detail=False, permission_classes=[])
     def password_reset_confirm(self, request):

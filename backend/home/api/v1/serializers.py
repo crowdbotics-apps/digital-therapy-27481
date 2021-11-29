@@ -18,7 +18,8 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from users.models import Token as UserToken
 from contact.models import Contact
-from conversation.models import  Conversation
+from conversation.models import Conversation
+
 User = get_user_model()
 
 
@@ -90,7 +91,8 @@ class SignupSerializer(serializers.ModelSerializer):
             contact = Contact.objects.create(user=user)
             contact.friends.add(friend.user)
 
-            conversation_qs = Conversation.objects.filter(person_from=friend.user, invited_email=validated_data.get('email'))
+            conversation_qs = Conversation.objects.filter(person_from=friend.user,
+                                                          invited_email=validated_data.get('email'))
             for conversation in conversation_qs:
                 conversation.person_to = user
                 conversation.save()
@@ -158,6 +160,19 @@ class PasswordSerializer(PasswordResetSerializer):
 
         opts.update(self.get_email_options())
         self.reset_form.save(**opts)
+
+
+class VerifyTokenSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    token = serializers.CharField()
+
+    def create(self, validated_data):
+        try:
+            user = User.objects.get(email=validated_data['email'])
+            return UserToken.objects.get(user=user, token=validated_data.get('token'))
+        except Exception as e:
+            raise serializers.ValidationError("Token does not match")
+
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
