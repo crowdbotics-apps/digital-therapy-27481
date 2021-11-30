@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from core.models import TimestampModel
 from model_utils import Choices
+from django.contrib.postgres.fields import JSONField
 
 
 class NotificationQuerySet(models.query.QuerySet):
@@ -80,7 +81,9 @@ class Notification(TimestampModel):
         related_name='notifications_sender',
         on_delete=models.CASCADE
     )
-    LEVELS = Choices('explain', 'info', 'sent', 'resolved')
+    action = JSONField(default=dict, null=True, blank=True)
+    action_url = models.CharField(max_length=60, null=True, blank=True)
+    LEVELS = Choices('explain', 'info', 'sent', 'resolved', 'invitation')
     level = models.CharField(choices=LEVELS, default=LEVELS.info, max_length=20)
 
     objects = NotificationQuerySet.as_manager()

@@ -1,7 +1,7 @@
 from django.http import HttpRequest
 from rest_framework import serializers
 
-from contact.models import Contact
+from contact.models import Contact, Invitation
 from core.utils import update_object
 
 
@@ -37,3 +37,9 @@ class ContactSerializer(serializers.ModelSerializer):
         for friend in validated_data.get('friends'):
             instance.friends.add(friend)
         return instance
+
+
+class InvitationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Invitation
+        fields = "__all__"

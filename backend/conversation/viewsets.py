@@ -8,8 +8,8 @@ from conversation.models import Conversation, Item
 from conversation.serializers import (
     ConversationSerializer, ItemSerializer,
 )
-from contact.models import Contact
-from core.utils import send_invitation_code
+from contact.models import Contact, Invitation
+from core.utils import send_invitation_code, create_invite_action
 from notification.signal import notification_saved
 from users.models import User
 from notification.models import Notification
@@ -77,6 +77,25 @@ class ConversationViewSet(viewsets.ModelViewSet):
         user_qs = User.objects.filter(email=instance.invited_email)
         if user_qs.exists():
             # add user as friend and send a notification
+            # Create invitation
+            Invitation.objects.create(
+                invitee=user_qs.first(),
+                inviter=user
+            )
+            # send notification
+            notification = Notification.objects.create(
+                title='Friend Invite',
+                description=f'{user.first_name or user.last_name or user.username} sent you a invitation request.',
+                recipient=user_qs.first(),
+                sender=user,
+                level='invitation',
+                action_url=f'/{user.id}/',
+                action=create_invite_action(user)
+            )
+            notification.save()
+            notification_saved.send(sender=Notification, notification=notification)
+
+            # TODO: only add user in contact when they accept
             Contact.objects.add_friend(user, user_qs.first())
             instance.person_to = user_qs.first()
             instance.save()

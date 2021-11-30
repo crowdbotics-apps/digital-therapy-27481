@@ -33,3 +33,16 @@ def send_email_local(subject, message, to_emails: list):
         to_emails,
         fail_silently=False,
     )
+
+
+def create_invite_action(user):
+    """
+    create accept/reject urls
+    don't include the api v1 or domain name
+    /api/v1/invitation/accept/{inviter_pk}/
+    /api/v1/invitation/reject/{inviter_pk}/
+    """
+    return {
+        "accept": f'invitation/accept/{user.id}/',
+        "reject": f'invitation/reject/{user.id}/',
+    }
