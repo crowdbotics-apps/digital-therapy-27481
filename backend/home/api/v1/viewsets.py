@@ -31,7 +31,7 @@ class SignupViewSet(ModelViewSet):
 class LoginViewSet(ViewSet):
     """Based on rest_framework.authtoken.views.ObtainAuthToken"""
 
-    serializer_class = AuthTokenEmailPasswordSerializer
+    serializer_class = AuthTokenSerializer
 
     def create(self, request):
         serializer = self.serializer_class(
