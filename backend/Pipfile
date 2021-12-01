@@ -33,3 +33,4 @@ factory-boy = "==3.2.0"
 django-anymail = {extras = ["mailgun"],version = "*"}
 django-filter = "*"
 django-model-utils = "*"
+twilio = "~=6.51.0"

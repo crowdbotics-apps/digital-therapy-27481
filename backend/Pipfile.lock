@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b177fa7992e143d70cd7ebf9e0149bbfcacbf216feed3bebaee90c7661abdc0f"
+            "sha256": "3136840f6515275766ef17a984f391bb58b875735e04a5ea375c717e2c9914fb"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -263,10 +263,10 @@
         },
         "faker": {
             "hashes": [
-                "sha256:3c997b505627e63eb54e7ec268d0669bc5b6b98c1822f632d2784d91664d5f11",
-                "sha256:76ad74cebe727affa1c108e17fc1d2c0be8f498ff71b25f464fb8241301fe6f2"
+                "sha256:049185d17ff95c4311557da6b72416c18732e5977dcfd116a323b6d620db5dca",
+                "sha256:7227703a3db36ed8241108547544445f45aa45db2f3f63e885cb9b5699383f0e"
             ],
-            "version": "==9.8.3"
+            "version": "==9.9.0"
         },
         "fcm-django": {
             "hashes": [
@@ -521,10 +521,10 @@
                 "crypto"
             ],
             "hashes": [
-                "sha256:b888b4d56f06f6dcd777210c334e69c737be74755d3e5e9ee3fe67dc18a0ee41",
-                "sha256:e0c4bb8d9f0af0c7f5b1ec4c5036309617d03d56932877f2f7a0beeb5318322f"
+                "sha256:5c6eca3c2940464d106b99ba83b00c6add741c9becaec087fb7ccdefea71350e",
+                "sha256:8d59a976fb773f3e6a39c85636357c4f0e242707394cadadd9814f5cbaa20e96"
             ],
-            "version": "==2.3.0"
+            "version": "==1.7.1"
         },
         "pyparsing": {
             "hashes": [
@@ -686,6 +686,13 @@
                 "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f"
             ],
             "version": "==0.10.2"
+        },
+        "twilio": {
+            "hashes": [
+                "sha256:b3357f7db6768080aa7e15aad484abc7b5153de15d9aae0c1f3436e6151b0aeb"
+            ],
+            "index": "pypi",
+            "version": "==6.51.1"
         },
         "uritemplate": {
             "hashes": [

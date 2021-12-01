@@ -280,3 +280,9 @@ ONESIGNAL = {
     'rest_api_key': env.str('ONE_SIGNAL_REST_API_KEY', ''),
     'user_auth_key': env.str('ONE_SIGNAL_USER_AUTH_KEY', '')
 }
+
+TWILIO = {
+    'account_sid': env.str('TWILIO_ACCOUNT_SID', ''),
+    'auth_token': env.str('TWILIO_AUTH_TOKEN', ''),
+    'from_': env.str('TWILIO_PHONE_NUMBER', 'Digital Therapy')
+}

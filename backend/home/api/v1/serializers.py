@@ -7,7 +7,7 @@ from allauth.account.utils import complete_signup, setup_user_email
 from allauth.socialaccount.helpers import complete_social_login
 from allauth.utils import email_address_exists, generate_unique_username
 from django.conf import settings
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
@@ -109,7 +109,7 @@ class SignupSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name',
+        fields = ['id', 'email', 'first_name', 'last_name', 'username',
                   'age', 'location', 'profile_picture', 'onesignal_user_id', 'allow_push_notification']
 
 
@@ -172,7 +172,6 @@ class VerifyTokenSerializer(serializers.Serializer):
             return UserToken.objects.get(user=user, token=validated_data.get('token'))
         except Exception as e:
             raise serializers.ValidationError("Token does not match")
-
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
@@ -316,3 +315,33 @@ class SocialSerializer(serializers.Serializer):
                                        validated_data=update_data)
 
         return user
+
+
+class AuthTokenEmailPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(label=_("Email"))
+    password = serializers.CharField(
+        label=_("Password"),
+        style={'input_type': 'password'},
+        trim_whitespace=False
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(request=self.context.get('request'),
+                                email=email, password=password)
+
+            # The authenticate call simply returns None for is_active=False
+            # users. (Assuming the default ModelBackend authentication
+            # backend.)
+            if not user:
+                msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = _('Must include "email" and "password".')
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+        return attrs

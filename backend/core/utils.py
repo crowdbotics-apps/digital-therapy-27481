@@ -46,3 +46,21 @@ def create_invite_action(user):
         "accept": f'invitation/accept/{user.id}/',
         "reject": f'invitation/reject/{user.id}/',
     }
+
+def sendSMS(to_number, body):
+    TWILLIO_SETTING = settings.TWILIO
+    account_sid = TWILLIO_SETTING.get('account_sid')
+    auth_token = TWILLIO_SETTING.get('auth_token')
+    client = Client(account_sid, auth_token)
+    print(account_sid, auth_token)
+    try:
+        message = client.messages \
+            .create(
+            body=body,
+            from_=TWILLIO_SETTING.get('from_'),
+            to=to_number
+        )
+        return True
+    except Exception as e:
+        print(e)
+        return False

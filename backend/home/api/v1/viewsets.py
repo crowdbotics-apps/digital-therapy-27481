@@ -6,7 +6,7 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.contrib.auth import get_user_model
 from home.api.v1.serializers import (PasswordResetConfirmSerializer,
                                      SignupSerializer, SocialSerializer,
-                                     UserSerializer, VerifyTokenSerializer)
+                                     UserSerializer, VerifyTokenSerializer, AuthTokenEmailPasswordSerializer)
 from home.api.v1.user_utils import UserUtils
 from home.utils import convert_base64_to_file
 from rest_auth.registration.views import SocialLoginView
@@ -31,7 +31,7 @@ class SignupViewSet(ModelViewSet):
 class LoginViewSet(ViewSet):
     """Based on rest_framework.authtoken.views.ObtainAuthToken"""
 
-    serializer_class = AuthTokenSerializer
+    serializer_class = AuthTokenEmailPasswordSerializer
 
     def create(self, request):
         serializer = self.serializer_class(
