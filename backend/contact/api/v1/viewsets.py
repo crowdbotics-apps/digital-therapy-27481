@@ -83,7 +83,7 @@ class InvitationViewSet(viewsets.ModelViewSet):
     def reject(self, request, inviter_pk=None, ):
         user = request.user
         recipient = User.objects.get(pk=inviter_pk)
-        st = Invitation.objects.update_status(recipient, user, status='reject')
+        st = Invitation.objects.update_status(user, recipient, status='reject')
         if not st:
             raise serializers.ValidationError('Invitation action failed')
             # send notification
@@ -94,7 +94,7 @@ class InvitationViewSet(viewsets.ModelViewSet):
     def accept(self, request, inviter_pk=None, ):
         user = request.user
         recipient = User.objects.get(pk=inviter_pk)
-        st = Invitation.objects.update_status(recipient, user, status='accepted')
+        st = Invitation.objects.update_status(user, recipient, status='accepted')
         if not st:
             raise serializers.ValidationError('Invitation action failed')
 

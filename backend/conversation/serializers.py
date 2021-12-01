@@ -38,8 +38,8 @@ class ItemSerializer(serializers.ModelSerializer):
         notification = Notification.objects.create(
             title='Sent Video',
             description=f'{user.first_name or user.last_name or user.username} sent a video!',
-            recipient=user,
-            sender=other_user,
+            recipient=other_user,
+            sender=user,
             level='sent'
         )
         notification.save()
