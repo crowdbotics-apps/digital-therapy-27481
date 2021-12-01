@@ -55,6 +55,7 @@ LOCAL_APPS = [
     'conversation',
     'contact',
     'notification',
+    'feedback'
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',

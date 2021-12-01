@@ -108,6 +108,13 @@ class UserViewSet(ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], authentication_classes=[authentication.TokenAuthentication])
+    def cancel(self, request, pk=None):
+        user = request.user
+        user.is_active = False
+        user.save()
+        return Response(request.data)
+
     @action(methods=['post'], detail=False)
     def set_profile_picture(self, request, pk=None):
         image = request.data['image']

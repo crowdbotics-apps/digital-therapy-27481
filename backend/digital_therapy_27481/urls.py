@@ -24,7 +24,8 @@ from drf_yasg import openapi
 
 api_urlpatterns = [
     path("", include('contact.api.v1.urls')),
-    path("", include('notification.api.v1.urls'))
+    path("", include('notification.api.v1.urls')),
+    path("", include('feedback.api.v1.urls'))
 ]
 urlpatterns = [
     path("", include("home.urls")),

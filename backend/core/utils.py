@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
 from django.conf import settings
+from twilio.rest import Client
 
 
 def update_object(instance, data):
@@ -47,17 +48,17 @@ def create_invite_action(user):
         "reject": f'invitation/reject/{user.id}/',
     }
 
-def sendSMS(to_number, body):
-    TWILLIO_SETTING = settings.TWILIO
-    account_sid = TWILLIO_SETTING.get('account_sid')
-    auth_token = TWILLIO_SETTING.get('auth_token')
+
+def send_sms(to_number, body):
+    TWILIO_SETTING = settings.TWILIO
+    account_sid = TWILIO_SETTING.get('account_sid')
+    auth_token = TWILIO_SETTING.get('auth_token')
     client = Client(account_sid, auth_token)
     print(account_sid, auth_token)
     try:
-        message = client.messages \
-            .create(
+        client.messages.create(
             body=body,
-            from_=TWILLIO_SETTING.get('from_'),
+            from_=TWILIO_SETTING.get('from_'),
             to=to_number
         )
         return True
