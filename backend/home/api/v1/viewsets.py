@@ -60,7 +60,7 @@ class AppleLogin(ViewSet):
     def create(self, request):
         social_serializer = SocialSerializer(data=request.data)
         social_serializer.is_valid(raise_exception=True)
-        id_token = jwt.decode(request.data.get('access_token'), options={"verify_signature": False})
+        id_token = jwt.decode(request.data.get('access_token'), options={"verify_signature": False}, audience="com.crowdbotics.digital-therapy-27481")
         response_data = {}
         if id_token:
             decoded = id_token
