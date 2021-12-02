@@ -281,7 +281,7 @@ TWILIO = {
 
 STRIPE = {
     'api_key': env.str('STRIPE_API_KEY', ""),
-    'client_id': env.str('STRIPE_CLIENT_ID' '')
+    'client_id': env.str('STRIPE_CLIENT_ID', '')
 }
 
 BRAIN_TREE = {
