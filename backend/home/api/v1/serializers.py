@@ -353,6 +353,6 @@ class StripePaymentSerializer(serializers.Serializer):
 
     """
     card_number = serializers.CharField()
-    exp_month = serializers.IntegerField()
+    exp_month = serializers.CharField()
     exp_year = serializers.CharField(max_length=4)
     cvc = serializers.CharField(max_length=4)

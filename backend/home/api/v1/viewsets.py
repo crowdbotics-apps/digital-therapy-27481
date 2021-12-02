@@ -152,6 +152,14 @@ class UserViewSet(ModelViewSet):
 
 
 class StripePaymentViewSet(views.APIView):
+    """
+    {
+    card_number* string
+    exp_month* string
+    exp_year* string max_length=4
+    cvc* string max_length=4
+    }
+    """
     serializer_class = StripePaymentSerializer
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
@@ -182,6 +190,13 @@ class StripePaymentViewSet(views.APIView):
 
 
 class BrainTreeAPIView(APIView):
+    """
+    BrainTree gateway
+    payload {
+      payment_method_nonce* string
+      device_data object device data from the client
+    }
+    """
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
 
