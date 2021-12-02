@@ -1,4 +1,5 @@
 import jwt
+import stripe
 from allauth.socialaccount.providers.facebook.views import \
     FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -6,11 +7,12 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from django.contrib.auth import get_user_model
 from home.api.v1.serializers import (PasswordResetConfirmSerializer,
                                      SignupSerializer, SocialSerializer,
-                                     UserSerializer, VerifyTokenSerializer, AuthTokenEmailPasswordSerializer)
+                                     UserSerializer, VerifyTokenSerializer, AuthTokenEmailPasswordSerializer,
+                                     StripePaymentSerializer)
 from home.api.v1.user_utils import UserUtils
 from home.utils import convert_base64_to_file
 from rest_auth.registration.views import SocialLoginView
-from rest_framework import authentication, status, serializers
+from rest_framework import authentication, status, serializers, views
 from rest_framework.authentication import (SessionAuthentication,
                                            TokenAuthentication)
 from rest_framework.authtoken.models import Token
@@ -19,6 +21,8 @@ from rest_framework.decorators import action, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.views import APIView
+from core.gateway import Gateway
 
 User = get_user_model()
 
@@ -60,7 +64,8 @@ class AppleLogin(ViewSet):
     def create(self, request):
         social_serializer = SocialSerializer(data=request.data)
         social_serializer.is_valid(raise_exception=True)
-        id_token = jwt.decode(request.data.get('access_token'), options={"verify_signature": False}, audience="com.crowdbotics.digital-therapy-27481")
+        id_token = jwt.decode(request.data.get('access_token'), options={"verify_signature": False},
+                              audience="com.crowdbotics.digital-therapy-27481")
         response_data = {}
         if id_token:
             decoded = id_token
@@ -108,7 +113,8 @@ class UserViewSet(ModelViewSet):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated], authentication_classes=[authentication.TokenAuthentication])
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated],
+            authentication_classes=[authentication.TokenAuthentication])
     def cancel(self, request, pk=None):
         user = request.user
         user.is_active = False
@@ -143,3 +149,59 @@ class UserViewSet(ModelViewSet):
         serializer.is_valid()
         serializer.save()
         return Response({"details": "Password reset"})
+
+
+class StripePaymentViewSet(views.APIView):
+    serializer_class = StripePaymentSerializer
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def post(self, request):
+        user = request.user
+        serializer = StripePaymentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        token = stripe.Token.create(
+            card={
+                "number": data.get('cardNumber'),
+                "exp_month": data.get('expiryMonth'),
+                "exp_year": data.get('expiryYear'),
+                "cvc": data.get('cvvNumber'),
+            }, )
+        stripe.Charge.create(
+            amount=5000,  # TODO: store subscription fee in the database
+            currency="usd",
+            source=token.id,
+            description=f"{user.email} membership payment",
+        )
+
+        user.is_member = True
+        user.save()
+
+        return Response('success')
+
+
+class BrainTreeAPIView(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, request_type=None, format=None):
+        return Response(Gateway.client_token())
+
+    def post(self, request, format=None):
+        payload = {
+            "amount": "50.00",
+            "payment_method_nonce": request.data.get("payment_method_nonce"),
+            "device_data": request.data.get("device_data"),
+            "options": {
+                "submit_for_settlement": True
+            },
+            "billing": {
+                "postal_code": request.data.get("postal_code")
+            }
+        }
+        Gateway.sale(payload)
+        user = request.user
+        user.is_member = True
+        user.save()
+        return Response(request.data)

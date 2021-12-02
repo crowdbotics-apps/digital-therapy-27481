@@ -345,3 +345,14 @@ class AuthTokenEmailPasswordSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+
+class StripePaymentSerializer(serializers.Serializer):
+    """
+    Stripe payment serializer
+
+    """
+    card_number = serializers.CharField()
+    exp_month = serializers.IntegerField()
+    exp_year = serializers.CharField(max_length=4)
+    cvc = serializers.CharField(max_length=4)

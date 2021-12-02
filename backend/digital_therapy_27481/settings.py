@@ -23,7 +23,6 @@ DEBUG = env.bool("DEBUG", default=False)
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -35,7 +34,6 @@ SITE_ID = 1
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
-
 
 # Application definition
 
@@ -109,7 +107,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'digital_therapy_27481.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
@@ -124,7 +121,6 @@ if env.str("DATABASE_URL", default=None):
     DATABASES = {
         'default': env.db()
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
@@ -144,7 +140,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -153,7 +148,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -220,7 +214,6 @@ ANYMAIL = {
     "MAILGUN_API_KEY": env.str("MAILGUN_API_KEY", ""),
 }
 
-
 # AWS S3 config
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
@@ -228,10 +221,10 @@ AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", "")
 AWS_STORAGE_REGION = env.str("AWS_STORAGE_REGION", "")
 
 USE_S3 = (
-    AWS_ACCESS_KEY_ID and
-    AWS_SECRET_ACCESS_KEY and
-    AWS_STORAGE_BUCKET_NAME and
-    AWS_STORAGE_REGION
+        AWS_ACCESS_KEY_ID and
+        AWS_SECRET_ACCESS_KEY and
+        AWS_STORAGE_BUCKET_NAME and
+        AWS_STORAGE_REGION
 )
 
 if USE_S3:
@@ -246,7 +239,6 @@ if USE_S3:
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     MEDIA_URL = '/mediafiles/'
     MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-
 
 # start fcm_django push notifications
 FCM_DJANGO_SETTINGS = {
@@ -264,7 +256,6 @@ EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
 
 if DEBUG:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-
 
 APPLE_KEY_ID = os.environ.get('APPLE_KEY_ID', '')
 
@@ -286,4 +277,16 @@ TWILIO = {
     'account_sid': env.str('TWILIO_ACCOUNT_SID', ''),
     'auth_token': env.str('TWILIO_AUTH_TOKEN', ''),
     'from_': env.str('TWILIO_PHONE_NUMBER', 'Digital Therapy')
+}
+
+STRIPE = {
+    'api_key': env.str('STRIPE_API_KEY', ""),
+    'client_id': env.str('STRIPE_CLIENT_ID' '')
+}
+
+BRAIN_TREE = {
+    'merchant_id': env.str('BRAIN_TREE_MERCHANT_ID', ''),
+    'public_key': env.str('BRAIN_TREE_PUBLIC_KEY', ''),
+    'private_key': env.str('BRAIN_TREE_PRIVATE_KEY', ''),
+    'environment': env.str('BRAIN_TREE_ENVIRONMENT', '')
 }

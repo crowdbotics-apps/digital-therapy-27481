@@ -22,6 +22,8 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
+from home.api.v1.viewsets import StripePaymentViewSet
+
 api_urlpatterns = [
     path("", include('contact.api.v1.urls')),
     path("", include('notification.api.v1.urls')),
@@ -32,6 +34,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("modules/", include("modules.urls")),
     path("api/v1/", include("home.api.v1.urls")),
+    path('api/v1/payment/stripe/', StripePaymentViewSet.as_view(), name="payment_stripe"),
     path("admin/", admin.site.urls),
     path("users/", include("users.urls", namespace="users")),
     path("rest-auth/", include("rest_auth.urls")),

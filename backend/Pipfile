@@ -34,3 +34,5 @@ django-anymail = {extras = ["mailgun"],version = "*"}
 django-filter = "*"
 django-model-utils = "*"
 twilio = "~=6.51.0"
+stripe = "*"
+braintree = "*"

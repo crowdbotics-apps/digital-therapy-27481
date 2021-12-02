@@ -34,6 +34,7 @@ class User(AbstractUser):
     profile_picture = models.ImageField(blank=True, null=True)
     allow_push_notification = models.BooleanField(default=True)
     onesignal_user_id = models.CharField(max_length=300, default='', null=True, blank=True)
+    is_member = models.BooleanField(default=False, null=True, blank=True)
 
     def fullname(self):
         return f'{self.first_name} {self.last_name}'
