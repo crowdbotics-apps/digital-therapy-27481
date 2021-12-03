@@ -133,6 +133,10 @@ class UserViewSet(ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_users(self, request, pk=None):
         users = User.objects.all().exclude(id=request.user.id)
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
         return Response(self.serializer_class(users, many=True).data)
 
     @action(methods=['post'], detail=False, permission_classes=[])
