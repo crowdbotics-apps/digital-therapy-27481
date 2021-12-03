@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from datetime import datetime, timedelta
 from home.models import DateTimeInfo
 from .enums import CategoryEnum
 
@@ -23,6 +24,26 @@ class Conversation(DateTimeInfo):
     topic = models.CharField(max_length=350)
     invited_email = models.CharField(max_length=125, null=True, blank=True)
 
+    def timesince(self, now=None):
+        """
+        Shortcut for the ``django.utils.timesince.timesince`` function of the
+        current timestamp.
+        """
+        # Get today's date
+        today = datetime.now()  # or presentday = datetime.today()
+
+        # Get Yesterday
+        yesterday = today - timedelta(1)
+
+        created_on = self.created_at.strftime('%B %d, %Y')
+
+        # Get Tomorrow
+        if yesterday.strftime('%B %d, %Y') == created_on:
+            return 'Yesterday'
+        if created_on == today.strftime('%B %d, %Y'):
+            return 'Today'
+        return created_on
+
     class Meta:
         ordering = ('-id',)
 
@@ -37,3 +58,23 @@ class Item(DateTimeInfo):
     argument = models.BooleanField(default=True)
     video = models.FileField()
     resolved = models.BooleanField(default=False)
+
+    def timesince(self, now=None):
+        """
+        Shortcut for the ``django.utils.timesince.timesince`` function of the
+        current timestamp.
+        """
+        # Get today's date
+        today = datetime.now()  # or presentday = datetime.today()
+
+        # Get Yesterday
+        yesterday = today - timedelta(1)
+
+        created_on = self.created_at.strftime('%B %d, %Y')
+
+        # Get Tomorrow
+        if yesterday.strftime('%B %d, %Y') == created_on:
+            return 'Yesterday'
+        if created_on == today.strftime('%B %d, %Y'):
+            return 'Today'
+        return created_on

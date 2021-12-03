@@ -171,24 +171,32 @@ class StripePaymentViewSet(views.APIView):
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
         stripe.api_key = settings.STRIPE.get('api_key')
-        token = stripe.Token.create(
-            card={
-                "number": data.get('card_number'),
-                "exp_month": data.get('exp_month'),
-                "exp_year": data.get('exp_year'),
-                "cvc": data.get('cvc'),
-            }, )
-        stripe.Charge.create(
-            amount=5000,  # TODO: store subscription fee in the database
-            currency="usd",
-            source=token.id,
-            description=f"{user.email} membership payment",
-        )
+        try:
+            token = stripe.Token.create(
+                card={
+                    "number": data.get('card_number'),
+                    "exp_month": data.get('exp_month'),
+                    "exp_year": data.get('exp_year'),
+                    "cvc": data.get('cvc'),
+                }, )
+            stripe.Charge.create(
+                amount=5000,  # TODO: store subscription fee in the database
+                currency="usd",
+                source=token.id,
+                description=f"{user.email} membership payment",
+            )
 
-        user.is_member = True
-        user.save()
+            user.is_member = True
+            user.save()
 
-        return Response('success')
+            return Response({
+                'success': True,
+                'result': UserSerializer(user).data,
+                'type': 'apple',
+                'token': Token.objects.get(user=user).key
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e)
 
 
 class BrainTreeAPIView(APIView):
@@ -206,19 +214,27 @@ class BrainTreeAPIView(APIView):
         return Response(Gateway.client_token())
 
     def post(self, request, format=None):
-        payload = {
-            "amount": "50.00",
-            "payment_method_nonce": request.data.get("payment_method_nonce"),
-            "device_data": request.data.get("device_data"),
-            "options": {
-                "submit_for_settlement": True
-            },
-            "billing": {
-                "postal_code": request.data.get("postal_code")
+        try:
+            payload = {
+                "amount": "50.00",
+                "payment_method_nonce": request.data.get("payment_method_nonce"),
+                "device_data": request.data.get("device_data"),
+                "options": {
+                    "submit_for_settlement": True
+                },
+                "billing": {
+                    "postal_code": request.data.get("postal_code")
+                }
             }
-        }
-        Gateway.sale(payload)
-        user = request.user
-        user.is_member = True
-        user.save()
-        return Response(request.data)
+            Gateway.sale(payload)
+            user = request.user
+            user.is_member = True
+            user.save()
+            return Response({
+                'success': True,
+                'result': UserSerializer(user).data,
+                'type': 'apple',
+                'token': Token.objects.get(user=user).key
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(e)

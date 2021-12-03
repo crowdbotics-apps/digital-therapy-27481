@@ -11,6 +11,10 @@ class ItemSerializer(serializers.ModelSerializer):
     listener = UserSerializer(read_only=True)
     should_resolve = serializers.SerializerMethodField(read_only=True)
     resolved = serializers.BooleanField(read_only=True)
+    timesince = serializers.SerializerMethodField(read_only=True)
+
+    def get_timesince(self, instance):
+        return instance.timesince()
 
     def get_should_resolve(self, obj):
         response = obj.conversation.items.filter(argument=False).first()
@@ -52,6 +56,11 @@ class ItemsSerializer(serializers.ModelSerializer):
     speaker = UserSerializer(read_only=True)
     listener = UserSerializer(read_only=True)
 
+    timesince = serializers.SerializerMethodField(read_only=True)
+
+    def get_timesince(self, instance):
+        return instance.timesince()
+
     class Meta:
         model = Item
         fields = "__all__"
@@ -61,6 +70,11 @@ class ConversationSerializer(serializers.ModelSerializer):
     items = ItemsSerializer(many=True, read_only=True)
     from_user = UserSerializer(read_only=True)
     to_user = UserSerializer(read_only=True)
+
+    timesince = serializers.SerializerMethodField(read_only=True)
+
+    def get_timesince(self, instance):
+        return instance.timesince()
 
     class Meta:
         model = Conversation
