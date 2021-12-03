@@ -1,5 +1,6 @@
 import jwt
 import stripe
+from django.conf import settings
 from allauth.socialaccount.providers.facebook.views import \
     FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -169,12 +170,13 @@ class StripePaymentViewSet(views.APIView):
         serializer = StripePaymentSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
+        stripe.api_key = settings.STRIPE.get('api_key')
         token = stripe.Token.create(
             card={
-                "number": data.get('cardNumber'),
-                "exp_month": data.get('expiryMonth'),
-                "exp_year": data.get('expiryYear'),
-                "cvc": data.get('cvvNumber'),
+                "number": data.get('card_number'),
+                "exp_month": data.get('exp_month'),
+                "exp_year": data.get('exp_year'),
+                "cvc": data.get('cvc'),
             }, )
         stripe.Charge.create(
             amount=5000,  # TODO: store subscription fee in the database
