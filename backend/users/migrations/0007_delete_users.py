@@ -4,7 +4,7 @@ from users.models import User
 
 
 def clean_users_table(_, __):
-    User.objects.exclude(username='crowdbotics').delete()
+    pass
 
 
 class Migration(migrations.Migration):
