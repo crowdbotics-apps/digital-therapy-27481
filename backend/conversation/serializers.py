@@ -1,24 +1,20 @@
+from core.utils import update_object
 from home.api.v1.serializers import UserSerializer
 from rest_framework import serializers
 
 from notification.models import Notification
 from notification.signal import notification_saved
+from .enums import ItemStatusEnum
 from .models import Conversation, Item
 
 
 class ItemSerializer(serializers.ModelSerializer):
     speaker = UserSerializer(read_only=True)
     listener = UserSerializer(read_only=True)
-    should_resolve = serializers.SerializerMethodField(read_only=True)
-    resolved = serializers.BooleanField(read_only=True)
     timesince = serializers.SerializerMethodField(read_only=True)
 
     def get_timesince(self, instance):
         return instance.timesince()
-
-    def get_should_resolve(self, obj):
-        response = obj.conversation.items.filter(argument=False).first()
-        return bool(obj.argument and (not response or not response.resolved))
 
     class Meta:
         model = Item
@@ -31,25 +27,66 @@ class ItemSerializer(serializers.ModelSerializer):
             fields['conversation'] = ConversationSerializer()
         return fields
 
+    def update(self, instance, validated_data):
+        return update_object(instance, validated_data)
+
     def create(self, validated_data):
         conversation = validated_data['conversation']
-        other_user = conversation.person_from
+
+        last_item = Item.objects.filter(conversation=conversation).order_by('-id').first()
+
+        person_from = conversation.person_from
+        person_to = conversation.person_to
         user = self.context.get('request').user
-        if other_user == user:
-            other_user = conversation.person_to
-        Item.objects.filter(conversation=conversation,
-                            listener=other_user).delete()
+
+        item = None
+
+        # speaker is always the person_from, unless
+        # previous
+
+        speaker = person_from
+        listener = person_to
+        if last_item:
+            if last_item.status in [ItemStatusEnum.confirmed.name, ItemStatusEnum.confirmed.value]:
+                speaker = last_item.listener
+                listener = last_item.speaker
+            else:
+                speaker = last_item.speaker
+                listener = last_item.listener
+            # update last item status to replied
+            if last_item.status in [ItemStatusEnum.sent.name, ItemStatusEnum.sent.value]:
+                last_item.status = ItemStatusEnum.replied.value
+                last_item.save()
+
+            # update last item, if it was not confirmed
+            # owner replying to an item that was not confirmed
+            if last_item.status in [ItemStatusEnum.not_confirmed.name,
+                                    ItemStatusEnum.not_confirmed.value]:  # and user.id == last_item.owner:
+                last_item.status = ItemStatusEnum.sent.value
+                last_item.save()
+                item = last_item
+
+        if item:
+            #  replying to a not confirmed item
+            instance = update_object(item, validated_data)
+        else:
+            instance = Item.objects.create(
+                owner=user,
+                speaker=speaker,
+                listener=listener,
+                **validated_data
+            )
         notification = Notification.objects.create(
             title='Sent Video',
             description=f'{user.first_name or user.last_name or user.username} sent a video!',
-            recipient=other_user,
+            recipient=speaker if user is not speaker else listener,
             sender=user,
             level='sent'
         )
         notification.save()
         notification_saved.send(sender=Notification, notification=notification)
 
-        return Item.objects.create(speaker=user, listener=other_user, **validated_data)
+        return instance
 
 
 class ItemsSerializer(serializers.ModelSerializer):
@@ -70,8 +107,12 @@ class ConversationSerializer(serializers.ModelSerializer):
     items = ItemsSerializer(many=True, read_only=True)
     from_user = UserSerializer(read_only=True)
     to_user = UserSerializer(read_only=True)
+    can_resolve = serializers.SerializerMethodField(required=False, read_only=True)
 
     timesince = serializers.SerializerMethodField(read_only=True)
+
+    def get_can_resolve(self, instance):
+        return instance.can_resolve()
 
     def get_timesince(self, instance):
         return instance.timesince()

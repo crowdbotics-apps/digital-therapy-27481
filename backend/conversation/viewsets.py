@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import filters
+from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
 from conversation.models import Conversation, Item
 from conversation.serializers import (
@@ -21,7 +22,10 @@ class ItemViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Item.objects.exclude(conversation__category='self').filter(listener=self.request.user)
+        return Item.objects.exclude(conversation__category='self').filter(
+            models.Q(listener=self.request.user) |
+            models.Q(speaker=self.request.user)
+        )
 
     @action(["get"], detail=False)
     def sent(self, request):
@@ -66,6 +70,24 @@ class ConversationViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
     filterset_fields = ['category', 'id']
+
+    @action(["post"], detail=True)
+    def resolve(self, request, pk):
+        obj = self.get_object()
+        obj.resolved = True
+        obj.save()
+        user = request.user
+        notification = Notification.objects.create(
+            title='Resolved',
+            description=f'{user.first_name or user.last_name or user.username} resolved the conversation',
+            recipient=obj.person_from if user is not obj.person_from else obj.person_to,
+            sender=obj.person_to if user is not obj.person_to else obj.person_from,
+            level='resolved'
+        )
+        notification.save()
+        notification_saved.send(sender=Notification, notification=notification)
+
+        return Response(self.serializer_class(obj, context={'request': request}).data)
 
     # def get_queryset(self):
     #     return Conversation.objects.filter(person_from=self.request.user)
