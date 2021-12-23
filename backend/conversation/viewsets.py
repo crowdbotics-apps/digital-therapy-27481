@@ -126,6 +126,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
             if hasattr(user, 'contacts'):
                 invite_code = user.contacts.invite_code
             else:
-                instance = Contact.objects.create(user=user)
-                invite_code = instance.invite_code
+                _instance = Contact.objects.create(user=user)
+                invite_code = _instance.invite_code
             send_invitation_code(user, invite_code, instance.invited_email)
