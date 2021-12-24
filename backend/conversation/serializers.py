@@ -52,24 +52,20 @@ class ItemSerializer(serializers.ModelSerializer):
         speaker = person_from
         listener = person_to
         if last_item:
-            if last_item.status in [ItemStatusEnum.confirmed.name, ItemStatusEnum.confirmed.value]:
-                speaker = last_item.listener
-                listener = last_item.speaker
-            else:
-                speaker = last_item.speaker
-                listener = last_item.listener
+            speaker = last_item.speaker
+            listener = last_item.listener
             # update last item status to replied
-            if last_item.status in [ItemStatusEnum.sent.name, ItemStatusEnum.sent.value]:
-                last_item.status = ItemStatusEnum.replied.value
-                last_item.save()
+        if last_item.status in [ItemStatusEnum.sent.name, ItemStatusEnum.sent.value]:
+            last_item.status = ItemStatusEnum.replied.value
+            last_item.save()
 
             # update last item, if it was not confirmed
             # owner replying to an item that was not confirmed
-            if last_item.status in [ItemStatusEnum.not_confirmed.name,
-                                    ItemStatusEnum.not_confirmed.value]:  # and user.id == last_item.owner:
-                last_item.status = ItemStatusEnum.sent.value
-                last_item.save()
-                item = last_item
+        if last_item.status in [ItemStatusEnum.not_confirmed.name,
+                                ItemStatusEnum.not_confirmed.value]:  # and user.id == last_item.owner:
+            last_item.status = ItemStatusEnum.sent.value
+            last_item.save()
+            item = last_item
 
         if item:
             #  replying to a not confirmed item
