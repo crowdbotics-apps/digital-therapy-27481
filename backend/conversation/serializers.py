@@ -28,7 +28,12 @@ class ItemSerializer(serializers.ModelSerializer):
         return fields
 
     def update(self, instance, validated_data):
-        return update_object(instance, validated_data)
+        instance = update_object(instance, validated_data)
+        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name]:
+            # swap listener / speaker
+            instance.speaker, instance.listener = instance.listener, instance.speaker
+            instance.save()
+        return instance
 
     def create(self, validated_data):
         conversation = validated_data['conversation']
