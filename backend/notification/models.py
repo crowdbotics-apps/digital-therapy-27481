@@ -1,8 +1,11 @@
+import logging
 from datetime import datetime, timedelta
 from django.db import models
 from core.models import TimestampModel
 from model_utils import Choices
 from django.contrib.postgres.fields import JSONField
+
+logger = logging.getLogger(__name__)
 
 
 class NotificationQuerySet(models.query.QuerySet):
@@ -117,3 +120,8 @@ class Notification(TimestampModel):
         if self.unread:
             self.unread = False
             self.save()
+
+    def save(self, *args, **kwargs):
+        # log notification
+        logger.info(msg=f"Notification: {self.pk}, Sender: {self.sender}, Recipient: {self.recipient}, Description: {self.description}  ")
+        super(Notification, self).save(*args, **kwargs)

@@ -29,10 +29,26 @@ class ItemSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance = update_object(instance, validated_data)
+        user = self.context.get('request').user
+        recipient = instance.speaker if instance.speaker is not user else instance.listener
         if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name]:
             # swap listener / speaker
             instance.speaker, instance.listener = instance.listener, instance.speaker
             instance.save()
+
+        # send notification if status is confirmed or not_confirmed
+        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name, ItemStatusEnum.not_confirmed.value,ItemStatusEnum.not_confirmed.name] and recipient is not None:
+            status = validated_data.get('status', '').replace('_', ' ').capitalize()
+            notification = Notification.objects.create(
+                title=f'{status} your video',
+                description=f'{user.first_name or user.last_name or user.username} {status} your video!',
+                recipient=recipient,
+                sender=user,
+                level='sent'
+            )
+            notification.save()
+            notification_saved.send(sender=Notification, notification=notification)
+
         return instance
 
     def create(self, validated_data):
@@ -42,6 +58,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
         person_from = conversation.person_from
         person_to = conversation.person_to
+        receipient = person_to
         user = self.context.get('request').user
 
         item = None
@@ -54,6 +71,7 @@ class ItemSerializer(serializers.ModelSerializer):
         if last_item:
             speaker = last_item.speaker
             listener = last_item.listener
+            receipient = last_item.owner if last_item.owner is not user else user
             # update last item status to replied
             if last_item.status in [ItemStatusEnum.sent.name, ItemStatusEnum.sent.value]:
                 last_item.status = ItemStatusEnum.replied.value
@@ -80,7 +98,7 @@ class ItemSerializer(serializers.ModelSerializer):
         notification = Notification.objects.create(
             title='Sent Video',
             description=f'{user.first_name or user.last_name or user.username} sent a video!',
-            recipient=speaker if user is not speaker else listener,
+            recipient=receipient,
             sender=user,
             level='sent'
         )
