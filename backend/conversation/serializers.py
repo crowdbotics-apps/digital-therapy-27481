@@ -140,6 +140,9 @@ class ConversationSerializer(serializers.ModelSerializer):
         model = Conversation
         fields = '__all__'
 
+    def update(self, instance, validated_data):
+        return update_object(instance, validated_data)
+
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get('request')
