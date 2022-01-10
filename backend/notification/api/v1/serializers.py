@@ -2,17 +2,23 @@ from django.db import transaction
 from rest_framework import serializers
 
 from core.utils import update_object
+from home.api.v1.serializers import UserSerializer
 from notification.models import Notification
 from notification.signal import notification_saved
 
 
 class NotificationSerializer(serializers.ModelSerializer):
-    sender = serializers.SerializerMethodField(required=False)
+    sender = UserSerializer()
+    recipient = UserSerializer()
     timesince = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Notification
         fields = "__all__"
+
+    def get_title(self, instance):
+        return instance.description
 
     def get_timesince(self, instance):
         return instance.timesince()
