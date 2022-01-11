@@ -39,8 +39,8 @@ function ProfileScreen(props) {
       ? user.profile_picture
       : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
   )
-  const [firstname, setFirstName] = useState(user?.name)
-  const [lastname, setLastName] = useState(user?.surname)
+  const [firstname, setFirstName] = useState(user?.first_name)
+  const [lastname, setLastName] = useState(user?.last_name)
   const [email, setEmail] = useState(user?.email)
   const [submitting, setSubmitting] = useState(false)
 
@@ -53,11 +53,13 @@ function ProfileScreen(props) {
       data: { image: imageData }
     })
       .then(res => {
+        console.warn(res)
         // dispatch(actionCategories(res.data.results))
         dispatch(update(res.data))
         return res
       })
       .catch(function (error) {
+        console.warn(error)
         // Toast.show({
         //   type: "error",
         //   text1: error,
@@ -77,8 +79,8 @@ function ProfileScreen(props) {
       headers: await GET_HEADER(),
       data: {
         email: email,
-        name: firstname,
-        surname: lastname
+        first_name: firstname,
+        last_name: lastname
       }
     })
       .then(res => {
@@ -116,10 +118,19 @@ function ProfileScreen(props) {
             props.navigation.goBack()
           }}
           updateUser={async () => {
-            setSubmitting(true)
-            await uploadProfilePicture()
-            await updateUser()
-            setSubmitting(false)
+            if (firstname == "" || lastname == "" || email == "") {
+              Toast.show({
+                type: "error",
+                text1: "Fill in all the fields",
+                position: "bottom",
+                visibilityTime: 3000
+              })
+            } else {
+              setSubmitting(true)
+              await uploadProfilePicture()
+              await updateUser()
+              setSubmitting(false)
+            }
           }}
           text="Profile Info"
         />
@@ -242,7 +253,7 @@ function ProfileScreen(props) {
             <TouchableOpacity
               style={styles.roundButtonLarge}
               onPress={() => {
-                props.navigation.navigate("Membership")
+                !user.is_member ? props.navigation.navigate("Membership") : null
               }}
             >
               <Image
@@ -252,39 +263,59 @@ function ProfileScreen(props) {
               />
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              flex: 0.2,
-              justifyContent: "space-evenly",
-              alignItems: "center"
-            }}
-          >
-            <Text
-              style={{
-                color: Theme.THEME_COLOR,
-                fontWeight: "bold",
-                fontSize: 22
-              }}
-            >
-              Upgrade to premium
-            </Text>
+          {user.is_member ? (
             <View
               style={{
-                width: 25,
-                height: 4,
-                borderRadius: 10,
-                backgroundColor: Theme.THEME_COLOR
-              }}
-            />
-            <Text
-              style={{
-                color: Theme.THEME_COLOR,
-                fontSize: 18
+                flex: 0.2,
+                justifyContent: "space-evenly",
+                alignItems: "center"
               }}
             >
-              Get rid of ads{" "}
-            </Text>
-          </View>
+              <Text
+                style={{
+                  color: Theme.THEME_COLOR,
+                  fontWeight: "bold",
+                  fontSize: 22
+                }}
+              >
+                You are a member
+              </Text>
+            </View>
+          ) : (
+            <View
+              style={{
+                flex: 0.2,
+                justifyContent: "space-evenly",
+                alignItems: "center"
+              }}
+            >
+              <Text
+                style={{
+                  color: Theme.THEME_COLOR,
+                  fontWeight: "bold",
+                  fontSize: 22
+                }}
+              >
+                Upgrade to premium
+              </Text>
+              <View
+                style={{
+                  width: 25,
+                  height: 4,
+                  borderRadius: 10,
+                  backgroundColor: Theme.THEME_COLOR
+                }}
+              />
+              <Text
+                style={{
+                  color: Theme.THEME_COLOR,
+                  fontSize: 18
+                }}
+              >
+                Get rid of ads{" "}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </ScrollView>

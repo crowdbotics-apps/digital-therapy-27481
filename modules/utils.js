@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { StyleSheet, View, Text, StatusBar } from "react-native"
 import ScreenNavigation from "../Router/Screen_Navigation"
 import Toast from "react-native-toast-message"
@@ -7,15 +7,21 @@ import { Provider } from "react-redux"
 import userReducer from "./../features/user"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Settings } from "react-native-fbsdk-next"
-import { FB_APPID } from "../Connection/index"
+import { FB_APPID, BaseURL, GET_HEADER } from "../Connection/index"
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes
 } from "@react-native-google-signin/google-signin"
+import OneSignal from "react-native-onesignal"
+import axios from "axios"
+import { useSelector } from "react-redux"
+
 const YourApp = () => {
+  const [loading, setLoading] = useState(false)
   Settings.setAppID(FB_APPID)
   Settings.initializeSDK()
+  const userState = useSelector(state => state.user.value)
 
   GoogleSignin.configure({
     scopes: ["https://www.googleapis.com/auth/drive.readonly"], // what API you want to access on behalf of the user, default is email and profile
@@ -28,6 +34,37 @@ const YourApp = () => {
     accountName: "" // [Android] specifies an account name on the device that should be used
     // iosClientId: "<FROM DEVELOPER CONSOLE>" // [iOS] optional, if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
   })
+
+  //OneSignal Init Code
+  OneSignal.setLogLevel(6, 0)
+  OneSignal.setAppId("8423fa99-5ce7-4aa6-97ba-f9b3435c159e")
+  //END OneSignal Init Code
+  //Prompt for push on iOS
+  OneSignal.promptForPushNotificationsWithUserResponse(response => {
+    console.log("Prompt response:", response)
+  })
+
+  //Method for handling notifications received while app in foreground
+  OneSignal.setNotificationWillShowInForegroundHandler(
+    notificationReceivedEvent => {
+      console.log(
+        "OneSignal: notification will show in foreground:",
+        notificationReceivedEvent
+      )
+      let notification = notificationReceivedEvent.getNotification()
+      console.log("notification: ", notification)
+      const data = notification.additionalData
+      console.log("additionalData: ", data)
+      // Complete with null means don't show a notification.
+      notificationReceivedEvent.complete(notification)
+    }
+  )
+
+  //Method for handling notifications opened
+  OneSignal.setNotificationOpenedHandler(notification => {
+    console.log("OneSignal: notification opened:", notification)
+  })
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />

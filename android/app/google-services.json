@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "712223643970",
+    "project_id": "speak-listen-resolve",
+    "storage_bucket": "speak-listen-resolve.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:712223643970:android:c17e50fcd5a28d2cb0d0db",
+        "android_client_info": {
+          "package_name": "com.digital_therapy_27481"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "712223643970-odeo0avjej6ce77j3lku1fof63295ak1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6UQWKWpMzrGvOuFlj4JNoOW-gKUJiMgo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "712223643970-odeo0avjej6ce77j3lku1fof63295ak1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "712223643970-6ik2q366grtnss74e7ho0l8fi3kr1gob.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.crowdbotics.digital-therapy-27481"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -26,6 +26,8 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>fb467358747803961</string>
+				<string>com.crowdbotics.digital-therapy-27481.payments</string>
+				<string>com.venmo.touch.v2</string>
 			</array>
 		</dict>
 		<dict>
@@ -62,6 +64,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Need access to camera to take profile picture</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Uses location while recording video</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Need access to microphone while recording</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -87,7 +91,6 @@
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>

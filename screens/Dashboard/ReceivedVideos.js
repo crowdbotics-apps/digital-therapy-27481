@@ -61,320 +61,52 @@ function ReceivedVideos(props) {
       })
   }
   const renderText = item => {
-    console.warn("argument:" + item.argument)
-    console.warn("should_resolve:" + item.should_resolve)
-    // I am not the initiator of this conversation
-    if (item.resolved) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
+    return (
+      <View style={{ flex: 0.4, flexDirection: "row" }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Image
+            source={require("../../assets/emoji.png")}
+            style={{ width: 20, height: 20 }}
+            resizeMode="contain"
+          />
+        </View>
+        <View style={{ flex: 3, justifyContent: "center" }}>
+          <Text style={{ color: "gray", fontSize: 16 }}>
+            Check out this video
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
           <View
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>
-              You resolved {item.speaker.name}'s explanation
-            </Text>
-            {/* <Text>You resolved {item.speaker.name}'s explanation</Text> */}
-          </View>
-          <View
-            style={{
-              flex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: 30,
+              backgroundColor: Theme.THEME_COLOR,
               alignItems: "center",
               justifyContent: "center"
             }}
           >
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                // backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/logo.png")}
-                resizeMode="contain"
-                style={{ height: "100%", width: "100%" }}
-              />
-            </View>
-          </View>
-        </View>
-      )
-    }
-    // I am not the initiator and initiator resolved this conversation now I am the speaker and I can create another argument
-    if (item.argument && !item.should_resolve) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
             <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
+              source={require("../../assets/headphone.png")}
               resizeMode="contain"
+              style={{ height: "60%", width: "60%" }}
             />
           </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>Approved!</Text>
-            <Text>
-              {item.speaker.name} approved your explanation, you are the speaker
-              now! Record your video and bring your word to the table!
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 30,
-                backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 20
-              }}
-            >
-              <Image
-                source={require("../../assets/headphone.png")}
-                resizeMode="contain"
-                style={{ height: "60%", width: "60%" }}
-              />
-            </View>
-          </View>
         </View>
-      )
-    }
-
-    if (
-      item.argument &&
-      item.should_resolve &&
-      item.conversation.person_from != user?.id
-    ) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>
-              Check out this video
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 30,
-                backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/headphone.png")}
-                resizeMode="contain"
-                style={{ height: "60%", width: "60%" }}
-              />
-            </View>
-          </View>
-        </View>
-      )
-    }
-    // I was the initiator of this conversation
-    if (
-      item.argument &&
-      item.should_resolve &&
-      item.conversation.person_from == user?.id
-    ) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>
-              Check out this video
-            </Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 30,
-                backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/headphone.png")}
-                resizeMode="contain"
-                style={{ height: "60%", width: "60%" }}
-              />
-            </View>
-          </View>
-        </View>
-      )
-    }
-
-    // I was the initiator and listener has responded
-    else if (!item.argument && !item.should_resolve) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>Confirm</Text>
-            <Text>Confirm {item.speaker.name}'s explanation</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 30,
-                backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/headphone.png")}
-                resizeMode="contain"
-                style={{ height: "60%", width: "60%" }}
-              />
-            </View>
-          </View>
-        </View>
-      )
-    }
-    // // I was not the initiator of this conversation
-    // else if (
-    //   item.argument &&
-    //   !item.should_resolve &&
-    //   item.conversation.person_from == user.id
-    // ) {
-    //   return (
-    //     <View style={{ flex: 0.4, flexDirection: "row" }}>
-    //       <View
-    //         style={{
-    //           flex: 1,
-    //           justifyContent: "center",
-    //           alignItems: "center"
-    //         }}
-    //       >
-    //         <Image
-    //           source={require("../../assets/emoji.png")}
-    //           style={{ width: 20, height: 20 }}
-    //           resizeMode="contain"
-    //         />
-    //       </View>
-    //       <View style={{ flex: 3, justifyContent: "center" }}>
-    //         <Text style={{ color: "gray", fontSize: 16 }}>Approved!</Text>
-    //         <Text>
-    //           {item.speaker.name} approved your explanation, you are the speaker
-    //           now! Record your video and bring your word to the table!
-    //         </Text>
-    //       </View>
-    //       <View
-    //         style={{
-    //           flex: 1,
-    //           alignItems: "center",
-    //           justifyContent: "center"
-    //         }}
-    //       >
-    //         <View
-    //           style={{
-    //             width: 40,
-    //             height: 40,
-    //             borderRadius: 30,
-    //             backgroundColor: Theme.THEME_COLOR,
-    //             alignItems: "center",
-    //             justifyContent: "center"
-    //           }}
-    //         >
-    //           <Image
-    //             source={require("../../assets/headphone.png")}
-    //             resizeMode="contain"
-    //             style={{ height: "60%", width: "60%" }}
-    //           />
-    //         </View>
-    //       </View>
-    //     </View>
-    //   )
-    // }
+      </View>
+    )
   }
   const renderItem = ({ item, index }) => {
     return (
@@ -421,15 +153,17 @@ function ReceivedVideos(props) {
               size="medium"
               source={{
                 uri:
-                  item.speaker.profile_picture != null
-                    ? item.speaker.profile_picture
-                    : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
+                  user.id == item.conversation.items?.[0].speaker.id
+                    ? item.conversation.items?.[0].listener.profile_picture
+                    : item.conversation.items?.[0].speaker.profile_picture
               }}
             ></Avatar>
           </View>
           <View style={{ flex: 2, justifyContent: "center" }}>
             <Text style={{ fontWeight: "bold" }}>
-              {item.conversation.topic}
+              {user.id == item.conversation.items?.[0].speaker.id
+                ? item.conversation.items?.[0].listener.first_name
+                : item.conversation.items?.[0].speaker.first_name}
             </Text>
             <Text
               style={{
@@ -438,16 +172,17 @@ function ReceivedVideos(props) {
                 fontSize: 12
               }}
             >
-              {moment(item.conversation.created_at).format(
-                "d MMMM, yyyy H:mma"
-              )}
+              {item.conversation.items?.[0].timesince}
+
+              {moment(
+                convertUTCDateToLocalDate(item.conversation.created_at)
+              ).format(" h:mma")}
+              {/* {moment(item.conversation.created_at).format(" H:mma")} */}
             </Text>
             <Text
               style={{ color: Theme.THEME_COLOR, fontSize: 16, marginTop: 5 }}
             >
-              {item.resolved || (item.argument && !item.should_resolve)
-                ? "Resolved"
-                : "Let's resolve this!"}
+              {item.conversation.topic}
             </Text>
           </View>
           <View
@@ -472,6 +207,14 @@ function ReceivedVideos(props) {
         {renderText(item)}
       </TouchableOpacity>
     )
+  }
+  function convertUTCDateToLocalDate(date) {
+    var dateLocal = new Date(date)
+    var newDate = new Date(
+      dateLocal.getTime() - dateLocal.getTimezoneOffset() * 60 * 1000
+    )
+    console.warn(newDate)
+    // return newDate
   }
   return (
     // <ScrollView

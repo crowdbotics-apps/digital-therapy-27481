@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import {
   View,
   Text,
@@ -12,8 +12,13 @@ import Icon from "react-native-vector-icons/MaterialIcons"
 import strings from "../../Localization"
 import HeaderWhite from "../../Component/HeaderWhite"
 import { connect } from "react-redux"
-
+import axios from "axios"
+import { BaseURL, Header, SET_TOKEN, GET_HEADER } from "../../Connection/index"
+import Toast from "react-native-toast-message"
 const InviteScreen = ({ navigation }) => {
+  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = useState("")
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <HeaderWhite
@@ -53,21 +58,90 @@ const InviteScreen = ({ navigation }) => {
             placeholder="Email"
             keyboardType="email-address"
             autoCapitalize="none"
+            onChangeText={text => setEmail(text)}
           />
         </View>
       </View>
       <View style={styles.signInBackground}>
         <TouchableOpacity
           style={styles.signInTextBackground}
-          onPress={() => navigation.navigate("OTPScreen")}
+          onPress={() => {
+            if (email != "") {
+              if (validateEmail(email)) {
+                SendInvite()
+              }
+            } else {
+              Toast.show({
+                type: "error",
+                text1: "Input email address to send an invite.",
+                position: "bottom",
+                visibilityTime: 3000
+              })
+            }
+          }}
         >
-          <Text style={styles.signInColorTextBackground}>
-            {strings.invite}{" "}
-          </Text>
+          <Text style={styles.signInColorTextBackground}>{strings.invite}</Text>
         </TouchableOpacity>
       </View>
     </View>
   )
+  function validateEmail(text) {
+    let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
+    if (reg.test(text) === false) {
+      Toast.show({
+        type: "error",
+        text1: "Input valid email",
+        visibilityTime: 3000,
+        position: "bottom"
+      })
+
+      return false
+    } else {
+      return true
+    }
+  }
+  async function SendInvite() {
+    setLoading(true)
+    await axios({
+      method: "POST",
+      url: BaseURL.concat("/invite"),
+      headers: await GET_HEADER(),
+      data: {
+        // category: "friend",
+        // invited_email: email,
+        email: email
+        // topic:
+        //   "Hi, I would like to invite you to resolve speaker listener application"
+      }
+    })
+      .then(res => {
+        Toast.show({
+          type: "success",
+          text1: "Invitaion has been sent to " + email,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setTimeout(() => {
+          navigation.goBack()
+        }, 1500)
+
+        console.warn(res)
+        // dispatch(actionCategories(res.data.results))
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        // setSubmitting(false)
+      })
+  }
 }
 
 const styles = StyleSheet.create({
@@ -134,7 +208,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center"
   },
-  textInputStyle: { flex: 1, paddingLeft: 15 },
+  textInputStyle: { flex: 1, paddingLeft: 15, paddingVertical: 15 },
 
   signInColorTextBackground: {
     fontSize: 16,

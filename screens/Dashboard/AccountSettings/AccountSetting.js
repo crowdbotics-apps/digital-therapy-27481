@@ -97,13 +97,20 @@ function AccountSettings(props) {
                   }}
                 />
               </View>
-              <View style={styles.viewContainerItem}>
+              <View
+                style={[styles.viewContainerItem, { flexDirection: "row" }]}
+              >
                 <Text style={{ fontSize: 16, color: "black" }}>
                   Push Notifications
                 </Text>
                 <Text style={{ fontSize: 14, color: Theme.THEME_COLOR }}>
                   on
                 </Text>
+                <Switch
+                  trackColor={{ false: "#767577", true: "#81b0ff" }}
+                  thumbColor={"#f5dd4b"}
+                  ios_backgroundColor="#3e3e3e"
+                />
               </View>
             </View>
             <View style={styles.line}></View>
@@ -141,14 +148,14 @@ function AccountSettings(props) {
                   }}
                 />
               </View>
-              <View style={styles.viewContainerItem}>
+              <TouchableOpacity style={styles.viewContainerItem}>
                 <Text style={{ fontSize: 16, color: "black" }}>
                   Reset your password
                 </Text>
                 <Text style={{ fontSize: 14, color: Theme.THEME_COLOR }}>
                   set a new once
                 </Text>
-              </View>
+              </TouchableOpacity>
             </View>
             <View style={styles.line}></View>
           </View>

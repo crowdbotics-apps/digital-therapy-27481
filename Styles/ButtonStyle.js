@@ -26,7 +26,8 @@ export default StyleSheet.create({
     padding: 5,
     elevation: 3,
     height: 50,
-    width: "90%"
+    width: "90%",
+    marginVertical: 20
   },
   inputStyle: {
     width: 200,

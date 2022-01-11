@@ -35,12 +35,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import Toast from "react-native-toast-message"
 import HeaderWhite from "../../../Component/HeaderWhite"
+import { useSelector } from "react-redux"
 function SendFeedback(props) {
   const [email, setEmail] = useState("")
   const [feedback, setFeedback] = useState("")
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-
+  const userState = useSelector(state => state.user.value)
   useEffect(() => {
     // checkLoggedin()
   })
@@ -54,7 +55,13 @@ function SendFeedback(props) {
       }}
     >
       <View style={{ flex: 1, alignItems: "center" }}>
-        <HeaderWhite text="Send Feedback" hideIcon />
+        <HeaderWhite
+          text="Send Feedback"
+          hideIcon
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        />
         <View style={[Styles.ViewStyle, { flex: 0.3, alignSelf: "center" }]}>
           <Text style={MainStyle.textStyleHeading}>Send Feedback</Text>
           {/* <Image
@@ -154,25 +161,29 @@ function SendFeedback(props) {
           url: BaseURL.concat("/feedback/"),
           data: {
             email: email,
-            feedback: feedback
+            content: feedback,
+            user: userState.user.id
           },
           headers: await GET_HEADER()
         })
           .then(res => {
+            Toast.show({
+              text1: "Feedback submitted",
+              text2: "Thank you, your feedback has been submitted.",
+              position: "bottom",
+              visibilityTime: 3000,
+              type: "success"
+            })
             console.warn(res)
-            SET_TOKEN(res.data.token)
-            // console.warn(GET_TOKEN())
-
-            // self.props.actionSignup("user", res.data.data[0])
-            saveUser(res.data)
             // self.props.navigation.replace('Dashboard');
 
             // Toast.show({ text: res.data.message }, 3000)
           })
           .catch(function (error) {
+            console.warn(error.response)
             Toast.show({
               type: "error",
-              text1: error.response.data.email[0],
+              text1: "Something went wrong",
               position: "bottom",
               visibilityTime: 3000
             })
@@ -223,47 +234,6 @@ function SendFeedback(props) {
     } else {
       return true
     }
-  }
-
-  function saveUser(data) {
-    storage.save({
-      key: "loginState", // Note: Do not use underscore("_") in key!
-      data,
-      // if not specified, the defaultExpires will be applied instead.
-      // if set to null, then it will never expire.
-      expires: null
-    })
-    //
-    storage
-      .load({
-        key: "loginState"
-      })
-      .then(ret => {
-        console.warn(ret)
-        // found data goes to then()
-        // self.props.actionSignup("user", ret)
-        props.navigation.replace("HomeScreen")
-        // self.props.actionSignup('profileStatus', ret.ProfileStatus);
-        Toast.show({
-          text1: "Registration successful",
-          position: "bottom",
-          visibilityTime: 3000
-        })
-      })
-      .catch(err => {
-        console.warn(err)
-        // any exception including data not found
-        // goes to catch()
-        //  console.warn(err.messagce);
-        switch (err.name) {
-          case "NotFoundError":
-            // TODO;
-            break
-          case "ExpiredError":
-            // TODO
-            break
-        }
-      })
   }
 }
 

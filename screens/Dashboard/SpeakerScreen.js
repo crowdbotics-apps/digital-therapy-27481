@@ -29,6 +29,7 @@ import { useSelector } from "react-redux"
 import axios from "axios"
 import { BaseURL, GET_HEADER } from "../../Connection"
 import Toast from "react-native-toast-message"
+import { cos } from "react-native-reanimated"
 // edited
 function speakerScreen(props) {
   const [receivedVideos, setReceivedVideos] = useState([1, 2, 3, 4, 5])
@@ -47,67 +48,157 @@ function speakerScreen(props) {
   const user = useSelector(state => state.user.value.user)
   console.warn(user)
   const { sent, received, conversation } = props.route.params
-  const renderMessage = (sent, received, conversation) => {
-    if (conversation.resolved) {
+  const renderMessage = conversation => {
+    var conversation = conversation.conversation
+    console.warn(conversation.items.length)
+
+    var firstItem = conversation.items?.[0]
+
+    // -----------------------------------------------New Code---------------------------------
+    if (
+      user.id == firstItem.owner &&
+      firstItem.status.toLowerCase() == "sent" &&
+      conversation.items.length == 1
+    ) {
+      //  Waiting for other person to reply
       return (
         <View
           style={{
-            flex: 1,
+            flex: 0.3,
             alignSelf: "center",
-
+            flexDirection: "row",
+            backgroundColor: "white",
             padding: 10,
             borderBottomLeftRadius: 20,
             borderBottomRightRadius: 20,
 
-            elevation: 0,
-            width: "100%",
-            justifyContent: "center",
-            alignItems: "center",
+            elevation: 1,
             shadowColor: "black",
             shadowRadius: 3,
             shadowOffset: { x: 3, y: 3 },
             shadowOpacity: 0.2
           }}
         >
-          <View style={styles.roundButtonLarge}>
-            <Image
-              source={require("../../assets/logo.png")}
-              style={{ height: "90%", width: "80%" }}
-              resizeMode="contain"
-            />
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Waiting</Text>
+            <Text style={{ color: Theme.GRAY }}>
+              Waiting for {firstItem.listener.first_name} to reply
+            </Text>
           </View>
-          <Text style={{ fontSize: 22, color: Theme.THEME_COLOR }}>
-            Resolved!
-          </Text>
         </View>
       )
-    } else {
-      // i am not the initiator and initiator resolved this conversation but now I am the speaker and create another argument
-      if (conversation.argument && !conversation.should_resolve && received) {
-        return (
+    }
+
+    if (
+      user.id != firstItem.owner &&
+      firstItem.status.toLowerCase() == "sent" &&
+      conversation.items.length == 1
+    ) {
+      //  You have received and you have to explain
+      return (
+        <View
+          style={{
+            height: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Explain</Text>
+            <Text style={{ color: Theme.GRAY }}>
+              Explain what you heard in your own words
+              {/* Explain what you heard in your own words */}
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={() => {
+                props.navigation.navigate("Camera", {
+                  data: {
+                    createConversation: false,
+                    id: conversation.id
+                  }
+                })
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                ></View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+    if (
+      user.id != firstItem.owner &&
+      conversation.items?.[1].status.toLowerCase() == "replied"
+    ) {
+      //  You have received from listener and you have to confirm or not confirm
+      return (
+        <View>
           <View
             style={{
-              flex: 0.3,
+              minHeight: 80,
               alignSelf: "center",
               flexDirection: "row",
               backgroundColor: "white",
               padding: 10,
-              borderBottomLeftRadius: 20,
+              borderTopLeftRadius: 20,
               borderBottomRightRadius: 20,
-
+              marginBottom: 20,
               elevation: 1,
               shadowColor: "black",
-              shadowRadius: 2,
+              shadowRadius: 3,
               shadowOffset: { x: 3, y: 3 },
               shadowOpacity: 0.2
             }}
           >
             <View style={{ flex: 3 }}>
-              <Text style={{ fontSize: 16 }}>Approved</Text>
-              <Text style={{ color: Theme.GRAY }}>
-                {conversation.speaker.name} approved your explanation, you are
-                the speaker now! Record your video and bring your word to the
-                table!
+              <Text style={{ fontSize: 16 }}>Confirm</Text>
+              <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+                Confirm {firstItem.listener.first_name}'s rephrasing (this is
+                what I said)
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -121,19 +212,7 @@ function speakerScreen(props) {
                   alignItems: "center"
                 }}
                 onPress={() => {
-                  props.navigation.navigate("Camera", {
-                    data: {
-                      categoryValue: null,
-                      personValue: null,
-                      topic: null,
-                      argument: true,
-                      // conversation.conversation.person_from == user.id
-                      //   ? true
-                      // : false,
-                      createConversation: false,
-                      id: conversation.conversation.id
-                    }
-                  })
+                  updateItem(firstItem.id, "confirmed")
                 }}
               >
                 <View
@@ -151,40 +230,22 @@ function speakerScreen(props) {
                     shadowOpacity: 0.2
                   }}
                 >
-                  <View
-                    style={{
-                      width: 25,
-                      height: 25,
-                      borderRadius: 100,
-                      backgroundColor: "white",
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}
-                  ></View>
+                  <Icon name="done" color={"white"} size={25} />
                 </View>
               </TouchableOpacity>
             </View>
           </View>
-        )
-      }
-
-      // you have to respond to the conversation
-      if (
-        user.id == conversation.listener.id &&
-        conversation.should_resolve &&
-        conversation.argument &&
-        received
-      ) {
-        return (
+          {/* Not confirm */}
           <View
             style={{
-              flex: 0.3,
+              minHeight: 80,
               alignSelf: "center",
               flexDirection: "row",
               backgroundColor: "white",
               padding: 10,
-              borderBottomLeftRadius: 20,
+              borderTopLeftRadius: 20,
               borderBottomRightRadius: 20,
+              borderTopRightRadius: 20,
 
               elevation: 1,
               shadowColor: "black",
@@ -194,9 +255,10 @@ function speakerScreen(props) {
             }}
           >
             <View style={{ flex: 3 }}>
-              <Text style={{ fontSize: 16 }}>Explain</Text>
-              <Text style={{ color: Theme.GRAY }}>
-                Explain what you heard in your own words
+              <Text style={{ fontSize: 16 }}>Not confirmed</Text>
+              <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+                Respond to {firstItem.listener.first_name}'s explanation as not
+                confirmed(this is not what I said)
                 {/* Explain what you heard in your own words */}
               </Text>
             </View>
@@ -211,19 +273,7 @@ function speakerScreen(props) {
                   alignItems: "center"
                 }}
                 onPress={() => {
-                  props.navigation.navigate("Camera", {
-                    data: {
-                      categoryValue: null,
-                      personValue: null,
-                      topic: null,
-                      argument: false,
-                      // conversation.conversation.person_from == user.id
-                      //   ? true
-                      // : false,
-                      createConversation: false,
-                      id: conversation.conversation.id
-                    }
-                  })
+                  updateItem(firstItem.id, "not_confirmed")
                 }}
               >
                 <View
@@ -241,426 +291,412 @@ function speakerScreen(props) {
                     shadowOpacity: 0.2
                   }}
                 >
-                  <View
-                    style={{
-                      width: 25,
-                      height: 25,
-                      borderRadius: 100,
-                      backgroundColor: "white",
-                      justifyContent: "center",
-                      alignItems: "center"
-                    }}
-                  ></View>
+                  <Icon name="close" color={"white"} size={25} />
                 </View>
               </TouchableOpacity>
             </View>
           </View>
-        )
-      }
-      // I switched the role and created argument
-      if (
-        conversation.should_resolve &&
-        conversation.argument &&
-        sent &&
-        conversation.speaker.id == user.id
-      ) {
-        return (
-          <View
-            style={{
-              flex: 0.3,
-              alignSelf: "center",
-              flexDirection: "row",
-              backgroundColor: "white",
-              padding: 10,
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-
-              elevation: 1,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <View style={{ flex: 3 }}>
-              <Text style={{ fontSize: 16 }}>
-                Waiting for {conversation.listener.name} to reply
-              </Text>
-              <Text style={{ color: Theme.GRAY }}>
-                Video will appear once {conversation.listener.name} replies.
-              </Text>
-            </View>
-          </View>
-        )
-      }
-      if (
-        user.id == conversation.speaker.id &&
-        !conversation.should_resolve &&
-        !conversation.argument &&
-        sent
-      ) {
-        return (
-          <View
-            style={{
-              flex: 0.3,
-              alignSelf: "center",
-              flexDirection: "row",
-              backgroundColor: "white",
-              padding: 10,
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-
-              elevation: 1,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <View style={{ flex: 3 }}>
-              <Text style={{ fontSize: 16 }}>Approval awaited</Text>
-              <Text style={{ color: Theme.GRAY }}>
-                waiting for {conversation.listener.name} to approve
-              </Text>
-            </View>
-          </View>
-        )
-      }
-      if (
-        user.id == conversation.listener.id &&
-        !conversation.should_resolve &&
-        !conversation.argument &&
-        received
-      ) {
-        return (
-          <View
-            style={{
-              flex: 0.3,
-              alignSelf: "center",
-              flexDirection: "row",
-              backgroundColor: "white",
-              padding: 10,
-              borderBottomLeftRadius: 20,
-              borderBottomRightRadius: 20,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2,
-              elevation: 1
-            }}
-          >
-            <View style={{ flex: 3 }}>
-              <Text style={{ fontSize: 16 }}>Confirm</Text>
-              <Text style={{ color: Theme.GRAY }}>
-                confirm {conversation.speaker.name}'s explanation
-              </Text>
-            </View>
-          </View>
-        )
-      }
-
-      //   // listener responded and waiting for initiator to approve
-      //   if (
-      //     user.id == conversation.conversation.person_to &&
-      //     conversation.should_resolve &&
-      //     conversation.argument &&
-      //     received &&
-      //     conversation.listener.id == user.id
-      //   ) {
-      //     return (
-      //       <View
-      //         style={{
-      //           flex: 0.3,
-      //           alignSelf: "center",
-      //           flexDirection: "row",
-      //           backgroundColor: "white",
-      //           padding: 10,
-      //           borderBottomLeftRadius: 20,
-      //           borderBottomRightRadius: 20,
-      //           shadowOffset: { x: 0, y: 10 },
-      //           shadowColor: "black",
-      //           shadowOpacity: 0.6,
-      //           shadowRadius: 5,
-      //           elevation: 1
-      //         }}
-      //       >
-      //         <View style={{ flex: 3 }}>
-      //           <Text style={{ fontSize: 16 }}>Waiting for approval</Text>
-      //           <Text style={{ color: Theme.GRAY }}>
-      //             Waiting for approval from {conversation.speaker.name}
-      //           </Text>
-      //         </View>
-      //       </View>
-      //     )
-      //   }
-      //   // initiator created an argument on listener response
-      //   // listener responded and you have to respond back
-      //   else if (
-      //     user.id == conversation.conversation.person_from &&
-      //     !conversation.should_resolve &&
-      //     !conversation.argument
-      //   ) {
-      //     return (
-      //       <View
-      //         style={{
-      //           flex: 0.3,
-      //           alignSelf: "center",
-      //           flexDirection: "row",
-      //           backgroundColor: "white",
-      //           padding: 10,
-      //           borderBottomLeftRadius: 20,
-      //           borderBottomRightRadius: 20,
-      //           shadowOffset: { x: 0, y: 10 },
-      //           shadowColor: "black",
-      //           shadowOpacity: 0.6,
-      //           shadowRadius: 5,
-      //           elevation: 1
-      //         }}
-      //       >
-      //         <View style={{ flex: 3 }}>
-      //           <Text style={{ fontSize: 16 }}>Approved</Text>
-      //           <Text style={{ color: Theme.GRAY }}>
-      //             {conversation.speaker.name} approved your explanation, you are
-      //             the speaker now! Record your video and bring your word to the
-      //             table!
-      //           </Text>
-      //         </View>
-      //         <View style={{ flex: 1 }}>
-      //           <TouchableOpacity
-      //             style={{
-      //               position: "absolute",
-      //               width: 60,
-      //               height: 60,
-      //               right: 15,
-      //               justifyContent: "center",
-      //               alignItems: "center"
-      //             }}
-      //             onPress={() => {
-      //               props.navigation.navigate("Camera", {
-      //                 data: {
-      //                   categoryValue: null,
-      //                   personValue: null,
-      //                   topic: null,
-      //                   argument: false,
-      //                   // conversation.conversation.person_from == user.id
-      //                   //   ? true
-      //                   // : false,
-      //                   createConversation: false,
-      //                   id: conversation.conversation.id
-      //                 }
-      //               })
-      //             }}
-      //           >
-      //             <View
-      //               style={{
-      //                 width: 40,
-      //                 height: 40,
-      //                 borderRadius: 100,
-      //                 backgroundColor: Theme.THEME_COLOR,
-      //                 justifyContent: "center",
-      //                 alignItems: "center",
-      //                 elevation: 20
-      //               }}
-      //             >
-      //               <View
-      //                 style={{
-      //                   width: 25,
-      //                   height: 25,
-      //                   borderRadius: 100,
-      //                   backgroundColor: "white",
-      //                   justifyContent: "center",
-      //                   alignItems: "center"
-      //                 }}
-      //               ></View>
-      //             </View>
-      //           </TouchableOpacity>
-      //         </View>
-      //       </View>
-      //     )
-      //   }
-      //   if (sent && conversation.should_resolve && conversation.argument) {
-      //     return (
-      //       <View
-      //         style={{
-      //           flex: 0.3,
-      //           alignSelf: "center",
-      //           flexDirection: "row",
-      //           backgroundColor: "white",
-      //           padding: 10,
-      //           borderBottomLeftRadius: 20,
-      //           borderBottomRightRadius: 20,
-      //           shadowOffset: { x: 0, y: 10 },
-      //           shadowColor: "black",
-      //           shadowOpacity: 0.6,
-      //           shadowRadius: 5,
-      //           elevation: 1
-      //         }}
-      //       >
-      //         <View style={{ flex: 3 }}>
-      //           <Text style={{ fontSize: 16 }}>Waiting</Text>
-      //           <Text style={{ color: Theme.GRAY }}>
-      //             waiting for {conversation.listener.name} to reply
-      //           </Text>
-      //         </View>
-      //         <View style={{ flex: 1 }}>
-      //           <View
-      //             style={{
-      //               position: "absolute",
-      //               width: 60,
-      //               height: 60,
-      //               right: 15,
-      //               justifyContent: "center",
-      //               alignItems: "center"
-      //             }}
-      //           >
-      //             <Image
-      //               source={require("../../assets/logo.png")}
-      //               style={{ width: 60, height: 60 }}
-      //               resizeMode="contain"
-      //             />
-      //           </View>
-      //         </View>
-      //       </View>
-      //     )
-      //     // return (
-      //     //   <View
-      //     //     style={{
-      //     //       flex: 0.3,
-      //     //       alignSelf: "center",
-      //     //       flexDirection: "row",
-      //     //       backgroundColor: "white",
-      //     //       padding: 10,
-      //     //       borderBottomLeftRadius: 20,
-      //     //       borderBottomRightRadius: 20,
-      //     //       shadowOffset: { x: 0, y: 10 },
-      //     //       shadowColor: "black",
-      //     //       shadowOpacity: 0.6,
-      //     //       shadowRadius: 5,
-      //     //       elevation: 1
-      //     //     }}
-      //     //   >
-      //     //     <View style={{ flex: 3 }}>
-      //     //       <Text style={{ fontSize: 16 }}>Approved</Text>
-      //     //       <Text style={{ color: Theme.GRAY }}>
-      //     //         Jane approved your explanation, you are the speaker now! Record
-      //     //         your video and bring your word to the table!
-      //     //       </Text>
-      //     //     </View>
-      //     //     <View style={{ flex: 1 }}>
-      //     //       <TouchableOpacity
-      //     //         style={{
-      //     //           position: "absolute",
-      //     //           width: 60,
-      //     //           height: 60,
-      //     //           right: 15,
-      //     //           justifyContent: "center",
-      //     //           alignItems: "center"
-      //     //         }}
-      //     //         onPress={() => {
-      //     //           props.navigation.navigate("Camera")
-      //     //         }}
-      //     //       >
-      //     //         <View
-      //     //           style={{
-      //     //             width: 40,
-      //     //             height: 40,
-      //     //             borderRadius: 100,
-      //     //             backgroundColor: Theme.THEME_COLOR,
-      //     //             justifyContent: "center",
-      //     //             alignItems: "center",
-      //     //             elevation: 20
-      //     //           }}
-      //     //         >
-      //     //           <View
-      //     //             style={{
-      //     //               width: 25,
-      //     //               height: 25,
-      //     //               borderRadius: 100,
-      //     //               backgroundColor: "white",
-      //     //               justifyContent: "center",
-      //     //               alignItems: "center"
-      //     //             }}
-      //     //           ></View>
-      //     //         </View>
-      //     //       </TouchableOpacity>
-      //     //     </View>
-      //     //   </View>
-      //     // )
-      //   }
-      //   if (
-      //     user.id == conversation.conversation.person_to &&
-      //     !conversation.should_resolve &&
-      //     !conversation.argument &&
-      //     sent &&
-      //     conversation.speaker.id == user.id
-      //   ) {
-      //     return (
-      //       <View
-      //         style={{
-      //           flex: 0.3,
-      //           alignSelf: "center",
-      //           flexDirection: "row",
-      //           backgroundColor: "white",
-      //           padding: 10,
-      //           borderBottomLeftRadius: 20,
-      //           borderBottomRightRadius: 20,
-      //           shadowOffset: { x: 0, y: 10 },
-      //           shadowColor: "black",
-      //           shadowOpacity: 0.6,
-      //           shadowRadius: 5,
-      //           elevation: 1
-      //         }}
-      //       >
-      //         <View style={{ flex: 3 }}>
-      //           <Text style={{ fontSize: 16 }}>
-      //             Waiting for {conversation.listener.name} to reply
-      //           </Text>
-      //           <Text style={{ color: Theme.GRAY }}>
-      //             Video will appear once Jane replies.
-      //           </Text>
-      //         </View>
-      //       </View>
-      //     )
-      //   }
-      //   if (
-      //     user.id == conversation.conversation.person_to &&
-      //     !conversation.should_resolve &&
-      //     !conversation.argument &&
-      //     sent
-      //   ) {
-      //     return (
-      //       <View
-      //         style={{
-      //           flex: 0.3,
-      //           alignSelf: "center",
-      //           flexDirection: "row",
-      //           backgroundColor: "white",
-      //           padding: 10,
-      //           borderBottomLeftRadius: 20,
-      //           borderBottomRightRadius: 20,
-      //           shadowOffset: { x: 0, y: 10 },
-      //           shadowColor: "black",
-      //           shadowOpacity: 0.6,
-      //           shadowRadius: 5,
-      //           elevation: 1
-      //         }}
-      //       >
-      //         <View style={{ flex: 3 }}>
-      //           <Text style={{ fontSize: 16 }}>Approval awaited</Text>
-      //           <Text style={{ color: Theme.GRAY }}>
-      //             waiting for {conversation.listener.name} to approve
-      //           </Text>
-      //         </View>
-      //       </View>
-      //     )
-      //   }
+        </View>
+      )
     }
-  }
-  const renderResolveButton = (sent, received, conversation) => {
     if (
-      conversation.resolved ||
-      (conversation.argument && !conversation.should_resolve && sent)
+      user.id == firstItem.owner &&
+      firstItem.status.toLowerCase() == "sent" &&
+      conversation.items?.length > 1 &&
+      conversation.items?.[1].status.toLowerCase() != "confirmed"
     ) {
+      //  You have sent the explanation video
+      return (
+        <View
+          style={{
+            height: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Explanation sent</Text>
+            <Text style={{ color: Theme.GRAY }}>
+              Waiting for {firstItem.speaker.first_name} to respond
+              {/* Explain what you heard in your own words */}
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={() => {
+                props.navigation.navigate("Camera", {
+                  data: {
+                    createConversation: false,
+                    id: conversation.id
+                  }
+                })
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                ></View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+    if (
+      user.id == firstItem.owner &&
+      firstItem.status.toLowerCase() == "confirmed" &&
+      !conversation.resolved
+    ) {
+      //  Speaker confirmed and switched the roles you are speaker now
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 14 }}>
+              Bring your opinion now into the conversation
+            </Text>
+            <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+              Start speaking in a speaker role and bring your opinion
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={() => {
+                props.navigation.navigate("Camera", {
+                  data: {
+                    createConversation: false,
+                    id: conversation.id
+                  }
+                })
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                ></View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+    if (
+      user.id == firstItem.owner &&
+      firstItem.status.toLowerCase() == "not_confirmed"
+    ) {
+      //  You have received and you have to explain
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 14 }}>
+              {firstItem.speaker.first_name} responded{" "}
+            </Text>
+            <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+              {firstItem.speaker.first_name} doesn’t confirm that you rephrased
+              his video in the right way as he intended to say{" "}
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={() => {
+                props.navigation.navigate("Camera", {
+                  data: {
+                    createConversation: false,
+                    id: conversation.id
+                  }
+                })
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                ></View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+
+    if (
+      user.id == firstItem.owner &&
+      firstItem.status.toLowerCase() == "sent" &&
+      conversation.items.length > 1 &&
+      conversation.items?.[1].status.toLowerCase() == "confirmed"
+    ) {
+      // After switching the role you are now speaker and asked question already
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Waiting</Text>
+            <Text style={{ color: Theme.GRAY }}>
+              Waiting for {firstItem.listener.first_name} to reply
+            </Text>
+          </View>
+        </View>
+      )
+    }
+    if (
+      user.id != firstItem.owner &&
+      firstItem.status.toLowerCase() == "sent" &&
+      conversation.items.length > 1 &&
+      conversation.items?.[1].status.toLowerCase() == "confirmed"
+    ) {
+      // After switching the role you are now listener and explain in your own word
+
+      return (
+        <View
+          style={{
+            height: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderBottomLeftRadius: 20,
+            borderBottomRightRadius: 20,
+
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Explain</Text>
+            <Text style={{ color: Theme.GRAY }}>
+              Explain what you heard in your own words
+              {/* Explain what you heard in your own words */}
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <TouchableOpacity
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+              onPress={() => {
+                props.navigation.navigate("Camera", {
+                  data: {
+                    createConversation: false,
+                    id: conversation.id
+                  }
+                })
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <View
+                  style={{
+                    width: 25,
+                    height: 25,
+                    borderRadius: 100,
+                    backgroundColor: "white",
+                    justifyContent: "center",
+                    alignItems: "center"
+                  }}
+                ></View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+    if (conversation.resolved) {
+      //  Speaker confirmed and switched the roles you are speaker now
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+
+            width: 100,
+            height: 100,
+            borderRadius: 50,
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
+          <Image
+            source={require("../../assets/logo.png")}
+            resizeMode="contain"
+            style={{ height: 80, width: 80 }}
+          />
+        </View>
+      )
+    }
+    // ----------------------------------------------New Code End---------------------------
+  }
+  const renderResolveButton = conversation => {
+    if (conversation.can_resolve && user.id != conversation.person_from) {
       return (
         <View style={{ flex: 0.3, justifyContent: "center" }}>
           <TouchableOpacity
@@ -674,22 +710,13 @@ function speakerScreen(props) {
         </View>
       )
     }
-
-    if (received && conversation.should_resolve && conversation.argument) {
-      return null
-    }
-
-    if (
-      user.id == conversation.listener.id &&
-      !conversation.should_resolve &&
-      !conversation.argument
-    ) {
+    if (conversation.can_resolve && user.id == conversation.person_from) {
       return (
         <View style={{ flex: 0.3, justifyContent: "center" }}>
           <TouchableOpacity
             style={ButtonStyle.button}
             onPress={() => {
-              resolveArgument()
+              resolveArgument(conversation)
             }}
           >
             <Text style={{ color: "white" }}>Mark it as resolved</Text>
@@ -697,14 +724,43 @@ function speakerScreen(props) {
         </View>
       )
     }
-  }
-  const resolveArgument = async () => {
-    axios({
-      method: "post",
-      headers: await GET_HEADER(),
-      url: BaseURL.concat(
-        "/conversation/items/" + conversation.id + "/resolve/"
+    if (conversation.resolved) {
+      return (
+        <View style={{ flex: 0.3, justifyContent: "center" }}>
+          <Text
+            style={{
+              color: Theme.THEME_COLOR,
+              alignSelf: "center",
+              fontSize: 24
+            }}
+          >
+            Resolved!
+          </Text>
+
+          <TouchableOpacity
+            style={ButtonStyle.button}
+            onPress={() => {
+              props.navigation.popToTop()
+            }}
+          >
+            <Text style={{ color: "white" }}>Go back to Home Screen</Text>
+          </TouchableOpacity>
+        </View>
       )
+    }
+  }
+  const resolveArgument = async conversation => {
+    console.warn(conversation.id)
+    axios({
+      method: "POST",
+      // url: BaseURL.concat(
+      //   "/conversation/items/" + conversation.items?.[0].id + "/resolve/"
+      // ),
+      url: BaseURL.concat(
+        "/conversation/conversation/" + conversation.id + "/resolve/"
+      ),
+      data: { resolved: true },
+      headers: await GET_HEADER()
     })
       .then(res => {
         console.warn(res)
@@ -715,755 +771,197 @@ function speakerScreen(props) {
           visibilityTime: 3000
         })
       })
-      .catch(ex =>
+      .catch(ex => {
+        console.warn(ex.response)
         Toast.show({
           type: "error",
           text1: "Something went wrong ",
           position: "bottom",
           visibilityTime: 3000
         })
-      )
+      })
+  }
+  async function updateItem(id, status) {
+    console.warn(id)
+    console.warn(status)
+    axios({
+      method: "PATCH",
+      headers: await GET_HEADER(),
+      url: BaseURL.concat("/conversation/items/" + id + "/"),
+      data: { status: status }
+    })
+      .then(res => {
+        console.warn(res)
+        props.navigation.popToTop()
+      })
+      .catch(ex => {
+        console.warn(ex.response)
+        Toast.show({
+          type: "error",
+          text1: "Something went wrong ",
+          position: "bottom",
+          visibilityTime: 3000
+        })
+      })
+  }
+  const renderSpeaker = (conversation, status) => {
+    var speaker = conversation.items?.[0].speaker
+    var uri = ""
+    conversation.items?.some(element => {
+      if (speaker.id == element.owner) {
+        uri = element.video
+        return true
+      }
+    })
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          marginRight: -50,
+          elevation: 2,
+          shadowColor: "black"
+          // shadowRadius: 3,
+          // shadowOffset: { x: 3, y: 3 },
+          // shadowOpacity: 0.2
+        }}
+      >
+        <Text>{speaker.first_name}</Text>
+        <TouchableOpacity
+          style={{
+            width: 130,
+            height: 130,
+            borderRadius: 100,
+            backgroundColor: "red",
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+          onPress={async () => {
+            props.navigation.navigate("ViewVideo", {
+              data: { uri: uri }
+            })
+          }}
+        >
+          <Avatar
+            source={{
+              uri:
+                speaker.profile_picture != null
+                  ? speaker.profile_picture
+                  : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+            }}
+            rounded
+            size={uri != "" ? 100 : 130}
+          />
+        </TouchableOpacity>
+        <View
+          style={{
+            width: 60,
+            height: 60,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Image
+            source={require("../../assets/soundwaves.png")}
+            style={{
+              width: 40,
+              height: 40,
+              tintColor: Theme.THEME_COLOR
+            }}
+            resizeMode="contain"
+          />
+        </View>
+        <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
+      </View>
+    )
+  }
+  function renderListener(conversation, status) {
+    var listener = conversation.items?.[0].listener
+    var uri = ""
+    conversation.items?.some(element => {
+      if (listener.id == element.owner) {
+        uri = element.video
+        return true
+      }
+    })
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          //   backgroundColor: "blue",
+          marginLeft: conversation.items?.[0].status == "replied" ? -60 : -40
+        }}
+      >
+        <Text>{listener.first_name}</Text>
+        <TouchableOpacity
+          disabled={!conversation.items?.[0].status == "replied"}
+          style={{
+            width: 130,
+            height: 130,
+            borderRadius: 100,
+            backgroundColor: "white",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "red"
+          }}
+          onPress={async () => {
+            await props.navigation.navigate("ViewVideo", {
+              data: { uri: uri }
+            })
+          }}
+        >
+          <Avatar
+            source={{
+              uri:
+                listener.profile_picture != null
+                  ? listener.profile_picture
+                  : "https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_960_720.png"
+            }}
+            rounded
+            size={
+              conversation.items?.[0].status == "replied" || uri != ""
+                ? 100
+                : 130
+            }
+          />
+        </TouchableOpacity>
+        <View
+          style={{
+            width: 60,
+            height: 60,
+            justifyContent: "center",
+            alignItems: "center"
+          }}
+        >
+          <Image
+            source={require("../../assets/headphones.png")}
+            style={{
+              width: 40,
+              height: 40,
+              tintColor: Theme.THEME_COLOR
+            }}
+            resizeMode="contain"
+          />
+        </View>
+        <Text style={{ fontWeight: "bold", fontSize: 16 }}>Listener</Text>
+      </View>
+    )
   }
   const renderAvatarView = (sent, received, conversation) => {
-    if (
-      user.id == conversation.speaker.id &&
-      conversation.should_resolve &&
-      conversation.argument &&
-      sent
-    ) {
-      // I am the initiator and responder has not responded yet
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "white",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={
-                  !(conversation.should_resolve && conversation.argument)
-                    ? 100
-                    : 130
-                }
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-              {!(conversation.should_resolve && conversation.argument)
-                ? "speaker"
-                : "Listener"}
-            </Text>
-          </View>
-        </View>
-      )
-    }
-
-    // I am not the initiator but I have responded back and waiting for initiator to resolve or fu
-    if (
-      user.id == conversation.speaker.id &&
-      !conversation.should_resolve &&
-      !conversation.argument &&
-      sent
-    ) {
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "white",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={130}
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Listener</Text>
-          </View>
-        </View>
-      )
-    }
-    // I am not the initiator and I have to respond to this conversation
-    if (
-      user.id == conversation.listener.id &&
-      conversation.should_resolve &&
-      conversation.argument &&
-      received
-    ) {
-      // I am not the initiator and I have to respond
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "white",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={
-                  !(conversation.should_resolve && conversation.argument)
-                    ? 100
-                    : 130
-                }
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-              {!(conversation.should_resolve && conversation.argument)
-                ? "speaker"
-                : "Listener"}
-            </Text>
-          </View>
-        </View>
-      )
-    }
-    // I am the initiator and responder have responded and I can resolve now
-    if (
-      user.id == conversation.listener.id &&
-      !conversation.should_resolve &&
-      !conversation.argument &&
-      received
+    return (
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row",
+          alignItems: "center",
+          marginVertical: 20
+        }}
+      >
+        {renderSpeaker(conversation.conversation, conversation.status)}
+        {renderListener(conversation.conversation, conversation.status)}
+      </View>
     )
-      // I was the initiator and responder has responded back now I have to resolve or argument back
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "white",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={130}
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Listener</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>
-              {"speaker"}
-            </Text>
-          </View>
-        </View>
-      )
-
-    // I am the initiator and I have resolved the conversation and coming from sent screen
-    if (conversation.argument && !conversation.should_resolve && sent) {
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={130}
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Listener</Text>
-          </View>
-        </View>
-      )
-    }
-
-    // I am not the initiator and the conversation is resolved by the initiator Now I am the speaker and create another argument which will change roles
-    if (conversation.argument && !conversation.should_resolve && received) {
-      return (
-        <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              marginRight: -50,
-              elevation: 2,
-              shadowColor: "black",
-              shadowRadius: 3,
-              shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
-            }}
-          >
-            <Text>{conversation.speaker.name}</Text>
-            <TouchableOpacity
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-              onPress={() => {
-                props.navigation.navigate("ViewVideo", {
-                  data: { uri: conversation.video }
-                })
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.speaker.profile_picture != null
-                      ? conversation.speaker.profile_picture
-                      : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
-                }}
-                rounded
-                size={100}
-              />
-            </TouchableOpacity>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>speaker</Text>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              alignItems: "center",
-              //   backgroundColor: "blue",
-              marginLeft: -40
-            }}
-          >
-            <Text>{conversation.listener.name}</Text>
-            <View
-              style={{
-                width: 130,
-                height: 130,
-                borderRadius: 100,
-                backgroundColor: "red",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Avatar
-                source={{
-                  uri:
-                    conversation.listener.profile_picture != null
-                      ? conversation.listener.profile_picture
-                      : "https://s3-alpha-sig.figma.com/img/c737/9d4a/bb8fda7f8824443fb63da9d8746e1a7e?Expires=1633305600&Signature=ZUGNZJkJ9HI7Hw997En1jlh1YcrLWMd3-r9ThMUT4ShgEckW7s2daoOtnWHvkopd1aNMovD5L5UzI2H3FtY2WQ1jvKyq9qWUUOUlydFVSpGPB8HE7zApaCKiJiBhN~NU~UAMT6htR9DSfduC4Ou6ReWQRWBFyr-rwS7vn0SPXIFPAlw5ZDI9-PC6G~exufMt6evYpRXp2e-4OzGCt45CDKX3hxtThiAzKqO4MgkMSPaY23JF1kMx2Yj~4CYQDWWudDcaWmN4sCyBvl0JHjokK0FJ~Gpf43I2rTGM4p1GvGCjirZFRfFmCF4Zu9C5k6wlPzWty3xEZqsndEItUXrZGw__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
-                }}
-                rounded
-                size={130}
-              />
-            </View>
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/soundwaves.png")}
-                style={{
-                  width: 40,
-                  height: 40,
-                  tintColor: Theme.THEME_COLOR
-                }}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={{ fontWeight: "bold", fontSize: 16 }}>Listener</Text>
-          </View>
-        </View>
-      )
-    }
   }
   return (
     <ScrollView
@@ -1472,7 +970,7 @@ function speakerScreen(props) {
     >
       <View style={{ flex: 1 }}>
         <HeaderWhite
-          text={conversation.speaker.name}
+          text={conversation.speaker.first_name}
           onPress={() => props.navigation.goBack()}
           hideIcon
           navigation={props.navigation}
@@ -1522,9 +1020,9 @@ function speakerScreen(props) {
           <View style={{ flex: 0.7 }}>
             {renderAvatarView(sent, received, conversation)}
 
-            {renderMessage(sent, received, conversation)}
+            {renderMessage(conversation)}
           </View>
-          {renderResolveButton(sent, received, conversation)}
+          {renderResolveButton(conversation.conversation)}
         </View>
       </View>
     </ScrollView>

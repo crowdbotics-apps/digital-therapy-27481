@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { View, TouchableOpacity, Text, Image } from "react-native"
+import { TouchableHighlight } from "react-native-gesture-handler"
 import StyleMain from "../Styles/ButtonStyle"
 import Theme from "../Styles/Theme"
 // edited
@@ -27,30 +28,33 @@ export default class HeaderWhite extends Component {
         ) : (
           <TouchableOpacity
             style={{
-              // position: "absolute",
               width: 50,
               height: 50,
-              left: 15,
+              marginLeft: 15,
               justifyContent: "center",
-              alignItems: "center",
-
-              elevation: 2
+              alignItems: "center"
             }}
             onPress={this.props.onPress}
           >
             {this.props.icon ? (
               this.props.icon
             ) : (
-              <Image
-                resizeMode={"contain"}
-                style={{
-                  width: 20,
-                  height: 20,
-                  tintColor: Theme.THEME_COLOR
+              <View
+                onPress={() => {
+                  console.warn("on")
                 }}
-                tintColor={Theme.THEME_COLOR}
-                source={require("../assets/nav_back.png")}
-              />
+              >
+                <Image
+                  resizeMode={"contain"}
+                  style={{
+                    width: 22,
+                    height: 22,
+                    tintColor: Theme.THEME_COLOR
+                  }}
+                  tintColor={Theme.THEME_COLOR}
+                  source={require("../assets/nav_back.png")}
+                />
+              </View>
             )}
           </TouchableOpacity>
         )}
@@ -84,9 +88,7 @@ export default class HeaderWhite extends Component {
               justifyContent: "center",
               alignItems: "center"
             }}
-            onPress={() => {
-              this.props.navigation.navigate("Camera")
-            }}
+            onPress={this.props.onRecordPress}
           >
             <View
               style={{
@@ -117,17 +119,21 @@ export default class HeaderWhite extends Component {
               position: "absolute",
               width: 60,
               height: 60,
-              right: 15
+              right: 15,
+              justifyContent: "center",
+              alignItems: "center"
             }}
             onPress={this.props.updateUser}
           >
             <View
               style={{
                 // alignItems: "flex-start",
-                width: "100%",
-                height: "100%",
+                width: 40,
+                height: 40,
                 alignItems: "center",
-                justifyContent: "center"
+                justifyContent: "center",
+                backgroundColor: "#F74040",
+                borderRadius: 25
               }}
             >
               {this.props.icon ? (
@@ -136,10 +142,11 @@ export default class HeaderWhite extends Component {
                 <Image
                   resizeMode={"contain"}
                   style={{
-                    width: "90%",
-                    height: "90%"
+                    width: 20,
+                    height: 20,
+                    tintColor: "white"
                   }}
-                  source={require("../assets/btn.png")}
+                  source={require("../assets/checkmark.png")}
                 />
               )}
             </View>

@@ -15,13 +15,14 @@ target 'digital_therapy_27481' do
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
   pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text', :modular_headers => true
   pod 'RNAppleAuthentication', :path => '../node_modules/@invertase/react-native-apple-authentication'
-
-
+  pod 'OneSignalXCFramework', '>= 3.0.0', '< 4.0'
+  pod 'Braintree/DataCollector'
 #  pod 'OpenSSL-Universal', '~>1.0.2.20'
   target 'digital_therapy_27481Tests' do
     inherit! :complete
     # Pods for testing
   end
+  
 
   # Enables Flipper.
   #
@@ -32,4 +33,6 @@ target 'digital_therapy_27481' do
   post_install do |installer|
     react_native_post_install(installer)
   end
+
 end
+

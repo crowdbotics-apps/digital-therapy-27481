@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Button,
   TouchableOpacity,
-  SegmentedControlIOSComponent
+  SegmentedControlIOSComponent,
+  ActivityIndicator
 } from "react-native"
 import Theme from "../../Styles/Theme"
 import Icon from "react-native-vector-icons/MaterialIcons"
@@ -14,6 +15,7 @@ import strings from "../../Localization"
 import { url, BaseURL, GET_HEADER } from "../../Connection"
 import Toast from "react-native-toast-message"
 import axios from "axios"
+import HeaderWhite from "../../Component/HeaderWhite"
 
 const ForgotScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false)
@@ -22,6 +24,14 @@ const ForgotScreen = ({ navigation }) => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
+      <HeaderWhite
+        text="Forgot password"
+        onPress={() => {
+          navigation.goBack()
+        }}
+        hideIcon
+        navigation={navigation}
+      />
       <View
         style={{
           flex: 0.4,
@@ -63,16 +73,26 @@ const ForgotScreen = ({ navigation }) => {
         <TouchableOpacity
           style={styles.signInTextBackground}
           onPress={() => {
-            sendOTP()
+            if (!loading) {
+              sendOTP()
+            }
           }}
         >
-          <Text style={styles.signInColorTextBackground}> {strings.sent} </Text>
+          {loading ? (
+            <ActivityIndicator size="small" color={Theme.THEME_WHITE} />
+          ) : (
+            <Text style={styles.signInColorTextBackground}>
+              {" "}
+              {strings.sent}{" "}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
   )
 
   async function sendOTP() {
+    setLoading(true)
     axios({
       method: "post",
       url: url.concat("/rest-auth/password/reset/"),
@@ -82,7 +102,7 @@ const ForgotScreen = ({ navigation }) => {
       }
     })
       .then(res => {
-        navigation.navigate("OTPScreen")
+        navigation.navigate("OTPScreen", { email })
         Toast.show({
           type: "success",
           text1: res.data.detail,
@@ -102,6 +122,8 @@ const ForgotScreen = ({ navigation }) => {
         setLoading(false)
       })
       .finally(() => {
+        setLoading(false)
+
         setSubmitting(false)
       })
   }

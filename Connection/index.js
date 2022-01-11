@@ -12,7 +12,6 @@ export const GET_HEADER = () => {
       key: "loginState"
     })
     .then(ret => {
-      console.warn(ret.key)
       // self.props.actionSignup("user", ret)
       return {
         Accept: "application/json",
@@ -27,7 +26,7 @@ export const GET_HEADER = () => {
         Authorization: ""
       }
       // console.warn(err)
-      console.warn(err)
+
       // any exception including data not found
       // goes to catch()
       //  console.warn(err.message);

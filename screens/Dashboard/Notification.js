@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   View,
   Image,
@@ -42,13 +42,151 @@ function ProfileScreen(props) {
       ? user.profile_picture
       : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
   )
-  const [firstname, setFirstName] = useState(user.name)
-  const [lastname, setLastName] = useState(user.surname)
-  const [email, setEmail] = useState(user.email)
-  const [notifications, setNotifications] = useState([
-    1, 2, 1, 2, 1, 2, 1, 2, 1, 2
-  ])
-  const renderItem = () => {
+  const [loading, setLoading] = useState(false)
+  const [notifications, setNotifications] = useState([])
+  useEffect(async () => {
+    async function getNotifications() {
+      setLoading(true)
+      axios({
+        method: "get",
+        url: BaseURL.concat("/notifications/"),
+        headers: await GET_HEADER()
+      })
+        .then(res => {
+          console.warn("hello")
+          console.warn(res)
+          setNotifications(res.data.results) // dispatch(actionCategories(res.data.results))
+        })
+        .catch(function (error) {
+          console.warn(error.response)
+          Toast.show({
+            type: "error",
+            text1: error.response.data.non_field_errors[0],
+            position: "bottom",
+            visibilityTime: 3000
+          })
+          setLoading(false)
+        })
+        .finally(() => {
+          // setSubmitting(false)
+        })
+    }
+    const networkCall = async () => {
+      // await getCategories()
+      await getNotifications()
+    }
+    networkCall()
+  }, [])
+  const renderItem = ({ item, index }) => {
+    console.warn(item?.sender?.profile_picture)
+    if (item.level == "invitation") {
+      return (
+        <View
+          style={{
+            width: "90%",
+            alignSelf: "center",
+            minHeight: 120,
+            backgroundColor: "white",
+            borderRadius: 15,
+            elevation: 4,
+            flexDirection: "row",
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2,
+            marginTop: index == 0 ? 10 : 0
+          }}
+        >
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
+            }}
+          >
+            <Avatar
+              rounded
+              size={60}
+              source={{
+                uri: item?.sender?.profile_picture
+              }}
+              imageProps={{
+                resizeMode: "contain"
+              }}
+            ></Avatar>
+          </View>
+          <View
+            style={{
+              flex: 3,
+              justifyContent: "center"
+            }}
+          >
+            <Text style={{ fontWeight: "bold" }}>{item.description}</Text>
+            <Text
+              style={{
+                marginTop: 5,
+                color: Theme.GRAY,
+                fontSize: 12
+              }}
+            >
+              {item.timesince}
+            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-evenly",
+                marginVertical: 5
+              }}
+            >
+              <TouchableOpacity
+                style={{
+                  width: "40%",
+                  height: 40,
+                  backgroundColor: "white",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 2,
+                  shadowColor: "black",
+                  shadowRadius: 2,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+                onPress={() => RequestAction(item.action.reject)}
+              >
+                <Icon
+                  name="close"
+                  color={"red"}
+                  size={24}
+                  style={{ fontWeight: "bold" }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  width: "40%",
+                  height: 40,
+                  backgroundColor: "white",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 2,
+                  shadowColor: "black",
+                  shadowRadius: 2,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+                onPress={() => RequestAction(item.action.accept)}
+              >
+                <Icon
+                  name="done"
+                  color={"green"}
+                  size={24}
+                  style={{ fontWeight: "bold" }}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )
+    }
     return (
       <View
         style={{
@@ -76,8 +214,9 @@ function ProfileScreen(props) {
             rounded
             size={60}
             source={{
-              uri: "https://s3-alpha-sig.figma.com/img/3c2f/1872/437fddc501ce01f3f7a70545c7daaa66?Expires=1633305600&Signature=DOzLldsYGkT06HECu5zulRNrf9rtoa~n62nG1fH3xsog6Qh6LfCMhlF3FBv6kmQnjL9oSTn1kI-kt~iTl8uDqwPgvjMFwrImrId-WkWQNAUABEkvHeetfr29pmGTQp6-l30rrcHkKha7geyjikuq2JNpzncskaqm0SMbF7CRNArXMWqIS29iP10QzRN-fDdMANmBcjbRDZd8v3PD~6v4MTQ8CoCa-vtZaOdGmvD~m3goTaRAmffLLA8Bf55YWhPqO66L5ngR68GC78xsWTDUHHotIXdddlYstNgqK2OwXysIqpfvc1rkoRc~W1h997HZoLsD0lGPlTRUoAZlOCz2RA__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA"
+              uri: item?.sender?.profile_picture
             }}
+            containerStyle={{ borderWidth: 0.5, borderColor: "#dcdcdc" }}
           ></Avatar>
           <View
             style={{
@@ -100,7 +239,7 @@ function ProfileScreen(props) {
           </View>
         </View>
         <View style={{ flex: 2, justifyContent: "center" }}>
-          <Text style={{ fontWeight: "bold" }}>Video 1</Text>
+          <Text style={{ fontWeight: "bold" }}>{item.title}</Text>
           <Text
             style={{
               marginTop: 5,
@@ -108,7 +247,7 @@ function ProfileScreen(props) {
               fontSize: 12
             }}
           >
-            2h ago
+            {item.timesince}
           </Text>
         </View>
         <View
@@ -128,6 +267,7 @@ function ProfileScreen(props) {
       </View>
     )
   }
+
   return (
     <View style={{ flex: 1 }}>
       <View
@@ -189,6 +329,31 @@ function ProfileScreen(props) {
       </View>
     </View>
   )
+  async function RequestAction(url_endpoint) {
+    setLoading(true)
+    axios({
+      method: "POST",
+      url: BaseURL.concat("/" + url_endpoint),
+      headers: await GET_HEADER()
+    })
+      .then(res => {
+        console.warn(res)
+        // dispatch(actionCategories(res.data.results))
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        // setSubmitting(false)
+      })
+  }
 }
 
 const styles = StyleSheet.create({

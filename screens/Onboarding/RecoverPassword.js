@@ -13,12 +13,23 @@ import strings from "../../Localization"
 import { BaseURL, GET_HEADER } from "../../Connection"
 import Toast from "react-native-toast-message"
 import axios from "axios"
+import HeaderWhite from "../../Component/HeaderWhite"
+
 const RecoverPassword = props => {
   console.warn(props.route.params.code)
+  console.warn(props.route.params.email)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
+      <HeaderWhite
+        text="Recover password"
+        onPress={() => {
+          props.navigation.goBack()
+        }}
+        hideIcon
+        navigation={props.navigation}
+      />
       <Text style={styles.fStyle}>{strings.createNewPassowrd} </Text>
 
       <View>
@@ -114,17 +125,20 @@ const RecoverPassword = props => {
       headers: await GET_HEADER(),
       data: {
         token: props.route.params.code,
-        password: password
+        password: password,
+        new_password2: password,
+        email: props.route.params.email
       }
     })
       .then(res => {
         console.warn(res)
-        // Toast.show({
-        //   type: "success",
-        //   text1: res.data,
-        //   position: "bottom",
-        //   visibilityTime: 3000
-        // })
+        Toast.show({
+          type: "success",
+          text1: res.data.details,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        props.navigation.popToTop()
         // Toast.show({ text: res.data.message }, 3000)
       })
       .catch(function (error) {

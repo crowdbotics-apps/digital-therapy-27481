@@ -42,10 +42,11 @@ function SelfVideos(props) {
   async function getSelfVideos() {
     axios({
       method: "get",
-      url: BaseURL.concat("/conversation/conversation/"),
+      url: BaseURL.concat("/conversation/items/self/"),
       headers: await GET_HEADER()
     })
       .then(res => {
+        console.warn(res)
         setSelfVideos(res.data.results)
         // dispatch(actionCategories(res.data.results))
       })
@@ -79,7 +80,12 @@ function SelfVideos(props) {
           shadowOffset: { x: 3, y: 3 },
           shadowOpacity: 0.2
         }}
-        onPress={() => {}}
+        onPress={() => {
+          props.navigation.replace("HomeScreen", {
+            editSelf: true,
+            conversationId: item.conversation.id
+          })
+        }}
       >
         <View
           style={{
@@ -100,7 +106,7 @@ function SelfVideos(props) {
           ></Avatar>
         </View>
         <View style={{ flex: 2, justifyContent: "center" }}>
-          <Text style={{ fontWeight: "bold" }}>{item.topic}</Text>
+          <Text style={{ fontWeight: "bold" }}>{item.conversation.topic}</Text>
           <Text
             style={{
               marginTop: 5,
@@ -108,7 +114,7 @@ function SelfVideos(props) {
               fontSize: 12
             }}
           >
-            2h ago
+            {item.conversation.timesince}
           </Text>
         </View>
         <View
@@ -137,10 +143,13 @@ function SelfVideos(props) {
     // >
     <View style={{ flex: 1 }}>
       <HeaderWhite
-        text="Profile info"
+        text="Self Videos"
         onPress={() => props.navigation.goBack()}
         showRecord
         navigation={props.navigation}
+        onRecordPress={() => {
+          props.navigation.replace("HomeScreen", { createSelf: true })
+        }}
       />
 
       <View

@@ -10,7 +10,8 @@ import {
   TextInput,
   StyleSheet,
   ScrollView,
-  Animated
+  Animated,
+  Alert
 } from "react-native"
 import Icon from "react-native-vector-icons/MaterialIcons"
 import { CheckBox } from "react-native-elements"
@@ -26,13 +27,22 @@ import Theme from "../../Styles/Theme"
 import { bindActionCreators } from "redux"
 import { actionSignup } from "../../Actions/index"
 import { useSelector } from "react-redux"
-import { BaseURL, Header, SET_TOKEN, GET_HEADER } from "../../Connection/index"
+import {
+  url,
+  BaseURL,
+  Header,
+  SET_TOKEN,
+  GET_HEADER
+} from "../../Connection/index"
 import ButtonStyle from "../../Styles/ButtonStyle"
 import HeaderWhite from "../../Component/HeaderWhite"
 import * as Animatable from "react-native-animatable"
 import axios from "axios"
 import DropDownPicker from "react-native-dropdown-picker"
 import Toast from "react-native-toast-message"
+import OneSignal from "react-native-onesignal"
+import user from "../../features/user"
+import { NavigationEvents } from "react-navigation"
 // edited
 function HomeScreen(props) {
   const [home, setHome] = useState(true)
@@ -47,13 +57,65 @@ function HomeScreen(props) {
   const viewAnimation = useRef()
   const homeViewAnimation = useRef()
   //newconversation
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState([
+    { type: "family" },
+    {
+      type: "couple"
+    },
+    {
+      type: "friend"
+    },
+    { type: "self" }
+  ])
   const [categoryValue, setCategoryValue] = useState("")
   const [categoryOpen, setCategoryOpen] = useState(false)
   const [personValue, setPersonValue] = useState("")
-  const [persons, setPersons] = useState([])
+  const [persons, setPersons] = useState(null)
   const [personOpen, setPersonOpen] = useState(false)
   const [topic, setTopic] = useState("")
+  const [isEnabled, setIsEnabled] = useState(!userState.allow_push_notification)
+  const toggleSwitchPush = () => {
+    setIsEnabled(previousState => !previousState)
+
+    EditUserSettings({ allow_push_notification: !isEnabled })
+  }
+  const [closeAccount, setCloseAccount] = useState(false)
+  const toggleCloseAccount = () => {
+    if (!closeAccount) {
+      Alert.alert(
+        "Close account confirmation",
+        "Are you sure you want to close your account?",
+        [
+          {
+            text: "Cancel",
+            onPress: () => {},
+            style: "cancel"
+          },
+          {
+            text: "Yes",
+            onPress: () => {
+              CloseAccount()
+              setCloseAccount(previousState => !previousState)
+            },
+            style: "yes"
+          }
+        ],
+        {
+          cancelable: true,
+          onDismiss: () =>
+            Alert.alert(
+              "This alert was dismissed by tapping outside of the alert dialog."
+            )
+        }
+      )
+    } else {
+      setCloseAccount(previousState => !previousState)
+    }
+  }
+  OneSignal.getDeviceState().then(res => {
+    EditUserSettings({ onesignal_user_id: res.userId })
+  })
+
   useEffect(async () => {
     const Animation = async () => {
       if (!isHome) {
@@ -66,14 +128,47 @@ function HomeScreen(props) {
     }
 
     const networkCall = async () => {
-      if (categories.length == 0) {
-        await getCategories()
+      if (persons?.length == 0 || persons == null) {
+        // await getCategories()
         await getPersons()
       }
     }
+    const listener = props.navigation.addListener("focus", () => {
+      // do something
+      if (props.route.params?.createSelf) {
+        setIsNewProfile(true)
+        setHome(false)
+        setIsHome(false) // props.navigation.navigate("NewConversation")
+        setCategoryValue("self")
+      }
+      if (props.route.params?.editSelf) {
+        setIsNewProfile(true)
+        setHome(false)
+        setIsHome(false)
+        setCategoryValue("self")
+        // props.navigation.navigate("NewConversation")
+        // editSelf: true,
+        //     conversationId: item.conversation.id
+      }
+    })
+
     networkCall()
     Animation()
-  }, [isHome, viewAnimation])
+    return listener
+  }, [isHome, viewAnimation, props.navigation])
+  // useEffect(() => {
+  //   const unsubscribe = props.navigation.addListener("focus", () => {
+  //     // do something
+  //     if (props.route?.params?.createSelf) {
+  //       setIsNewProfile(true)
+  //       setHome(false)
+  //       setIsHome(false) // props.navigation.navigate("NewConversation")
+  //       setCategoryValue("self")
+  //     }
+  //   })
+
+  //   return unsubscribe
+  // }, [props.navigation])
 
   const AnimationHome = async () => {
     if (isHome) {
@@ -84,18 +179,17 @@ function HomeScreen(props) {
       setIsHome(true)
     }
   }
-  async function getCategories() {
+  async function EditUserSettings(data) {
     axios({
-      method: "get",
-      url: BaseURL.concat("/conversation/category/"),
-      headers: await GET_HEADER()
+      method: "PATCH",
+      url: BaseURL.concat("/user/" + userState.user.id + "/"),
+      headers: await GET_HEADER(),
+      data: data
     })
       .then(res => {
-        setCategories(res.data.results)
         // dispatch(actionCategories(res.data.results))
       })
       .catch(function (error) {
-        console.warn(error.response)
         Toast.show({
           type: "error",
           text1: error.response.data.non_field_errors[0],
@@ -108,6 +202,37 @@ function HomeScreen(props) {
         // setSubmitting(false)
       })
   }
+  async function CloseAccount() {
+    axios({
+      method: "POST",
+      url: BaseURL.concat("/user/cancel/"),
+      headers: await GET_HEADER()
+    })
+      .then(res => {
+        global.storage.remove({
+          key: "loginState"
+        })
+        props.navigation.reset({
+          index: 0,
+          routes: [{ name: "LoginScreen" }]
+        })
+        // dispatch(actionCategories(res.data.results))
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: "Something went wrong",
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        // setSubmitting(false)
+      })
+  }
+
   async function getPersons() {
     axios({
       method: "get",
@@ -115,10 +240,12 @@ function HomeScreen(props) {
       headers: await GET_HEADER()
     })
       .then(res => {
-        setPersons(res.data)
+        console.warn(res)
+        setPersons(res.data.results)
         // dispatch(actionCategories(res.data.results))
       })
       .catch(function (error) {
+        setPersons(null)
         Toast.show({
           type: "error",
           text1: error.response.data.non_field_errors[0],
@@ -172,7 +299,11 @@ function HomeScreen(props) {
                   props.navigation.navigate("Notification")
                 }}
               >
-                <Icon name="notifications" size={30} />
+                <Icon
+                  name="notifications"
+                  color={Theme.THEME_COLOR}
+                  size={30}
+                />
               </TouchableOpacity>
             </View>
             <View
@@ -378,9 +509,14 @@ function HomeScreen(props) {
             <HeaderWhite
               text="New Conversation"
               onPress={() => {
-                setIsHome(true)
-                setHome(true)
-                setIsNewProfile(false)
+                if (props.route.params?.editSelf) {
+                  props.navigation.popToTop()
+                } else {
+                  setIsHome(true)
+                  setHome(true)
+                  setIsNewProfile(false)
+                  setPersons([])
+                }
               }}
               hideIcon
               navigation={props.navigation}
@@ -426,7 +562,7 @@ function HomeScreen(props) {
                       />
                     )}
                     placeholder="Category"
-                    schema={{ label: "name", value: "id" }}
+                    schema={{ label: "type", value: "type" }}
                     open={categoryOpen}
                     value={categoryValue}
                     items={categories}
@@ -436,49 +572,53 @@ function HomeScreen(props) {
                     listMode="MODAL"
                   />
                 </View>
-                <View style={styles.pickerContainerStyle}>
-                  <Text>Select Person</Text>
-                  <DropDownPicker
-                    style={{
-                      width: "100%",
-                      height: 50,
-                      backgroundColor: "white",
-                      borderWidth: 0,
-                      marginTop: 10,
-                      elevation: 4,
-                      borderRadius: 3,
-                      shadowColor: "black",
-                      shadowRadius: 3,
-                      shadowOffset: { x: 3, y: 3 },
-                      shadowOpacity: 0.2
-                    }}
-                    textStyle={{ color: Theme.THEME_COLOR }}
-                    ArrowDownIconComponent={() => (
-                      <Icon
-                        name="keyboard-arrow-down"
-                        color={Theme.THEME_COLOR}
-                        size={25}
+                {categoryValue == "self" ? null : (
+                  <View style={styles.pickerContainerStyle}>
+                    <Text>Select Person</Text>
+                    {persons?.length > 0 ? (
+                      <DropDownPicker
+                        style={{
+                          width: "100%",
+                          height: 50,
+                          backgroundColor: "white",
+                          borderWidth: 0,
+                          marginTop: 10,
+                          elevation: 4,
+                          borderRadius: 3,
+                          shadowColor: "black",
+                          shadowRadius: 3,
+                          shadowOffset: { x: 3, y: 3 },
+                          shadowOpacity: 0.2
+                        }}
+                        textStyle={{ color: Theme.THEME_COLOR }}
+                        ArrowDownIconComponent={() => (
+                          <Icon
+                            name="keyboard-arrow-down"
+                            color={Theme.THEME_COLOR}
+                            size={25}
+                          />
+                        )}
+                        ArrowUpIconComponent={() => (
+                          <Icon
+                            name="keyboard-arrow-up"
+                            color={Theme.THEME_COLOR}
+                            size={25}
+                          />
+                        )}
+                        // setItems={setCategories}
+                        placeholder="Persons"
+                        schema={{ label: "first_name", value: "id" }}
+                        open={personOpen}
+                        value={personValue}
+                        items={persons}
+                        setValue={setPersonValue}
+                        setItems={setPersons}
+                        setOpen={setPersonOpen}
+                        listMode="MODAL"
                       />
-                    )}
-                    ArrowUpIconComponent={() => (
-                      <Icon
-                        name="keyboard-arrow-up"
-                        color={Theme.THEME_COLOR}
-                        size={25}
-                      />
-                    )}
-                    // setItems={setCategories}
-                    placeholder="Persons"
-                    schema={{ label: "name", value: "id" }}
-                    open={personOpen}
-                    value={personValue}
-                    items={persons}
-                    setValue={setPersonValue}
-                    setItems={setPersons}
-                    setOpen={setPersonOpen}
-                    listMode="MODAL"
-                  />
-                </View>
+                    ) : null}
+                  </View>
+                )}
                 <View style={styles.pickerContainerStyle}>
                   <Text>Set Topic</Text>
                   <TextInput
@@ -538,21 +678,23 @@ function HomeScreen(props) {
                 <TouchableOpacity
                   style={{}}
                   onPress={() => {
-                    console.warn(categoryValue)
-                    if (
-                      categoryValue != "" &&
-                      personValue != "" &&
-                      topic != ""
-                    ) {
-                      props.navigation.navigate("Camera", {
-                        data: {
-                          categoryValue,
-                          personValue,
-                          topic,
-                          argument: true,
-                          createConversation: true
-                        }
-                      })
+                    if (ValidateForm()) {
+                      if (props.route.params?.editSelf) {
+                        editConversation(props.route.params?.conversationId)
+                      } else {
+                        props.navigation.navigate("Camera", {
+                          data: {
+                            categoryValue,
+                            personValue:
+                              categoryValue == "self"
+                                ? userState.user.id
+                                : personValue,
+                            topic,
+                            argument: true,
+                            createConversation: true
+                          }
+                        })
+                      }
                     } else {
                       Toast.show({
                         type: "error",
@@ -563,43 +705,61 @@ function HomeScreen(props) {
                     }
                   }}
                 >
-                  <View
-                    style={{
-                      width: 70,
-                      height: 70,
-                      borderRadius: 100,
-                      backgroundColor: Theme.THEME_COLOR,
-                      justifyContent: "center",
-                      alignItems: "center",
-                      elevation: 20,
-                      shadowColor: "black",
-                      shadowRadius: 3,
-                      shadowOffset: { x: 3, y: 3 },
-                      shadowOpacity: 0.2
-                    }}
-                  >
+                  {props.route.params?.editSelf ? (
                     <View
                       style={{
-                        width: 50,
-                        height: 50,
-                        borderRadius: 100,
-                        backgroundColor: "white",
+                        width: 80,
+                        height: 80,
+                        borderRadius: 50,
+                        alignItems: "center",
                         justifyContent: "center",
-                        alignItems: "center"
+                        backgroundColor: Theme.THEME_COLOR,
+                        marginTop: 30
                       }}
-                    ></View>
-                  </View>
+                    >
+                      <Text style={{ color: "white", fontSize: 18 }}>Send</Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={{
+                        width: 70,
+                        height: 70,
+                        borderRadius: 100,
+                        backgroundColor: Theme.THEME_COLOR,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        elevation: 20,
+                        shadowColor: "black",
+                        shadowRadius: 3,
+                        shadowOffset: { x: 3, y: 3 },
+                        shadowOpacity: 0.2
+                      }}
+                    >
+                      <View
+                        style={{
+                          width: 50,
+                          height: 50,
+                          borderRadius: 100,
+                          backgroundColor: "white",
+                          justifyContent: "center",
+                          alignItems: "center"
+                        }}
+                      ></View>
+                    </View>
+                  )}
                 </TouchableOpacity>
 
-                <Text
-                  style={{
-                    fontSize: 24,
-                    color: Theme.THEME_COLOR,
-                    marginTop: 10
-                  }}
-                >
-                  Record video
-                </Text>
+                {props.route.params?.editSelf ? null : (
+                  <Text
+                    style={{
+                      fontSize: 24,
+                      color: Theme.THEME_COLOR,
+                      marginTop: 10
+                    }}
+                  >
+                    Record video
+                  </Text>
+                )}
               </View>
             </View>
           </Animatable.View>
@@ -655,7 +815,7 @@ function HomeScreen(props) {
                     </View>
                     <View style={styles.viewContainerItem}>
                       <Text style={{ fontSize: 16, color: Theme.THEME_COLOR }}>
-                        Account Settings
+                        Account settings
                       </Text>
                     </View>
                   </View>
@@ -663,7 +823,7 @@ function HomeScreen(props) {
                   <View style={styles.viewContainer}>
                     <View style={styles.roundButton}>
                       <Image
-                        source={require("../../assets/matches.png")}
+                        source={require("../../assets/notification.png")}
                         resizeMode="contain"
                         style={{
                           width: 20,
@@ -672,20 +832,42 @@ function HomeScreen(props) {
                         }}
                       />
                     </View>
-                    <View style={styles.viewContainerItem}>
-                      <Text style={{ fontSize: 16, color: "black" }}>
-                        Push Notifications
-                      </Text>
-                      <Text style={{ fontSize: 14, color: Theme.THEME_COLOR }}>
-                        on
-                      </Text>
+                    <View
+                      style={[
+                        styles.viewContainerItem,
+                        {
+                          flexDirection: "row",
+                          justifyContent: "space-between"
+                        }
+                      ]}
+                    >
+                      <View>
+                        <Text style={{ fontSize: 16, color: "black" }}>
+                          Push notifications
+                        </Text>
+                        <Text
+                          style={{ fontSize: 14, color: Theme.THEME_COLOR }}
+                        >
+                          {isEnabled ? "On" : "Off"}
+                        </Text>
+                      </View>
+                      <Switch
+                        trackColor={{
+                          false: "#dcdcdc",
+                          true: Theme.THEME_COLOR
+                        }}
+                        thumbColor={"white"}
+                        ios_backgroundColor={"#dcdcdc"}
+                        onValueChange={toggleSwitchPush}
+                        value={isEnabled}
+                      />
                     </View>
                   </View>
                   <View style={styles.line}></View>
                   <View style={styles.viewContainer}>
                     <View style={styles.roundButton}>
                       <Image
-                        source={require("../../assets/matches.png")}
+                        source={require("../../assets/closeaccount.png")}
                         resizeMode="contain"
                         style={{
                           width: 20,
@@ -694,20 +876,47 @@ function HomeScreen(props) {
                         }}
                       />
                     </View>
-                    <View style={styles.viewContainerItem}>
-                      <Text style={{ fontSize: 16, color: "black" }}>
-                        Close your account
-                      </Text>
-                      <Text style={{ fontSize: 14, color: Theme.THEME_COLOR }}>
-                        off
-                      </Text>
+                    <View
+                      style={[
+                        styles.viewContainerItem,
+                        {
+                          flexDirection: "row",
+                          justifyContent: "space-between"
+                        }
+                      ]}
+                    >
+                      <View>
+                        <Text style={{ fontSize: 16, color: "black" }}>
+                          Close your account
+                        </Text>
+                        <Text
+                          style={{ fontSize: 14, color: Theme.THEME_COLOR }}
+                        >
+                          {closeAccount ? "On" : "Off"}
+                        </Text>
+                      </View>
+                      <Switch
+                        trackColor={{
+                          false: "#dcdcdc",
+                          true: Theme.THEME_COLOR
+                        }}
+                        thumbColor={"white"}
+                        ios_backgroundColor={"#dcdcdc"}
+                        onValueChange={toggleCloseAccount}
+                        value={closeAccount}
+                      />
                     </View>
                   </View>
                   <View style={styles.line}></View>
-                  <View style={styles.viewContainer}>
+                  <TouchableOpacity
+                    style={styles.viewContainer}
+                    onPress={() => {
+                      sendOTP()
+                    }}
+                  >
                     <View style={styles.roundButton}>
                       <Image
-                        source={require("../../assets/matches.png")}
+                        source={require("../../assets/changepassword.png")}
                         resizeMode="contain"
                         style={{
                           width: 20,
@@ -721,10 +930,10 @@ function HomeScreen(props) {
                         Reset your password
                       </Text>
                       <Text style={{ fontSize: 14, color: Theme.THEME_COLOR }}>
-                        set a new once
+                        set a new one
                       </Text>
                     </View>
-                  </View>
+                  </TouchableOpacity>
                   <View style={styles.line}></View>
                 </View>
               </View>
@@ -775,7 +984,7 @@ function HomeScreen(props) {
                   <Text
                     style={{ color: "black", fontSize: 16, fontWeight: "bold" }}
                   >
-                    Send Feedback
+                    Send feedback
                   </Text>
                 </TouchableOpacity>
 
@@ -789,12 +998,6 @@ function HomeScreen(props) {
                     global.storage.remove({
                       key: "loginState"
                     })
-                    //   const resetAction = StackActions.reset({
-                    //     index: 0,
-                    //     key: null,
-                    //     actions: [NavigationActions.navigate({routeName: 'LoginScreen'})],
-                    //   });
-                    //   self.props.navigation.dispatch(resetAction);
                     props.navigation.reset({
                       index: 0,
                       routes: [{ name: "LoginScreen" }]
@@ -804,7 +1007,7 @@ function HomeScreen(props) {
                   <Text
                     style={{ color: "gray", fontSize: 16, fontWeight: "bold" }}
                   >
-                    Logout
+                    Sign out
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -872,12 +1075,15 @@ function HomeScreen(props) {
                 alignItems: "center"
               }}
               onPress={() => {
-                setProfile(false)
-                setHome(true)
-                setAccount(false)
-
-                AnimationHome()
-                setIsHome(true)
+                if (props.route.params?.editSelf) {
+                  props.navigation.popToTop()
+                } else {
+                  setProfile(false)
+                  setHome(true)
+                  setAccount(false)
+                  AnimationHome()
+                  setIsHome(true)
+                }
               }}
             >
               <Image
@@ -904,8 +1110,9 @@ function HomeScreen(props) {
               onPress={() => {
                 setProfile(false)
                 setHome(false)
-                setAccount(true)
                 setIsHome(false)
+                setIsNewProfile(false)
+                setAccount(true)
 
                 // props.navigation.navigate("AccountSetting")
               }}
@@ -927,6 +1134,80 @@ function HomeScreen(props) {
       </View>
     </ScrollView>
   )
+  async function editConversation(id) {
+    return axios({
+      method: "PATCH",
+      url: BaseURL.concat("/conversation/conversation/" + id + "/"),
+      headers: await GET_HEADER(),
+      data: { category: categoryValue, person_to: personValue, topic: topic }
+    })
+      .then(res => {
+        var item = persons.filter(item => {
+          return item.id == personValue
+        })
+        Toast.show({
+          type: "success",
+          text1: "Successfully sent to " + item?.[0]?.first_name,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        this.props.navigation.replace("SentVideos")
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        return false
+      })
+      .finally(() => {})
+  }
+
+  function ValidateForm() {
+    if (categoryValue != "" && topic != "") {
+      if (categoryValue == "self") {
+        return true
+      } else {
+        if (personValue != "") {
+          return true
+        } else {
+          return false
+        }
+      }
+    } else {
+      return false
+    }
+  }
+  async function sendOTP() {
+    setLoading(true)
+    axios({
+      method: "post",
+      url: url.concat("/rest-auth/password/reset/"),
+      headers: await GET_HEADER(),
+      data: {
+        email: userState.user.email
+      }
+    })
+      .then(res => {
+        props.navigation.navigate("OTPScreen", { email: userState.user.email })
+        Toast.show({
+          type: "success",
+          text1: res.data.detail,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        setLoading(false)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
 }
 
 const mapStateToProps = state => {

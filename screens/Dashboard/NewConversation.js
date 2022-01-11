@@ -32,7 +32,6 @@ import {
   actionTopic,
   actionPersons
 } from "../../features/conversation"
-
 import axios from "axios"
 
 // edited
@@ -48,7 +47,7 @@ function NewConversation(props) {
   const [persons, setPersons] = useState([])
   const [personOpen, setPersonOpen] = useState(false)
   const [topic, setTopic] = useState("")
-
+  const [loading, setLoading] = useState(false)
   const dispatch = useDispatch()
 
   // setValue = setValue.bind(this)
@@ -67,13 +66,12 @@ function NewConversation(props) {
 
   useEffect(() => {
     const networkCall = async () => {
-      if (categories.length == 0) {
-        await getCategories()
-        await getPersons()
-      }
+      // await getCategories()
+      await getPersons()
     }
     networkCall()
   }, [])
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1, justifyContent: "space-evenly" }}
@@ -170,7 +168,7 @@ function NewConversation(props) {
                 )}
                 // setItems={setCategories}
                 placeholder="Persons"
-                schema={{ label: "name", value: "id" }}
+                schema={{ label: "first_name", value: "id" }}
                 open={personOpen}
                 value={personValue}
                 items={persons}
@@ -414,30 +412,7 @@ function NewConversation(props) {
       </View>
     </ScrollView>
   )
-  async function getCategories() {
-    axios({
-      method: "get",
-      url: BaseURL.concat("/conversation/category/"),
-      headers: await GET_HEADER()
-    })
-      .then(res => {
-        setCategories(res.data.results)
-        // dispatch(actionCategories(res.data.results))
-      })
-      .catch(function (error) {
-        console.warn(error.response)
-        Toast.show({
-          type: "error",
-          text1: error.response.data.non_field_errors[0],
-          position: "bottom",
-          visibilityTime: 3000
-        })
-        setLoading(false)
-      })
-      .finally(() => {
-        // setSubmitting(false)
-      })
-  }
+
   async function getPersons() {
     axios({
       method: "get",
@@ -445,7 +420,8 @@ function NewConversation(props) {
       headers: await GET_HEADER()
     })
       .then(res => {
-        setPersons(res.data)
+        console.warn(res.data.results)
+        setPersons(res.data.results)
         // dispatch(actionCategories(res.data.results))
       })
       .catch(function (error) {

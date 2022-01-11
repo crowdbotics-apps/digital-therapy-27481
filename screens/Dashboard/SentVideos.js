@@ -65,133 +65,44 @@ function SentVideos(props) {
       })
   }
   const renderText = item => {
-    if (item.resolved) {
-      return (
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
+    return (
+      <View style={{ flex: 0.4, flexDirection: "row" }}>
+        <View
+          style={{ flex: 3, justifyContent: "center", alignItems: "center" }}
+        >
+          <Text style={{ color: "gray", fontSize: 16 }}>
+            {user.id == item.conversation.items?.[0].speaker.id
+              ? item.conversation.items?.[0].listener.first_name
+              : item.conversation.items?.[0].speaker.first_name}{" "}
+            review is pending
+          </Text>
+        </View>
+        <View
+          style={{
+            flex: 1,
+            alignItems: "center",
+            justifyContent: "center"
+          }}
+        >
           <View
             style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Image
-              source={require("../../assets/emoji.png")}
-              style={{ width: 20, height: 20 }}
-              resizeMode="contain"
-            />
-          </View>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            <Text style={{ color: "gray", fontSize: 16 }}>
-              {item.listener.name} resolved your explanation
-            </Text>
-            {/* <Text>You resolved {item.speaker.name}'s explanation</Text> */}
-          </View>
-          <View
-            style={{
-              flex: 1,
+              width: 40,
+              height: 40,
+              borderRadius: 30,
+              backgroundColor: Theme.THEME_COLOR,
               alignItems: "center",
               justifyContent: "center"
             }}
           >
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                // backgroundColor: Theme.THEME_COLOR,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <Image
-                source={require("../../assets/logo.png")}
-                resizeMode="contain"
-                style={{ height: "100%", width: "100%" }}
-              />
-            </View>
+            <Image
+              source={require("../../assets/soundwaves.png")}
+              resizeMode="contain"
+              style={{ height: "60%", width: "60%" }}
+            />
           </View>
         </View>
-      )
-    }
-    if (
-      item.argument &&
-      !item.should_resolve &&
-      user.id == item.conversation.person_from
-    ) {
-      return (
-        <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-          You resolved {item.listener.name}'s explanation
-        </Text>
-      )
-    }
-    if (item.argument && item.should_resolve && user.id == item.speaker.id) {
-      return (
-        <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-          {item.listener.name} has not responded yet to this argument
-        </Text>
-      )
-    } else if (
-      !item.argument &&
-      !item.should_resolve &&
-      user.id == item.speaker.id
-    ) {
-      //  switched the role and replied back
-      return (
-        <Text
-          style={{
-            color: "gray",
-            marginLeft: 20,
-            marginVertical: 5,
-            fontSize: 14
-          }}
-        >
-          <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-            Waiting for {item.listener.name} to approve
-          </Text>
-        </Text>
-      )
-    }
-    if (
-      item.argument &&
-      item.should_resolve &&
-      user.id == item.conversation.person_to
-    ) {
-      return (
-        <Text
-          style={{
-            color: "gray",
-            marginLeft: 20,
-            marginVertical: 5,
-            fontSize: 14
-          }}
-        >
-          {item.speaker.name} has approved your explanation, you are the speaker
-          now! Record your video and bring your word to the table!"
-        </Text>
-      )
-    } else if (
-      !item.argument &&
-      !item.should_resolve &&
-      user.id == item.conversation.person_to &&
-      item.speaker.id == user.id
-    ) {
-      return (
-        <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-          Waiting for {item.listener.name} to approve
-        </Text>
-      )
-    } else if (
-      !item.argument &&
-      !item.should_resolve &&
-      user.id == item.conversation.person_to
-    ) {
-      return (
-        <Text style={{ color: "gray", marginLeft: 20, fontSize: 14 }}>
-          {item.listener.name} has not responded yet to this response
-        </Text>
-      )
-    }
+      </View>
+    )
   }
   const renderItem = ({ item, index }) => {
     return (
@@ -214,8 +125,8 @@ function SentVideos(props) {
         onPress={() => {
           props.navigation.navigate("SpeakerScreen", {
             conversation: item,
-            received: false,
-            sent: true
+            received: true,
+            sen: false
           })
         }}
       >
@@ -238,15 +149,17 @@ function SentVideos(props) {
               size="medium"
               source={{
                 uri:
-                  item.speaker.profile_picture != null
-                    ? item.speaker.profile_picture
-                    : "https://th.bing.com/th/id/R.d7e225fbcef887e32a0cef4f28c333ba?rik=V3gaVPpl%2bwuUiA&pid=ImgRaw&r=0"
+                  user.id == item.conversation.items?.[0].speaker.id
+                    ? item.conversation.items?.[0].speaker.profile_picture
+                    : item.conversation.items?.[0].listener.profile_picture
               }}
             ></Avatar>
           </View>
           <View style={{ flex: 2, justifyContent: "center" }}>
             <Text style={{ fontWeight: "bold" }}>
-              {item.conversation.topic}
+              {user.id == item.conversation.items?.[0].speaker.id
+                ? item.conversation.items?.[0].listener.first_name
+                : item.conversation.items?.[0].speaker.first_name}
             </Text>
             <Text
               style={{
@@ -255,15 +168,27 @@ function SentVideos(props) {
                 fontSize: 12
               }}
             >
-              {moment(item.conversation.created_at).format(
-                "d MMMM, yyyy H:mma"
-              )}
+              {item.conversation.items?.[0].timesince}
+              {moment(
+                convertUTCDateToLocalDate(item.conversation.created_at)
+              ).format(" h:mma")}
+              {/* {moment(item.conversation.created_at).format(" H:mma")} */}
             </Text>
             <Text
               style={{ color: Theme.THEME_COLOR, fontSize: 16, marginTop: 5 }}
             >
-              Let's resolve this!
+              {item.conversation.topic}
             </Text>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              flexDirection: "row",
+              justifyContent: "center"
+            }}
+          >
+            <Icon name="keyboard-arrow-up" size={25} />
           </View>
         </View>
         <View
@@ -274,39 +199,17 @@ function SentVideos(props) {
             alignSelf: "center"
           }}
         />
-        <View style={{ flex: 0.4, flexDirection: "row" }}>
-          <View style={{ flex: 3, justifyContent: "center" }}>
-            {renderText(item)}
-          </View>
-          {!item.resolved ? (
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center"
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 30,
-                  backgroundColor: Theme.THEME_COLOR,
-                  alignItems: "center",
-                  justifyContent: "center"
-                }}
-              >
-                <Image
-                  source={require("../../assets/soundwaves.png")}
-                  resizeMode="contain"
-                  style={{ height: "70%", width: "70%" }}
-                />
-              </View>
-            </View>
-          ) : null}
-        </View>
+        {renderText(item)}
       </TouchableOpacity>
     )
+  }
+  function convertUTCDateToLocalDate(date) {
+    var dateLocal = new Date(date)
+    var newDate = new Date(
+      dateLocal.getTime() - dateLocal.getTimezoneOffset() * 60 * 1000
+    )
+    console.warn(newDate)
+    // return newDate
   }
   return (
     // <ScrollView

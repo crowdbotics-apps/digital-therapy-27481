@@ -91,7 +91,6 @@ function LoginScreen(props) {
 
   const [hidePassword, setHidePassword] = useState(true)
   const dispatch = useDispatch()
-
   if (checkingLoggedIn) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -434,7 +433,10 @@ function LoginScreen(props) {
     })
       .then(res => {
         console.warn(res.data)
-        var data = { token: GET_TOKEN(), user: res.data }
+        var data = {
+          token: GET_TOKEN(),
+          user: res.data
+        }
         dispatch(login(data))
 
         // self.props.actionSignup("user", res.data.data[0])
@@ -475,6 +477,7 @@ function LoginScreen(props) {
           headers: Header
         })
           .then(res => {
+            console.warn(res.data)
             SET_TOKEN(res.data.token)
             dispatch(login(res.data))
 
@@ -567,13 +570,13 @@ function LoginScreen(props) {
         // Toast.show({ text: res.data.message }, 3000)
       })
       .catch(function (error) {
-        console.error(error.response)
-        // Toast.show({
-        //   type: "error",
-        //   text1: error.response.data.email[0],
-        //   position: "bottom",
-        //   visibilityTime: 3000
-        // })
+        Toast.show({
+          type: "error",
+          text1: "Error signing up",
+          text2: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
         setLoading(false)
       })
       .finally(() => {

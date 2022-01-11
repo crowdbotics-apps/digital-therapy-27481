@@ -75,7 +75,12 @@ class SplashScreen extends Component {
           >
             <TouchableOpacity
               onPress={() => {
-                this.props.navigation.replace("LoginScreen")
+                if (!this.state.submitting) {
+                  this.setState({ submitting: true })
+                  setTimeout(() => {
+                    this.props.navigation.replace("LoginScreen")
+                  }, 1000)
+                }
               }}
               info
               style={[MainStyle.button, { width: "80%" }]}

@@ -1,9 +1,10 @@
 #import "AppDelegate.h"
-
+#import "RNPaypal.h"
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 @import Firebase;
+#import <OneSignal/OneSignal.h>
 #import <RNGoogleSignin/RNGoogleSignin.h>
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
@@ -29,6 +30,19 @@ static void InitializeFlipper(UIApplication *application) {
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   [FIRApp configure];
+  [[RNPaypal sharedInstance] configure];
+  // Remove this method to stop OneSignal Debugging
+    [OneSignal setLogLevel:ONE_S_LL_VERBOSE visualLevel:ONE_S_LL_NONE];
+    
+    // OneSignal initialization
+    [OneSignal initWithLaunchOptions:launchOptions];
+    [OneSignal setAppId:@"8423fa99-5ce7-4aa6-97ba-f9b3435c159e"];
+
+    // promptForPushNotifications will show the native iOS notification permission prompt.
+    // We recommend removing the following code and instead using an In-App Message to prompt for notification permission (See step 8)
+    [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
+      NSLog(@"User accepted notifications: %d", accepted);
+    }];
   
 #ifdef FB_SONARKIT_ENABLED
   InitializeFlipper(application);
@@ -62,7 +76,7 @@ static void InitializeFlipper(UIApplication *application) {
 #endif
 }
 - (BOOL)application:(UIApplication *)application openURL:(nonnull NSURL *)url options:(nonnull NSDictionary<NSString *,id> *)options {
-  return [RNGoogleSignin application:application openURL:url options:options];
+  return [RNGoogleSignin application:application openURL:url options:options] || [[RNPaypal sharedInstance] application:application openURL:url options:options];
 }
 
 @end

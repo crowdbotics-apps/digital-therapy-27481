@@ -48,6 +48,7 @@ class VideoView extends Component {
         style={styles.container}
       >
         <Video
+          ref={component => (this._video = component)}
           resizeMode={Platform.OS == "ios" ? "stretch" : "cover"}
           style={{ width: "100%", flex: 1 }}
           source={{ uri: this.props.route.params.data.uri }}
@@ -112,7 +113,9 @@ class VideoView extends Component {
                   }
                 ]}
                 onPress={() => {
-                  this.setState({ paused: !this.state.paused })
+                  this._video && this._video.seek(0)
+                  this.setState({ paused: false })
+                  // this.setState({ paused: !this.state.paused })
                 }}
               >
                 <Icon name="play" size={45} color="white" style={{}} />

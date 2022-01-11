@@ -68,7 +68,6 @@ class CameraView extends Component {
     this.fullsreenClip = this.fullsreenClip.bind(this)
     this.popVideoClip = this.popVideoClip.bind(this)
     this.submitVideo = this.submitVideo.bind(this)
-    this.submitPicture = this.submitPicture.bind(this)
     this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
   }
   async componentWillMount() {
@@ -129,7 +128,6 @@ class CameraView extends Component {
   //   )
   // }
   handleBackButtonClick() {
-    console.warn("dsafasd")
     // this.props.navigation.goBack()
     // return true
   }
@@ -350,21 +348,21 @@ class CameraView extends Component {
           props: {} // any custom props passed to the Toast component
         })
 
-        this.props.navigation.popToTop()
+        this.props.navigation.replace("SentVideos")
       } else {
-        Toast.show({
-          type: "error",
-          position: "bottom",
-          text1: "Error while uploading video",
-          visibilityTime: 4000,
-          autoHide: true,
-          topOffset: 30,
-          bottomOffset: 40,
-          onShow: () => {},
-          onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
-          onPress: () => {},
-          props: {} // any custom props passed to the Toast component
-        })
+        // Toast.show({
+        //   type: "error",
+        //   position: "bottom",
+        //   text1: "Error while uploading video",
+        //   visibilityTime: 4000,
+        //   autoHide: true,
+        //   topOffset: 30,
+        //   bottomOffset: 40,
+        //   onShow: () => {},
+        //   onHide: () => {}, // called when Toast hides (if `autoHide` was set to `true`)
+        //   onPress: () => {},
+        //   props: {} // any custom props passed to the Toast component
+        // })
       }
     } else if (self.mcManager != null && self.mcManager.getClips().length > 0) {
       var count = 0
@@ -411,9 +409,35 @@ class CameraView extends Component {
       data: { category: categoryValue, person_to: personValue, topic: topic }
     })
       .then(res => {
+        console.warn(res)
         return res
       })
       .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        return false
+      })
+      .finally(() => {})
+  }
+  async editConversation(id) {
+    const { categoryValue, personValue, topic } = this.props.route.params.data
+    return axios({
+      method: "PATCH",
+      url: BaseURL.concat("/conversation/conversation/" + id + "/"),
+      headers: await GET_HEADER(),
+      data: { category: categoryValue, person_to: personValue, topic: topic }
+    })
+      .then(res => {
+        console.warn(res)
+        return res
+      })
+      .catch(function (error) {
+        console.warn(error.response)
         Toast.show({
           type: "error",
           text1: error.response.data.non_field_errors[0],
@@ -440,11 +464,10 @@ class CameraView extends Component {
     //   "" + self.props.addListingReducer.addedListingID
     // )
     formData.append("conversation", data.id) // conversation id
-    formData.append("argument", self.props.route.params.data.argument)
+    // formData.append("argument", self.props.route.params.data.argument)
 
     axios.defaults.timeout = 300000
     const filename = Date.now().toString()
-
     axios({
       method: "post",
       url: BaseURL.concat("/conversation/items/"),
@@ -483,13 +506,11 @@ class CameraView extends Component {
         console.warn(error.response)
         self.setState({ videoSubmitting: false, videoSubmitted: false })
       })
+      .finally(() => {
+        self.setState({ videoSubmitting: false, videoSubmitted: false })
+      })
   }
 
-  submitPicture(caption) {
-    if (this.state.picture) {
-      //@TODO submit to backend & navigate
-    }
-  }
   renderCamera() {
     if (this.state.cameraOn) {
       if (Platform.OS === "android") {
