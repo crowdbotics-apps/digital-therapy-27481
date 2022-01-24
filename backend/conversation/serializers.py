@@ -37,7 +37,9 @@ class ItemSerializer(serializers.ModelSerializer):
             instance.save()
 
         # send notification if status is confirmed or not_confirmed
-        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name, ItemStatusEnum.not_confirmed.value,ItemStatusEnum.not_confirmed.name] and recipient is not None:
+        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name,
+                                            ItemStatusEnum.not_confirmed.value,
+                                            ItemStatusEnum.not_confirmed.name] and recipient is not None:
             status = validated_data.get('status', '').replace('_', ' ').capitalize()
             notification = Notification.objects.create(
                 title=f'{status} your video',
@@ -68,6 +70,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
         speaker = person_from
         listener = person_to
+        _status = 'sent'
         if last_item:
             speaker = last_item.speaker
             listener = last_item.listener
@@ -75,6 +78,7 @@ class ItemSerializer(serializers.ModelSerializer):
             # update last item status to replied
             if last_item.status in [ItemStatusEnum.sent.name, ItemStatusEnum.sent.value]:
                 last_item.status = ItemStatusEnum.replied.value
+                _status = 'explained'
                 last_item.save()
 
             # update last item, if it was not confirmed
@@ -96,8 +100,8 @@ class ItemSerializer(serializers.ModelSerializer):
                 **validated_data
             )
         notification = Notification.objects.create(
-            title='Sent Video',
-            description=f'{user.first_name or user.last_name or user.username} sent a video!',
+            title=f'{_status} Video',
+            description=f'{user.first_name or user.last_name or user.username} {_status} a video!',
             recipient=receipient,
             sender=user,
             level='sent'
