@@ -101,7 +101,7 @@ class UserViewSet(ModelViewSet):
             if hasattr(self.request.user, 'contacts'):
                 friends = [i.id for i in self.request.user.contacts.friends.all()]
 
-            return User.objects.filter(id__in=friends)
+            return User.objects.exclude(id=self.request.user.id).filter(id__in=friends)
         return User.objects.all()
 
     def get_serializer_context(self):
