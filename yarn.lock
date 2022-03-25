@@ -6991,6 +6991,11 @@ react-native-storage@^1.0.1:
     opencollective "^1.0.3"
     opencollective-postinstall "^2.0.2"
 
+react-native-system-navigation-bar@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/react-native-system-navigation-bar/-/react-native-system-navigation-bar-1.0.2.tgz#c930eeb8f56429e8843e4c4f3ac23bbd57745b55"
+  integrity sha512-qaqJlQLksBF1Q+OJB0gMeAql8iXHGpeG/VNcGTRFt7W4M0iY35au5GHSntbpxm/7/OagfVf4WU3ppGEK7MvbZg==
+
 react-native-text-input-mask@^3.1.4:
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/react-native-text-input-mask/-/react-native-text-input-mask-3.1.4.tgz#9b09d97a910ce8c24024d6187256b07c73e173ac"

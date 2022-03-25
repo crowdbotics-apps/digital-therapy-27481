@@ -74,7 +74,16 @@ const ForgotScreen = ({ navigation }) => {
           style={styles.signInTextBackground}
           onPress={() => {
             if (!loading) {
-              sendOTP()
+              if (email != "") {
+                sendOTP()
+              } else {
+                Toast.show({
+                  type: "error",
+                  text1: "Enter email address",
+                  position: "bottom",
+                  visibilityTime: 3000
+                })
+              }
             }
           }}
         >

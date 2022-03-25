@@ -108,6 +108,7 @@ function SendFeedback(props) {
               onChangeText={text => {
                 setFeedback(text)
               }}
+              blurOnSubmit
               placeholderTextColor={Theme.PlaceHolderTextColor}
             />
           </View>

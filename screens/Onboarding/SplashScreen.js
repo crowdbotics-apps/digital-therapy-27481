@@ -79,7 +79,7 @@ class SplashScreen extends Component {
                   this.setState({ submitting: true })
                   setTimeout(() => {
                     this.props.navigation.replace("LoginScreen")
-                  }, 1000)
+                  }, 2000)
                 }
               }}
               info

@@ -5,7 +5,8 @@ import {
   TextInput,
   StyleSheet,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from "react-native"
 import Theme from "../../Styles/Theme"
 import Icon from "react-native-vector-icons/MaterialIcons"
@@ -20,6 +21,7 @@ const RecoverPassword = props => {
   console.warn(props.route.params.email)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <HeaderWhite
@@ -77,15 +79,21 @@ const RecoverPassword = props => {
         <TouchableOpacity
           style={styles.signInTextBackground}
           onPress={() => {
-            if (checkValidation()) {
-              recoverPassword()
+            if (!loading) {
+              if (checkValidation()) {
+                recoverPassword()
+              }
             }
           }}
         >
-          <Text style={styles.signInColorTextBackground}>
-            {" "}
-            {strings.changePassword}{" "}
-          </Text>
+          {loading ? (
+            <ActivityIndicator size={"small"} color={"white"} />
+          ) : (
+            <Text style={styles.signInColorTextBackground}>
+              {" "}
+              {strings.changePassword}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -119,6 +127,7 @@ const RecoverPassword = props => {
     return true
   }
   async function recoverPassword() {
+    setLoading(true)
     axios({
       method: "post",
       url: BaseURL.concat("/user/password_reset_confirm/"),
@@ -131,6 +140,8 @@ const RecoverPassword = props => {
       }
     })
       .then(res => {
+        setLoading(false)
+
         console.warn(res)
         Toast.show({
           type: "success",
@@ -142,6 +153,8 @@ const RecoverPassword = props => {
         // Toast.show({ text: res.data.message }, 3000)
       })
       .catch(function (error) {
+        setLoading(false)
+
         console.warn(error.response)
         Toast.show({
           type: "error",
@@ -150,7 +163,9 @@ const RecoverPassword = props => {
           visibilityTime: 3000
         })
       })
-      .finally(() => {})
+      .finally(() => {
+        setLoading(false)
+      })
   }
 }
 

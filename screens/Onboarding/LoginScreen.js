@@ -84,7 +84,7 @@ function LoginScreen(props) {
   const [loading, setLoading] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [googleSignedIn, setGoogleSignIn] = useState(false)
-  const [checkingLoggedIn, setCheckingLoggedIn] = useState(false)
+  const [checkingLoggedIn, setCheckingLoggedIn] = useState(true)
   const [submittingGoogle, setSubmittingGoogle] = useState(false)
   const [submittingFacebook, setSubmittingFacebook] = useState(false)
   const [submittingApple, setSubmittingApple] = useState(false)

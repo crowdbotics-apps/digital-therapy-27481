@@ -67,10 +67,12 @@ const YourApp = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView style={{ flex: 1 }}>
-        <ScreenNavigation />
-      </SafeAreaView>
+      {/* <SafeAreaView style={{ flex: 1 }}> */}
+      <View style={styles.StatusBar}>
+        <StatusBar barStyle="dark-content" backgroundColor="#000" />
+      </View>
+      <ScreenNavigation />
+      {/* </SafeAreaView> */}
       <Toast ref={ref => Toast.setRef(ref)} />
     </View>
   )
@@ -84,6 +86,10 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20
+  },
+  StatusBar: {
+    height: 50,
+    backgroundColor: "white"
   }
 })
 

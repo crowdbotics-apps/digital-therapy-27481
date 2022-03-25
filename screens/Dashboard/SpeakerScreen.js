@@ -29,7 +29,6 @@ import { useSelector } from "react-redux"
 import axios from "axios"
 import { BaseURL, GET_HEADER } from "../../Connection"
 import Toast from "react-native-toast-message"
-import { cos } from "react-native-reanimated"
 // edited
 function speakerScreen(props) {
   const [receivedVideos, setReceivedVideos] = useState([1, 2, 3, 4, 5])
@@ -82,7 +81,9 @@ function speakerScreen(props) {
           <View style={{ flex: 3 }}>
             <Text style={{ fontSize: 16 }}>Waiting</Text>
             <Text style={{ color: Theme.GRAY }}>
-              Waiting for {firstItem.listener.first_name} to reply
+              In the meantime remember while this conversation may be old to
+              you, It may be new to them. Try to be patient.
+              {/* Waiting for {firstItem.listener.first_name} to reply */}
             </Text>
           </View>
         </View>
@@ -114,9 +115,11 @@ function speakerScreen(props) {
           }}
         >
           <View style={{ flex: 3 }}>
-            <Text style={{ fontSize: 16 }}>Explain</Text>
+            <Text style={{ fontSize: 16 }}>Show understanding</Text>
             <Text style={{ color: Theme.GRAY }}>
-              Explain what you heard in your own words
+              Explain what you heard in your own words. Remember this is not
+              agreement or disagreement. Its simply to show understanding. If
+              you aren't sure. Ask questions.
               {/* Explain what you heard in your own words */}
             </Text>
           </View>
@@ -197,8 +200,10 @@ function speakerScreen(props) {
             <View style={{ flex: 3 }}>
               <Text style={{ fontSize: 16 }}>Confirm</Text>
               <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
-                Confirm {firstItem.listener.first_name}'s rephrasing (this is
-                what I said)
+                Great job expressing the issue. Now that there is an
+                understanding we can work towards getting this resolved.
+                {/* Confirm {firstItem.listener.first_name}'s rephrasing (this is
+                what I said) */}
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -257,9 +262,11 @@ function speakerScreen(props) {
             <View style={{ flex: 3 }}>
               <Text style={{ fontSize: 16 }}>Not confirmed</Text>
               <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
-                Respond to {firstItem.listener.first_name}'s explanation as not
-                confirmed(this is not what I said)
-                {/* Explain what you heard in your own words */}
+                Lets help Jane get a clearer understanding. What do you believe
+                they missed? How do you think we can get them from where they
+                are now to a better understanding?
+                {/* Respond to {firstItem.listener.first_name}'s explanation as not
+                confirmed(this is not what I said) */}
               </Text>
             </View>
             <View style={{ flex: 1 }}>
@@ -325,10 +332,13 @@ function speakerScreen(props) {
           }}
         >
           <View style={{ flex: 3 }}>
-            <Text style={{ fontSize: 16 }}>Explanation sent</Text>
+            <Text style={{ fontSize: 16 }}>Understanding sent</Text>
             <Text style={{ color: Theme.GRAY }}>
-              Waiting for {firstItem.speaker.first_name} to respond
-              {/* Explain what you heard in your own words */}
+              Great! Listening is not easy and is critical to the success of any
+              relationship.
+              {/* Waiting - In the meantime remember while this conversation may be
+              old to you, It may be new to them. Try to be patient. */}
+              {/* Waiting for {firstItem.speaker.first_name} to respond */}
             </Text>
           </View>
           <View style={{ flex: 1 }}>
@@ -407,10 +417,11 @@ function speakerScreen(props) {
         >
           <View style={{ flex: 3 }}>
             <Text style={{ fontSize: 14 }}>
-              Bring your opinion now into the conversation
+              Bring your view into the conversation
+              {/* Bring your opinion now into the conversation */}
             </Text>
             <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
-              Start speaking in a speaker role and bring your opinion
+              Start speaking in a speaker role and bring your view
             </Text>
           </View>
           <View style={{ flex: 1 }}>
@@ -491,8 +502,10 @@ function speakerScreen(props) {
               {firstItem.speaker.first_name} responded{" "}
             </Text>
             <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
-              {firstItem.speaker.first_name} doesn’t confirm that you rephrased
-              his video in the right way as he intended to say{" "}
+              We think there still maybe some misunderstanding. We tried to
+              expound on the information given.
+              {/* {firstItem.speaker.first_name} doesn’t confirm that you rephrased
+              his video in the right way as he intended to say{" "} */}
             </Text>
           </View>
           <View style={{ flex: 1 }}>
@@ -574,7 +587,9 @@ function speakerScreen(props) {
           <View style={{ flex: 3 }}>
             <Text style={{ fontSize: 16 }}>Waiting</Text>
             <Text style={{ color: Theme.GRAY }}>
-              Waiting for {firstItem.listener.first_name} to reply
+              In the meantime remember while this conversation may be old to
+              you, It may be new to them. Try to be patient.
+              {/* Waiting for {firstItem.listener.first_name} to reply */}
             </Text>
           </View>
         </View>
@@ -607,9 +622,11 @@ function speakerScreen(props) {
           }}
         >
           <View style={{ flex: 3 }}>
-            <Text style={{ fontSize: 16 }}>Explain</Text>
+            <Text style={{ fontSize: 16 }}>Show understanding</Text>
             <Text style={{ color: Theme.GRAY }}>
-              Explain what you heard in your own words
+              Explain what you heard in your own words. Remember this is not
+              agreement or disagreement. Its simply to show understanding. If
+              you aren't sure. Ask questions.
               {/* Explain what you heard in your own words */}
             </Text>
           </View>
@@ -983,6 +1000,7 @@ function speakerScreen(props) {
             width: "100%",
             paddingHorizontal: 15,
             alignSelf: "center"
+            // flexDirection: "row"
           }}
         >
           <View
@@ -997,10 +1015,12 @@ function speakerScreen(props) {
               shadowColor: "black",
               shadowRadius: 3,
               shadowOffset: { x: 3, y: 3 },
-              shadowOpacity: 0.2
+              shadowOpacity: 0.2,
+              // backgroundColor: "red",
+              flexDirection: "row"
             }}
           >
-            <View>
+            <View style={{ justifyContent: "space-between" }}>
               <View style={{ flexDirection: "row" }}>
                 <Text style={{ fontSize: 16 }}>Category:</Text>
                 <Text style={{ fontSize: 16 }}>
@@ -1008,13 +1028,22 @@ function speakerScreen(props) {
                 </Text>
               </View>
               <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
-                {moment(conversation.conversation.created_at).format(
-                  "d MMMM, yyyy H:mma"
-                )}
+                {/* {moment("2022-01-24T11:31:45.150079").format(
+                  "DD MMMM, yyyy H:mma"
+                )} */}
+                {moment(
+                  convertUTCDateToLocalDate(
+                    conversation.conversation.created_at
+                  )
+                ).format("DD MMMM, yyyy hh:mma")}
+              </Text>
+              <Text style={{ color: Theme.THEME_COLOR, fontSize: 16 }}>
+                {conversation.conversation.topic}
               </Text>
             </View>
-            <Text style={{ color: Theme.THEME_COLOR, fontSize: 16 }}>
-              {conversation.conversation.topic}
+
+            <Text style={{ fontSize: 9, color: "black" }}>
+              Video expires in 3h
             </Text>
           </View>
           <View style={{ flex: 0.7 }}>
@@ -1027,6 +1056,13 @@ function speakerScreen(props) {
       </View>
     </ScrollView>
   )
+  function convertUTCDateToLocalDate(date) {
+    var dateFormat = "DD MMMM, yyyy H:mma"
+    var testDateUtc = moment.utc(date)
+    var localDate = testDateUtc.local()
+
+    return localDate
+  }
 }
 
 const styles = StyleSheet.create({

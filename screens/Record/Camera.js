@@ -350,6 +350,7 @@ class CameraView extends Component {
 
         this.props.navigation.replace("SentVideos")
       } else {
+        console.warn("error while uploading the video")
         // Toast.show({
         //   type: "error",
         //   position: "bottom",
@@ -659,6 +660,7 @@ class CameraView extends Component {
             ref={ref => {
               this.captureButton = ref
             }}
+            
             onTimerEnd={this.stopRecording.bind(this)}
             onLongPressOut={this.stopRecording.bind(this)}
             onLongPressIn={this.startRecording.bind(this)}
@@ -764,9 +766,21 @@ class CameraView extends Component {
   }
   render() {
     if (this.state.videoSubmitted) {
+      Toast.show({
+        text1: "Video has been sent successfully",
+        visibilityTime: 3000,
+        position: "bottom",
+        type: "success"
+      })
+
       setTimeout(() => {
         this.setState({ videoSubmitted: false })
-        this.props.navigation.popToTop()
+        // this.props.navigation.popToTop()
+        if (this.props.route.params.data.categoryValue == "self") {
+          this.props.navigation.replace("SelfVideos")
+        } else {
+          this.props.navigation.replace("SentVideos")
+        }
       }, 3000)
       return (
         <Modal transparent visible={this.state.videoSubmitted}>

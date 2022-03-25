@@ -5,7 +5,8 @@ import {
   TextInput,
   StyleSheet,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from "react-native"
 import OTPInputView from "@twotalltotems/react-native-otp-input"
 import Theme from "../../Styles/Theme"
@@ -19,12 +20,16 @@ import {
   androidConfig,
   SET_TOKEN,
   GET_TOKEN,
-  GET_HEADER
+  GET_HEADER,
+  url
 } from "../../Connection/index"
 import HeaderWhite from "../../Component/HeaderWhite"
 
 const OTPScreen = props => {
   const [code, setCode] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [email, setEmail] = useState("")
   console.warn(props.route.params.email)
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -51,6 +56,7 @@ const OTPScreen = props => {
           onCodeChanged={code => {
             setCode(code)
           }}
+          autoFocusOnLoad={false}
         />
       </View>
 
@@ -71,13 +77,56 @@ const OTPScreen = props => {
         <Text style={styles.continueTextColor}> {strings.continue} </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => props.navigation.navigate("ForgotScreen")}
-      >
-        <Text style={styles.resendCodeStyling}>{strings.resendCode}</Text>
-      </TouchableOpacity>
+      {loading ? (
+        <ActivityIndicator size={"small"} color={Theme.THEME_COLOR} />
+      ) : (
+        <TouchableOpacity
+          onPress={() => {
+            if (!loading) {
+              sendOTP()
+            }
+          }}
+        >
+          <Text style={styles.resendCodeStyling}>{strings.resendCode}</Text>
+        </TouchableOpacity>
+      )}
     </View>
   )
+  async function sendOTP() {
+    setLoading(true)
+    axios({
+      method: "post",
+      url: url.concat("/rest-auth/password/reset/"),
+      headers: await GET_HEADER(),
+      data: {
+        email: props.route.params.email
+      }
+    })
+      .then(res => {
+        Toast.show({
+          type: "success",
+          text1: res.data.detail,
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        // Toast.show({ text: res.data.message }, 3000)
+      })
+      .catch(function (error) {
+        console.warn(error.response)
+        Toast.show({
+          type: "error",
+          text1: error.response.data.non_field_errors[0],
+          position: "bottom",
+          visibilityTime: 3000
+        })
+        setLoading(false)
+      })
+      .finally(() => {
+        setLoading(false)
+
+        setSubmitting(false)
+      })
+  }
   async function VerifyOtp() {
     axios({
       method: "POST",

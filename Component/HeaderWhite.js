@@ -32,29 +32,24 @@ export default class HeaderWhite extends Component {
               height: 50,
               marginLeft: 15,
               justifyContent: "center",
-              alignItems: "center"
+              alignItems: "center",
+              zIndex: 99
             }}
             onPress={this.props.onPress}
           >
             {this.props.icon ? (
               this.props.icon
             ) : (
-              <View
-                onPress={() => {
-                  console.warn("on")
+              <Image
+                resizeMode={"contain"}
+                style={{
+                  width: 22,
+                  height: 22,
+                  tintColor: Theme.THEME_COLOR
                 }}
-              >
-                <Image
-                  resizeMode={"contain"}
-                  style={{
-                    width: 22,
-                    height: 22,
-                    tintColor: Theme.THEME_COLOR
-                  }}
-                  tintColor={Theme.THEME_COLOR}
-                  source={require("../assets/nav_back.png")}
-                />
-              </View>
+                tintColor={Theme.THEME_COLOR}
+                source={require("../assets/nav_back.png")}
+              />
             )}
           </TouchableOpacity>
         )}

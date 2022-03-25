@@ -1,1 +1,1 @@
-export const duration = 90000
+export const duration = 9990000

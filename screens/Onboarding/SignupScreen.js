@@ -68,8 +68,8 @@ function SignupScreen(props) {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: Theme.THEME_WHITE }}
-      behavior="position"
-      keyboardVerticalOffset={-100}
+      behavior="padding"
+      // keyboardVerticalOffset={100}
     >
       <ScrollView>
         <View

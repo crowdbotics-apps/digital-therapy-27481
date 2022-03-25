@@ -204,12 +204,11 @@ function SentVideos(props) {
     )
   }
   function convertUTCDateToLocalDate(date) {
-    var dateLocal = new Date(date)
-    var newDate = new Date(
-      dateLocal.getTime() - dateLocal.getTimezoneOffset() * 60 * 1000
-    )
-    console.warn(newDate)
-    // return newDate
+    var dateFormat = "DD MMMM, yyyy H:mma"
+    var testDateUtc = moment.utc(date)
+    var localDate = testDateUtc.local()
+
+    return localDate
   }
   return (
     // <ScrollView

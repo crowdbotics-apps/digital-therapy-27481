@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">digital_therapy_27481</string>
+    <string name="app_name">Speak listen resolve </string>
+    <string name="facebook_app_id">467358747803961</string>
+    <string name="facebook_client_token">e92abf0ef0aea0b1d9358cfef4e7e6ac</string>
 </resources>

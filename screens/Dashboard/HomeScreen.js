@@ -1135,6 +1135,7 @@ function HomeScreen(props) {
     </ScrollView>
   )
   async function editConversation(id) {
+    var self = this
     return axios({
       method: "PATCH",
       url: BaseURL.concat("/conversation/conversation/" + id + "/"),
@@ -1142,6 +1143,7 @@ function HomeScreen(props) {
       data: { category: categoryValue, person_to: personValue, topic: topic }
     })
       .then(res => {
+        console.warn("res")
         var item = persons.filter(item => {
           return item.id == personValue
         })
@@ -1151,9 +1153,10 @@ function HomeScreen(props) {
           position: "bottom",
           visibilityTime: 3000
         })
-        this.props.navigation.replace("SentVideos")
+        props.navigation.replace("SentVideos")
       })
       .catch(function (error) {
+        console.warn(error)
         console.warn(error.response)
         Toast.show({
           type: "error",

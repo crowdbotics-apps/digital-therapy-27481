@@ -14,8 +14,11 @@ import { hooks, slices, navigators, initialRoute } from "@modules"
 import { connectors } from "@store"
 import userReducer from "./features/user"
 import conversationReducer from "./features/conversation"
+import SystemNavigationBar from "react-native-system-navigation-bar"
 
 const Stack = createStackNavigator()
+SystemNavigationBar.fullScreen(true)
+SystemNavigationBar.navigationHide()
 const getNavigation = (modules, screens, initialRoute) => {
   const Navigation = () => {
     const routes = modules.concat(screens).map(([name, navigator]) => {

@@ -33,7 +33,7 @@ let strings = new LocalizedStrings({
     password: "Password",
     newCust: "Don't have an account?",
     createAccount: "Sign Up",
-    forgotPassword: "Forgot your password?",
+    forgotPassword: "Forgot password?",
     alreadyHave: "Already have an account?",
     loginHere: "Login Here",
     name: "Name",
