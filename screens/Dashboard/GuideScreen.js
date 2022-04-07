@@ -115,33 +115,83 @@ export class GuideScreen extends React.Component {
               style={{
                 fontSize: 14,
                 textAlignVertical: "top",
+                textAlign: "center",
+                fontWeight: "bold",
+                lineHeight: 50
+              }}
+            >
+              Welcome to Speak Listen Resolve {"\n"} Speak Listen Resolve app is
+              a tool to help people communicate without arguing. {"\n"} Below is
+              a brief guide for the roles
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 20
+              }}
+            >
+              Rules for the Speaker
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
                 textAlign: "center"
               }}
             >
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas
-              facilisis vehicula nisl in condimentum. Nullam ante diam, aliquam
-              sit amet convallis vel, lacinia quis lorem. Suspendisse enim est,
-              iaculis eget interdum id, accumsan quis est. Sed eu efficitur dui.
-              Aenean dictum faucibus diam eget ultrices. Suspendisse elementum
-              tortor ornare, placerat sapien ac, elementum quam. Proin
-              tincidunt, turpis vitae placerat ornare, elit nunc malesuada diam,
-              eu facilisis odio lacus id quam. Proin a magna fringilla, auctor
-              eros eget, pharetra velit. In hac habitasse platea dictumst.
-              Vestibulum sollicitudin purus in libero dignissim semper. Aliquam
-              eleifend, nunc id egestas aliquam, elit sapien sodales urna, sit
-              amet vehicula turpis sapien vel elit. Donec at Lorem ipsum dolor
-              sit amet, consectetur adipiscing elit. Maecenas facilisis vehicula
-              nisl in condimentum. Nullam ante diam, aliquam sit amet convallis
-              vel, lacinia quis lorem. Suspendisse enim est, iaculis eget
-              interdum id, accumsan quis est. Sed eu efficitur dui. Aenean
-              dictum faucibus diam eget ultrices. Suspendisse elementum tortor
-              ornare, placerat sapien ac, elementum quam. Proin tincidunt,
-              turpis vitae placerat ornare, elit nunc malesuada diam, eu
-              facilisis odio lacus id quam. Proin a magna fringilla, auctor eros
-              eget, pharetra velit. In hac habitasse platea dictumst. Vestibulum
-              sollicitudin purus in libero dignissim semper. Aliquam eleifend,
-              nunc id egestas aliquam, elit sapien sodales urna, sit amet
-              vehicula turpis sapien vel elit. Donec at placerat
+              – Speak for yourself and about how you felt.{"\n"}– Don’t mind
+              read! Don't tell them how they feel or what they think.{"\n"}–
+              Keep statements brief (3-5 min). Don’t go on and on.{"\n"}– Focus
+              on how you felt about the situation or act.
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 20
+              }}
+            >
+              Rules for the Listener
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
+                textAlign: "center"
+              }}
+            >
+              – Paraphrase what you hear.{"\n"}– Focus on the speaker’s message.
+              Don’t rebut.{"\n"}– Focus on how they felt about the situation or
+              act.{"\n"}– This is not agreement. It is only to let them know you
+              heard them.
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
+                textAlign: "center",
+                fontWeight: "bold",
+                marginTop: 20
+              }}
+            >
+              Rules for Both
+            </Text>
+            <Text
+              style={{
+                fontSize: 14,
+                textAlignVertical: "top",
+                textAlign: "center"
+              }}
+            >
+              – The speaker has the floor.{"\n"}– Speaker keeps the floor while
+              the listener paraphrases.{"\n"}– Once the Speaker acknowledges the
+              Listeners paraphrasing the roles will swap.{"\n"}– Remember you
+              are a team!
             </Text>
           </View>
         </View>
