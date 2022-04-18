@@ -30,7 +30,8 @@ class ItemSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         instance = update_object(instance, validated_data)
         user = self.context.get('request').user
-        recipient = instance.speaker if instance.speaker is not user else instance.listener
+        recipient = instance.speaker if instance.speaker.id is not user.id else instance.listener
+
         if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name]:
             # swap listener / speaker
             instance.speaker, instance.listener = instance.listener, instance.speaker
