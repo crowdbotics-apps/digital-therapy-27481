@@ -32,11 +32,6 @@ class ItemSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         recipient = instance.speaker if instance.speaker.id is not user.id else instance.listener
 
-        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name]:
-            # swap listener / speaker
-            instance.speaker, instance.listener = instance.listener, instance.speaker
-            instance.save()
-
         # send notification if status is confirmed or not_confirmed
         if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name,
                                             ItemStatusEnum.not_confirmed.value,
@@ -51,7 +46,10 @@ class ItemSerializer(serializers.ModelSerializer):
             )
             notification.save()
             notification_saved.send(sender=Notification, notification=notification)
-
+        if validated_data.get('status') in [ItemStatusEnum.confirmed.value, ItemStatusEnum.confirmed.name]:
+            # swap listener / speaker
+            instance.speaker, instance.listener = instance.listener, instance.speaker
+            instance.save()
         return instance
 
     def create(self, validated_data):
