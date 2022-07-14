@@ -347,8 +347,14 @@ class CameraView extends Component {
           onPress: () => {},
           props: {} // any custom props passed to the Toast component
         })
-
+        // if (this.props?.route?.params?.update) {
+        //   this.updateItem(
+        //     this.props?.route?.params?.data?.itemId,
+        //     this.props?.route?.params?.data?.status
+        //   )
+        // } else {
         this.props.navigation.replace("SentVideos")
+        // }
       } else {
         console.warn("error while uploading the video")
         // Toast.show({
@@ -401,6 +407,7 @@ class CameraView extends Component {
       }
     }
   }
+
   async createConversation() {
     const { categoryValue, personValue, topic } = this.props.route.params.data
     return axios({
@@ -424,6 +431,31 @@ class CameraView extends Component {
         return false
       })
       .finally(() => {})
+  }
+  async updateItem(id, status) {
+    console.warn(id + 1)
+    console.warn(status)
+    // var id = parseInt(id) + 1
+    console.warn(id)
+    axios({
+      method: "PATCH",
+      headers: await GET_HEADER(),
+      url: BaseURL.concat("/conversation/items/" + id + "/"),
+      data: { status: status }
+    })
+      .then(res => {
+        console.warn(res)
+        this.props.navigation.goBack()
+      })
+      .catch(ex => {
+        console.warn(ex.response)
+        Toast.show({
+          type: "error",
+          text1: "Something went wrong ",
+          position: "bottom",
+          visibilityTime: 3000
+        })
+      })
   }
   async editConversation(id) {
     const { categoryValue, personValue, topic } = this.props.route.params.data
@@ -459,57 +491,106 @@ class CameraView extends Component {
     })
 
     const formData = new FormData()
-    formData.append("video", file)
-    // formData.append(
-    //   "listing_id",
-    //   "" + self.props.addListingReducer.addedListingID
-    // )
-    formData.append("conversation", data.id) // conversation id
-    // formData.append("argument", self.props.route.params.data.argument)
+    if (data?.updateItem) {
+      formData.append("status", data?.status)
 
-    axios.defaults.timeout = 300000
-    const filename = Date.now().toString()
-    axios({
-      method: "post",
-      url: BaseURL.concat("/conversation/items/"),
-      data: formData,
-      headers: await GET_HEADER(),
+      formData.append("video", file)
 
-      onUploadProgress: progressEvent => {
-        if (progressEvent.lengthComputable) {
-          console.log(progressEvent.loaded + " " + progressEvent.total)
-          var percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          )
+      console.warn(BaseURL.concat("/conversation/items/" + data?.id + "/"))
+      console.warn(formData)
+      axios({
+        method: "PATCH",
+        headers: await GET_HEADER(),
+        url: BaseURL.concat("/conversation/items/" + data?.id + "/"),
+        data: formData,
+        onUploadProgress: progressEvent => {
+          if (progressEvent.lengthComputable) {
+            console.log(progressEvent.loaded + " " + progressEvent.total)
+            var percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            )
 
-          self.updateProgressBarValue(
-            progressEvent,
-            count,
-            total,
-            percentCompleted
-          )
+            self.updateProgressBarValue(
+              progressEvent,
+              count,
+              total,
+              percentCompleted
+            )
+          }
         }
-      }
-    })
-      .then(response => {
-        console.warn(response)
-        // alert('Video Uploaded Successfully');
-        self.setState({
-          videoSubmitting: false,
-          videoSubmitted: true,
-          currentVideoCount: 0,
-          totalVideosCount: 0,
-          disableSubmit: false
+      })
+        .then(response => {
+          console.warn(response)
+          // alert('Video Uploaded Successfully');
+          self.setState({
+            videoSubmitting: false,
+            videoSubmitted: true,
+            currentVideoCount: 0,
+            totalVideosCount: 0,
+            disableSubmit: false
+          })
         })
-      })
 
-      .catch(error => {
-        console.warn(error.response)
-        self.setState({ videoSubmitting: false, videoSubmitted: false })
+        .catch(error => {
+          console.warn(error.response)
+          self.setState({ videoSubmitting: false, videoSubmitted: false })
+        })
+        .finally(() => {
+          self.setState({ videoSubmitting: false, videoSubmitted: false })
+        })
+    } else {
+      formData.append("video", file)
+      // formData.append(
+      //   "listing_id",
+      //   "" + self.props.addListingReducer.addedListingID
+      // )
+      formData.append("conversation", data.id) // conversation id
+      // formData.append("argument", self.props.route.params.data.argument)
+
+      axios.defaults.timeout = 300000
+      const filename = Date.now().toString()
+      axios({
+        method: "post",
+        url: BaseURL.concat("/conversation/items/"),
+        data: formData,
+        headers: await GET_HEADER(),
+
+        onUploadProgress: progressEvent => {
+          if (progressEvent.lengthComputable) {
+            console.log(progressEvent.loaded + " " + progressEvent.total)
+            var percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            )
+
+            self.updateProgressBarValue(
+              progressEvent,
+              count,
+              total,
+              percentCompleted
+            )
+          }
+        }
       })
-      .finally(() => {
-        self.setState({ videoSubmitting: false, videoSubmitted: false })
-      })
+        .then(response => {
+          console.warn(response)
+          // alert('Video Uploaded Successfully');
+          self.setState({
+            videoSubmitting: false,
+            videoSubmitted: true,
+            currentVideoCount: 0,
+            totalVideosCount: 0,
+            disableSubmit: false
+          })
+        })
+
+        .catch(error => {
+          console.warn(error.response)
+          self.setState({ videoSubmitting: false, videoSubmitted: false })
+        })
+        .finally(() => {
+          self.setState({ videoSubmitting: false, videoSubmitted: false })
+        })
+    }
   }
 
   renderCamera() {
@@ -660,7 +741,6 @@ class CameraView extends Component {
             ref={ref => {
               this.captureButton = ref
             }}
-            
             onTimerEnd={this.stopRecording.bind(this)}
             onLongPressOut={this.stopRecording.bind(this)}
             onLongPressIn={this.startRecording.bind(this)}
@@ -779,7 +859,14 @@ class CameraView extends Component {
         if (this.props.route.params.data.categoryValue == "self") {
           this.props.navigation.replace("SelfVideos")
         } else {
-          this.props.navigation.replace("SentVideos")
+          if (this.props?.route?.params?.update) {
+            this.updateItem(
+              this.props?.route?.params?.data?.itemId,
+              this.props?.route?.params?.data?.status
+            )
+          } else {
+            this.props.navigation.replace("SentVideos")
+          }
         }
       }, 3000)
       return (

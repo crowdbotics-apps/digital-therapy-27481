@@ -173,6 +173,132 @@ function speakerScreen(props) {
         </View>
       )
     }
+    //  testing
+    if (
+      user.id != firstItem.owner &&
+      conversation.items?.[0].status.toLowerCase() == "confirmed"
+    ) {
+      // you have confirmed the explanation
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderTopLeftRadius: 20,
+            borderBottomRightRadius: 20,
+            marginBottom: 20,
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Confirmed</Text>
+            <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+              You have confirmed the explanation.
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <Icon name="done" color={"white"} size={25} />
+              </View>
+            </View>
+          </View>
+        </View>
+      )
+    }
+    if (
+      user.id != firstItem.owner &&
+      conversation.items?.[0].status.toLowerCase() == "not_confirmed"
+    ) {
+      // you have not confirmed the explanation
+      return (
+        <View
+          style={{
+            minHeight: 80,
+            alignSelf: "center",
+            flexDirection: "row",
+            backgroundColor: "white",
+            padding: 10,
+            borderTopLeftRadius: 20,
+            borderBottomRightRadius: 20,
+            marginBottom: 20,
+            elevation: 1,
+            shadowColor: "black",
+            shadowRadius: 3,
+            shadowOffset: { x: 3, y: 3 },
+            shadowOpacity: 0.2
+          }}
+        >
+          <View style={{ flex: 3 }}>
+            <Text style={{ fontSize: 16 }}>Not Confirmed</Text>
+            <Text style={{ color: Theme.GRAY, fontSize: 12 }}>
+              You have not confirmed the explanation.
+            </Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <View
+              style={{
+                position: "absolute",
+                width: 60,
+                height: 60,
+                right: 15,
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 100,
+                  backgroundColor: Theme.THEME_COLOR,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  elevation: 20,
+                  shadowColor: "black",
+                  shadowRadius: 3,
+                  shadowOffset: { x: 3, y: 3 },
+                  shadowOpacity: 0.2
+                }}
+              >
+                <Icon name="close" color={"white"} size={25} />
+              </View>
+            </View>
+          </View>
+        </View>
+      )
+    }
+    //
     if (
       user.id != firstItem.owner &&
       conversation.items?.[1].status.toLowerCase() == "replied"
@@ -280,6 +406,53 @@ function speakerScreen(props) {
                   alignItems: "center"
                 }}
                 onPress={() => {
+                  props.navigation.navigate("Camera", {
+                    data: {
+                      createConversation: false,
+                      updateItem: true,
+                      id: firstItem.id,
+                      status: "not_confirmed"
+                    }
+                  })
+                }}
+              >
+                <View
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 100,
+                    backgroundColor: Theme.THEME_COLOR,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    elevation: 20,
+                    shadowColor: "black",
+                    shadowRadius: 3,
+                    shadowOffset: { x: 3, y: 3 },
+                    shadowOpacity: 0.2
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 25,
+                      height: 25,
+                      borderRadius: 100,
+                      backgroundColor: "white",
+                      justifyContent: "center",
+                      alignItems: "center"
+                    }}
+                  ></View>
+                </View>
+              </TouchableOpacity>
+              {/* <TouchableOpacity
+                style={{
+                  position: "absolute",
+                  width: 60,
+                  height: 60,
+                  right: 15,
+                  justifyContent: "center",
+                  alignItems: "center"
+                }}
+                onPress={() => {
                   updateItem(firstItem.id, "not_confirmed")
                 }}
               >
@@ -300,12 +473,13 @@ function speakerScreen(props) {
                 >
                   <Icon name="close" color={"white"} size={25} />
                 </View>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </View>
       )
     }
+
     if (
       user.id == firstItem.owner &&
       firstItem.status.toLowerCase() == "sent" &&
@@ -837,6 +1011,7 @@ function speakerScreen(props) {
           alignItems: "center",
           marginRight: -50,
           elevation: 2,
+          zIndex: 4,
           shadowColor: "black"
           // shadowRadius: 3,
           // shadowOffset: { x: 3, y: 3 },
@@ -907,7 +1082,7 @@ function speakerScreen(props) {
           flex: 1,
           alignItems: "center",
           //   backgroundColor: "blue",
-          marginLeft: conversation.items?.[0].status == "replied" ? -60 : -40
+          marginLeft: conversation.items?.[0].status == "replied" ? -60 : -60
         }}
       >
         <Text>{listener.first_name}</Text>
@@ -938,7 +1113,7 @@ function speakerScreen(props) {
             rounded
             size={
               conversation.items?.[0].status == "replied" || uri != ""
-                ? 100
+                ? 130
                 : 130
             }
           />

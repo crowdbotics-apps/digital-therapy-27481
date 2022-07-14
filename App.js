@@ -15,6 +15,7 @@ import { connectors } from "@store"
 import userReducer from "./features/user"
 import conversationReducer from "./features/conversation"
 import SystemNavigationBar from "react-native-system-navigation-bar"
+import { SafeAreaView } from "react-native-safe-area-context"
 
 const Stack = createStackNavigator()
 SystemNavigationBar.fullScreen(true)
@@ -82,7 +83,9 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <Navigation />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Navigation />
+      </SafeAreaView>
     </Provider>
   )
 }
